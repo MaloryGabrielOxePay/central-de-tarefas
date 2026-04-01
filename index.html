@@ -61,6 +61,7 @@ body.dark{
 
 /* ── Logo ── */
 .logo{padding:0 18px 18px;border-bottom:1px solid var(--border)}
+/* Plus Jakarta Sans para o logo — compacta, moderna, sem esticamento */
 .logo-title{
   font-family:'Plus Jakarta Sans',sans-serif;
   font-size:24px;font-weight:900;letter-spacing:-0.5px;line-height:1;
@@ -104,7 +105,9 @@ body.dark{
 }
 .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
 
+/* ── Page header ── */
 .page-header{margin-bottom:22px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+/* Mesmo Plus Jakarta Sans para o título de página */
 .page-title{
   font-family:'Plus Jakarta Sans',sans-serif;
   font-size:26px;font-weight:800;letter-spacing:-0.3px;line-height:1.15
@@ -119,6 +122,7 @@ body.dark{
 }
 .add-btn:hover{opacity:.88;transform:translateY(-1px)}
 
+/* ── Stats ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
 .stat-card{
   background:var(--card);border:1px solid var(--border);border-radius:12px;
@@ -131,6 +135,7 @@ body.dark{
 }
 .stat-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
 
+/* ── Filters ── */
 .filter-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .search-input{
   flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);
@@ -146,6 +151,7 @@ body.dark{
 .filter-chip:hover{border-color:var(--accent);color:var(--accent)}
 .filter-chip.active{background:rgba(124,106,247,.15);border-color:var(--accent);color:var(--accent);font-weight:700}
 
+/* ── Task cards ── */
 .task-list{display:flex;flex-direction:column;gap:8px}
 .task-card{
   background:var(--card);border:1px solid var(--border);border-radius:10px;
@@ -158,6 +164,7 @@ body.dark{
 .task-title.done{text-decoration:line-through;color:var(--muted)}
 .task-desc{color:var(--muted);font-size:11px;margin-top:2px}
 
+/* ── Priority badge ── */
 .priority-badge{
   display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
   padding:3px 8px;border-radius:6px;cursor:pointer;user-select:none;
@@ -200,6 +207,7 @@ body.dark{
 }
 .comment-toggle:hover{color:var(--accent)}
 
+/* ── Comments ── */
 .comments-area{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .comment-item{background:var(--surface);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--text);margin-bottom:5px}
 .comment-item small{color:var(--muted);display:block;margin-bottom:2px;font-size:10px}
@@ -211,6 +219,7 @@ body.dark{
 .comment-input:focus{border-color:var(--accent)}
 .comment-send{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:700}
 
+/* ── Priority picker ── */
 .priority-picker{
   position:absolute;right:0;top:28px;z-index:200;background:var(--card);
   border:1px solid var(--border);border-radius:12px;padding:12px;
@@ -227,6 +236,7 @@ body.dark{
 .prio-cell.selected{border-color:var(--accent);background:rgba(124,106,247,.15)}
 .prio-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted)}
 
+/* ── Modal ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:480px}
 .modal h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;margin-bottom:14px}
@@ -247,6 +257,7 @@ body.dark{
 .empty-icon{font-size:32px;margin-bottom:8px}
 .task-count{font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600}
 
+/* ── Mobile ── */
 .mobile-header{
   display:none;background:var(--surface);border-bottom:1px solid var(--border);
   padding:12px 16px;align-items:center;justify-content:space-between;
@@ -357,7 +368,7 @@ function App(){
     const txt=(cmtTxt[task.id]||'').trim();if(!txt)return;
     const updated=[...(task.comments||[]),{text:txt,date:new Date().toISOString()}];
     await mut(task.id,{comments:updated});
-    setCmtTxt(p=>({...p,[task.id]:''}))
+    setCmtTxt(p=>({...p,[task.id]:''}));
   }
 
   const counts=React.useMemo(()=>{
@@ -402,6 +413,7 @@ function App(){
 
   return(
     <div className="app" onClick={()=>picker&&setPicker(null)}>
+      {/* Mobile header */}
       <div className="mobile-header">
         <button className="mobile-menu-btn" onClick={()=>setMob(true)}>☰</button>
         <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:900,fontSize:16}}>
