@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Central de Tarefas · Malory</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;transition:background .3s,color .3s}
+h1,h2,h3,.font-syne{font-family:'Syne',sans-serif}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* DARK THEME */
+body.dark{
+  --bg:#0a0a0f;--surface:#111118;--card:#16161f;--border:#1e1e2e;
+  --accent:#7c6af7;--text:#e8e6f0;--muted:#5a5870;
+  --green:#4ade80;--yellow:#facc15;--red:#f87171;--blue:#60a5fa;
+  --shadow:rgba(0,0,0,.4);
+  background:var(--bg);color:var(--text)
+}
+/* LIGHT THEME */
+body.light{
+  --bg:#f5f5fa;--surface:#ffffff;--card:#ffffff;--border:#e0dff0;
+  --accent:#5b4de0;--text:#1a1a2e;--muted:#6b6890;
+  --green:#16a34a;--yellow:#ca8a04;--red:#dc2626;--blue:#2563eb;
+  --shadow:rgba(0,0,0,.08);
+  background:var(--bg);color:var(--text)
+}
+body.light .task-card{box-shadow:0 1px 4px var(--shadow)}
+body.light .stat-card{box-shadow:0 1px 4px var(--shadow)}
+body.light .sidebar{box-shadow:2px 0 8px var(--shadow)}
+body.light .nav-btn{color:var(--muted)}
+body.light .nav-btn:hover{background:#f0effe;color:var(--accent)}
+body.light .nav-btn.active{background:#ebe8fd;color:var(--accent);font-weight:700}
+body.light .section-title{color:var(--text);font-weight:700}
+body.light .task-title{color:var(--text);font-weight:600}
+body.light .stat-num{font-weight:800}
+body.light .page-title{font-weight:800}
+body.light input,body.light select,body.light textarea{background:#fff!important;color:var(--text)!important;border-color:#c9c7e0!important}
+
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;min-width:230px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:30}
+.main{flex:1;padding:28px 32px;overflow-y:auto;min-height:100vh}
+.logo{padding:0 20px 20px;border-bottom:1px solid var(--border)}
+.logo h1{font-size:18px;font-weight:800;letter-spacing:-.5px}
+.logo h1 span{color:var(--accent)}
+.logo small{color:var(--muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
+.nav{padding:14px 10px;flex:1;overflow-y:auto}
+.nav-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:12px 0 4px}
+.nav-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;text-align:left;transition:all .15s;font-family:'DM Sans',sans-serif}
+.nav-btn:hover{background:var(--card);color:var(--text)}
+.nav-btn.active{background:rgba(124,106,247,.15);color:var(--accent);font-weight:600}
+.nav-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nav-btn .cnt{margin-left:auto;background:var(--border);color:var(--muted);font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700}
+.nav-btn.active .cnt{background:rgba(124,106,247,.2);color:var(--accent)}
+
+.sync-badge{margin:0 10px 12px;padding:7px 10px;border-radius:8px;font-size:11px;display:flex;align-items:center;gap:6px}
+.sync-badge.ok{background:rgba(74,222,128,.08);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.sync-badge.syncing{background:rgba(250,204,21,.08);color:var(--yellow);border:1px solid rgba(250,204,21,.2)}
+.sync-badge.err{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.5s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.theme-btn{margin:0 10px 10px;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;transition:all .2s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* MAIN HEADER */
+.page-header{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-title{font-size:24px;font-weight:800;letter-spacing:-1px}
+.page-title span{color:var(--accent)}
+.page-sub{color:var(--muted);font-size:12px;margin-top:2px}
+.add-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.add-btn:hover{opacity:.88;transform:translateY(-1px)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,var(--accent))}
+.stat-num{font-size:26px;font-weight:800;font-family:'Syne',sans-serif;line-height:1}
+.stat-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+
+/* FILTERS */
+.filter-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.search-input{flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+.search-input:focus{border-color:var(--accent)}
+.filter-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.filter-chip:hover{border-color:var(--accent);color:var(--accent)}
+.filter-chip.active{background:rgba(124,106,247,.15);border-color:var(--accent);color:var(--accent);font-weight:700}
+
+/* TASK CARDS */
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:all .15s;border-left:3px solid var(--pc,var(--border))}
+.task-card:hover{border-color:var(--accent);background:rgba(124,106,247,.04)}
+.task-card.done{opacity:.5}
+.task-top{display:flex;align-items:flex-start;gap:8px}
+.task-title{flex:1;font-size:13px;font-weight:500;line-height:1.4}
+.task-title.done{text-decoration:line-through;color:var(--muted)}
+.task-desc{color:var(--muted);font-size:11px;margin-top:2px}
+
+/* PRIORITY BADGE — clickable */
+.priority-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;user-select:none;transition:all .15s;white-space:nowrap;flex-shrink:0;border:1px solid transparent}
+.priority-badge:hover{filter:brightness(1.1);transform:scale(1.05)}
+.p1{background:rgba(248,113,113,.15);color:var(--red);border-color:rgba(248,113,113,.3)}
+.p2{background:rgba(250,204,21,.12);color:var(--yellow);border-color:rgba(250,204,21,.3)}
+.p3{background:rgba(96,165,250,.12);color:var(--blue);border-color:rgba(96,165,250,.3)}
+.p-low{background:rgba(74,222,128,.1);color:var(--green);border-color:rgba(74,222,128,.3)}
+
+/* PRIORITY NUMBER — thermometer style */
+.priority-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+
+.task-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.status-pill{font-size:11px;padding:3px 8px;border-radius:20px;cursor:pointer;font-weight:600;transition:all .15s;border:1px solid transparent;white-space:nowrap}
+.st-pendente{background:rgba(248,113,113,.12);color:var(--red);border-color:rgba(248,113,113,.2)}
+.st-aguardando{background:rgba(250,204,21,.1);color:var(--yellow);border-color:rgba(250,204,21,.2)}
+.st-concluido{background:rgba(74,222,128,.1);color:var(--green);border-color:rgba(74,222,128,.2)}
+.st-excluido{background:rgba(120,120,120,.1);color:var(--muted);border-color:rgba(120,120,120,.2)}
+
+.task-date{font-size:10px;color:var(--muted)}
+.action-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:3px 7px;font-size:11px;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.action-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.action-btn.restore:hover{border-color:var(--green);color:var(--green)}
+.comment-toggle{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;padding:0;margin-left:auto;white-space:nowrap}
+.comment-toggle:hover{color:var(--accent)}
+
+/* COMMENTS */
+.comments-area{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.comment-item{background:var(--surface);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--text);margin-bottom:5px}
+.comment-item small{color:var(--muted);display:block;margin-bottom:2px;font-size:10px}
+.comment-input-row{display:flex;gap:6px;margin-top:6px}
+.comment-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+.comment-input:focus{border-color:var(--accent)}
+.comment-send{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:700}
+
+/* PRIORITY PICKER */
+.priority-picker{position:absolute;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 8px 24px var(--shadow);min-width:220px}
+.priority-picker h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px}
+.prio-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+.prio-cell{padding:6px;border-radius:8px;border:2px solid var(--border);cursor:pointer;text-align:center;font-weight:800;font-size:13px;transition:all .15s;font-family:'Syne',sans-serif}
+.prio-cell:hover{border-color:var(--accent);transform:scale(1.1)}
+.prio-cell.selected{border-color:var(--accent);background:rgba(124,106,247,.15)}
+.prio-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:4px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:480px}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:14px}
+.form-group{margin-bottom:12px}
+.form-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;display:block;font-weight:700}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-textarea{resize:vertical;min-height:60px}
+.form-select option{background:var(--card)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.btn-cancel{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif}
+.btn-save{padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif}
+
+.empty{text-align:center;padding:40px 24px;color:var(--muted)}
+.empty-icon{font-size:32px;margin-bottom:8px}
+
+/* MOBILE */
+.mobile-header{display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.mobile-menu-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);cursor:pointer;font-size:15px}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:60}
+.sidebar.mobile-open{transform:translateX(0)!important}
+@media(max-width:768px){
+  .mobile-header{display:flex}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:70;transform:translateX(-100%);transition:transform .25s}
+  .sidebar-overlay{display:block}
+  .main{padding:14px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .page-header{margin-top:8px}
+}
+</style>
+</head>
+<body class="dark">
+<div id="root"></div>
+
+<script type="text/babel">
+const SB_URL  = 'https://pyoabyuqbjivqgidrtpi.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5b2FieXVxYmppdnFnaWRydHBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NzA3NjcsImV4cCI6MjA5MDU0Njc2N30.lRC-1hcPqZv4ODHBOfkmbv9wlyDDpv7oNRC42YeuiV4';
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_ANON);
+
+const SECTORS = [
+  {id:'wowlog',label:'Wowlog',color:'#7c6af7'},
+  {id:'iai',label:'Agência IAI',color:'#e8b86d'},
+  {id:'entretenimento',label:'Entretenimento',color:'#f87171'},
+  {id:'oxepay',label:'Oxepay',color:'#4ade80'},
+  {id:'pessoal',label:'Pessoal',color:'#60a5fa'},
+];
+
+// Priority 1-10: 1 = red/urgent, 10 = green/low
+function priorityColor(p){
+  if(p<=2)return{bg:'rgba(248,113,113,.15)',tc:'#f87171',cls:'p1',label:'Urgente'};
+  if(p<=4)return{bg:'rgba(250,204,21,.12)',tc:'#facc15',cls:'p2',label:'Alta'};
+  if(p<=6)return{bg:'rgba(96,165,250,.12)',tc:'#60a5fa',cls:'p3',label:'Média'};
+  return{bg:'rgba(74,222,128,.1)',tc:'#4ade80',cls:'p-low',label:'Baixa'};
+}
+
+const STATUS_NEXT={pendente:'aguardando',aguardando:'concluido',concluido:'pendente'};
+const STATUS_PREV={pendente:'concluido',aguardando:'pendente',concluido:'aguardando'};
+const STATUS_LABEL={pendente:'Pendente',aguardando:'Aguardando',concluido:'Concluído',excluido:'Excluído'};
+const STATUS_CLASS={pendente:'st-pendente',aguardando:'st-aguardando',concluido:'st-concluido',excluido:'st-excluido'};
+
+function fmt(iso){
+  if(!iso)return'';
+  return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+const SEED=[
+  {sector:'wowlog',title:'Cobrar comissões não faturadas de Robertinho (White Eagle, Pedestais Warren, CD Player, Pedestal John, Pinturinha)',status:'pendente',priority:1,description:'',comments:[]},
+  {sector:'wowlog',title:'Ligar para o Ministério Público (MPPB) — pendências jurídicas',status:'pendente',priority:1,description:'',comments:[]},
+  {sector:'wowlog',title:'Revisar frota de veículos para embarques programados',status:'pendente',priority:3,description:'',comments:[]},
+  {sector:'iai',title:'Atualizar portfólio de clientes na agência',status:'pendente',priority:4,description:'',comments:[]},
+  {sector:'iai',title:'Proposta comercial para novo cliente de marketing',status:'aguardando',priority:5,description:'',comments:[]},
+  {sector:'entretenimento',title:'Reunião com Vanessa (Afya) — 07/04 às 15h',status:'pendente',priority:1,description:'Unidade Afya Jaboatão, Recife',comments:[]},
+  {sector:'oxepay',title:'Revisar integração de pagamentos Oxepay',status:'pendente',priority:3,description:'',comments:[]},
+  {sector:'pessoal',title:'Spa Sunday Mariana — acompanhar processo',status:'aguardando',priority:6,description:'',comments:[]},
+];
+
+// ====== APP ======
+function App(){
+  const [tasks,setTasks]=React.useState([]);
+  const [view,setView]=React.useState('all'); // all | sector id | concluidos | lixeira
+  const [filter,setFilter]=React.useState('all');
+  const [search,setSearch]=React.useState('');
+  const [syncSt,setSyncSt]=React.useState('syncing');
+  const [modal,setModal]=React.useState(false);
+  const [form,setForm]=React.useState({title:'',sector:'wowlog',priority:3,description:''});
+  const [openComments,setOpenComments]=React.useState({});
+  const [commentText,setCommentText]=React.useState({});
+  const [priorityPickerTask,setPriorityPickerTask]=React.useState(null);
+  const [mobileOpen,setMobileOpen]=React.useState(false);
+  const [theme,setTheme]=React.useState('dark');
+
+  React.useEffect(()=>{
+    document.body.className=theme;
+  },[theme]);
+
+  // Load + realtime
+  React.useEffect(()=>{
+    loadTasks();
+    const ch=sb.channel('tasks-rt')
+      .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks())
+      .subscribe();
+    return()=>sb.removeChannel(ch);
+  },[]);
+
+  async function loadTasks(){
+    setSyncSt('syncing');
+    const{data,error}=await sb.from('tasks').select('*').order('priority').order('created_at');
+    if(!error&&data){
+      if(data.length===0){
+        // seed inicial
+        const rows=SEED.map(s=>({...s,id:undefined,created_at:new Date().toISOString()}));
+        await sb.from('tasks').insert(rows);
+        const{data:d2}=await sb.from('tasks').select('*').order('priority').order('created_at');
+        setTasks(d2||[]);
+      }else{
+        setTasks(data);
+      }
+      setSyncSt('ok');
+    }else{
+      const c=localStorage.getItem('tasks_cache');
+      if(c)setTasks(JSON.parse(c));
+      setSyncSt('err');
+    }
+  }
+
+  React.useEffect(()=>{
+    if(tasks.length)localStorage.setItem('tasks_cache',JSON.stringify(tasks));
+  },[tasks]);
+
+  async function mutate(id,fields){
+    setTasks(prev=>prev.map(t=>t.id===id?{...t,...fields}:t));
+    await sb.from('tasks').update(fields).eq('id',id);
+  }
+
+  async function addTask(){
+    if(!form.title.trim())return;
+    const t={sector:form.sector,title:form.title.trim(),description:form.description,status:'pendente',priority:Number(form.priority),comments:[],created_at:new Date().toISOString()};
+    const{data}=await sb.from('tasks').insert([t]).select();
+    if(data)setTasks(prev=>[...prev,...data]);
+    setModal(false);
+    setForm({title:'',sector:'wowlog',priority:3,description:''});
+  }
+
+  async function cycleStatus(task){
+    await mutate(task.id,{status:STATUS_NEXT[task.status]||'pendente'});
+  }
+  async function prevStatus(task){
+    await mutate(task.id,{status:STATUS_PREV[task.status]||'pendente'});
+  }
+  async function toTrash(task){
+    await mutate(task.id,{status:'excluido'});
+  }
+  async function restore(task){
+    await mutate(task.id,{status:'pendente'});
+  }
+  async function permDelete(task){
+    if(!confirm('Excluir permanentemente?'))return;
+    setTasks(prev=>prev.filter(t=>t.id!==task.id));
+    await sb.from('tasks').delete().eq('id',task.id);
+  }
+  async function addComment(task){
+    const txt=(commentText[task.id]||'').trim();
+    if(!txt)return;
+    const updated=[...(task.comments||[]),{text:txt,date:new Date().toISOString()}];
+    await mutate(task.id,{comments:updated});
+    setCommentText(p=>({...p,[task.id]:''}));
+  }
+  async function setPriority(taskId,p){
+    await mutate(taskId,{priority:p});
+    setPriorityPickerTask(null);
+  }
+
+  // Derived counts
+  const counts=React.useMemo(()=>{
+    const c={all:0,concluidos:0,lixeira:0};
+    SECTORS.forEach(s=>{c[s.id]=0});
+    tasks.forEach(t=>{
+      if(t.status==='excluido'){c.lixeira++;return;}
+      if(t.status==='concluido'){c.concluidos++;return;}
+      c.all++;
+      if(c[t.sector]!==undefined)c[t.sector]++;
+    });
+    return c;
+  },[tasks]);
+
+  const visible=React.useMemo(()=>{
+    return tasks.filter(t=>{
+      if(view==='lixeira')return t.status==='excluido';
+      if(view==='concluidos')return t.status==='concluido';
+      if(t.status==='excluido'||t.status==='concluido')return false;
+      if(view!=='all'&&t.sector!==view)return false;
+      if(filter==='pendente'&&t.status!=='pendente')return false;
+      if(filter==='aguardando'&&t.status!=='aguardando')return false;
+      if(filter==='urgente'&&t.priority>2)return false;
+      if(search&&!t.title.toLowerCase().includes(search.toLowerCase()))return false;
+      return true;
+    });
+  },[tasks,view,filter,search]);
+
+  const stats=React.useMemo(()=>({
+    pendente:tasks.filter(t=>t.status==='pendente').length,
+    aguardando:tasks.filter(t=>t.status==='aguardando').length,
+    concluido:tasks.filter(t=>t.status==='concluido').length,
+    total:tasks.filter(t=>t.status!=='excluido').length,
+  }),[tasks]);
+
+  const activeSector=SECTORS.find(s=>s.id===view);
+
+  function viewTitle(){
+    if(view==='all')return<>Todas as <span>Tarefas</span></>;
+    if(view==='concluidos')return<>✅ <span>Concluídos</span></>;
+    if(view==='lixeira')return<>🗑️ <span>Lixeira</span></>;
+    return<>{activeSector?.label}</>;
+  }
+
+  return(
+    <div className="app">
+      {/* Mobile header */}
+      <div className="mobile-header">
+        <button className="mobile-menu-btn" onClick={()=>setMobileOpen(true)}>☰</button>
+        <span style={{fontFamily:'Syne',fontWeight:800,fontSize:15}}>Central.</span>
+        <button className="theme-btn" style={{margin:0,padding:'4px 8px'}} onClick={()=>setTheme(t=>t==='dark'?'light':'dark')}>
+          {theme==='dark'?'☀️':'🌙'}
+        </button>
+      </div>
+
+      {mobileOpen&&<div className="sidebar-overlay" onClick={()=>setMobileOpen(false)} style={{zIndex:65}}/>}
+
+      <aside className={`sidebar${mobileOpen?' mobile-open':''}`}>
+        <div className="logo">
+          <h1>Central<span>.</span></h1>
+          <small>Malory Empresas</small>
+        </div>
+        <nav className="nav">
+          <div className="nav-label">Visão</div>
+          <button className={`nav-btn${view==='all'?' active':''}`} onClick={()=>{setView('all');setMobileOpen(false)}}>
+            ⊞ Todas as tarefas<span className="cnt">{counts.all}</span>
+          </button>
+          <button className={`nav-btn${view==='concluidos'?' active':''}`} onClick={()=>{setView('concluidos');setMobileOpen(false)}}>
+            ✅ Concluídos<span className="cnt">{counts.concluidos}</span>
+          </button>
+          <button className={`nav-btn${view==='lixeira'?' active':''}`} onClick={()=>{setView('lixeira');setMobileOpen(false)}}>
+            🗑️ Lixeira<span className="cnt">{counts.lixeira}</span>
+          </button>
+          <div className="nav-label">Setor</div>
+          {SECTORS.map(s=>(
+            <button key={s.id} className={`nav-btn${view===s.id?' active':''}`} onClick={()=>{setView(s.id);setMobileOpen(false)}}>
+              <span className="dot" style={{background:s.color}}/>
+              {s.label}<span className="cnt">{counts[s.id]||0}</span>
+            </button>
+          ))}
+        </nav>
+        <button className="theme-btn" onClick={()=>setTheme(t=>t==='dark'?'light':'dark')}>
+          {theme==='dark'?'☀️ Modo Claro':'🌙 Modo Escuro'}
+        </button>
+        <div className={`sync-badge ${syncSt}`}>
+          <div className="pulse"/>
+          {syncSt==='ok'?'✓ Sincronizado':syncSt==='syncing'?'Sincronizando...':'⚠️ Offline (cache)'}
+        </div>
+      </aside>
+
+      <main className="main" onClick={()=>priorityPickerTask&&setPriorityPickerTask(null)}>
+        <div className="page-header">
+          <div>
+            <h2 className="page-title">{viewTitle()}</h2>
+            <div className="page-sub">{new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</div>
+          </div>
+          {view!=='lixeira'&&view!=='concluidos'&&(
+            <button className="add-btn" onClick={()=>{setForm({title:'',sector:SECTORS.find(s=>s.id===view)?view:'wowlog',priority:3,description:''});setModal(true)}}>
+              + Nova tarefa
+            </button>
+          )}
+        </div>
+
+        {/* Stats — only in main views */}
+        {(view==='all'||SECTORS.find(s=>s.id===view))&&(
+          <div className="stats">
+            <div className="stat-card" style={{'--ac':'#f87171'}}>
+              <div className="stat-num" style={{color:'#f87171'}}>{stats.pendente}</div>
+              <div className="stat-label">Pendentes</div>
+            </div>
+            <div className="stat-card" style={{'--ac':'#facc15'}}>
+              <div className="stat-num" style={{color:'#facc15'}}>{stats.aguardando}</div>
+              <div className="stat-label">Aguardando</div>
+            </div>
+            <div className="stat-card" style={{'--ac':'#4ade80'}}>
+              <div className="stat-num" style={{color:'#4ade80'}}>{stats.concluido}</div>
+              <div className="stat-label">Concluídos</div>
+            </div>
+            <div className="stat-card" style={{'--ac':'#7c6af7'}}>
+              <div className="stat-num" style={{color:'#7c6af7'}}>{stats.total}</div>
+              <div className="stat-label">Total</div>
+            </div>
+          </div>
+        )}
+
+        {/* Filters */}
+        {view!=='lixeira'&&view!=='concluidos'&&(
+          <div className="filter-bar">
+            <input className="search-input" placeholder="🔍 Buscar..." value={search} onChange={e=>setSearch(e.target.value)}/>
+            {['all','pendente','aguardando','urgente'].map(f=>(
+              <button key={f} className={`filter-chip${filter===f?' active':''}`} onClick={()=>setFilter(f)}>
+                {f==='all'?'Todas':f==='pendente'?'Pendente':f==='aguardando'?'Aguardando':'🔴 Urgente'}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div style={{fontSize:12,color:'var(--muted)',marginBottom:10,fontWeight:600}}>
+          {visible.length} tarefa{visible.length!==1?'s':''}
+        </div>
+
+        {visible.length===0?(
+          <div className="empty">
+            <div className="empty-icon">{view==='lixeira'?'🗑️':view==='concluidos'?'✅':'📋'}</div>
+            <div>{view==='lixeira'?'Lixeira vazia':view==='concluidos'?'Nenhuma tarefa concluída':'Nenhuma tarefa encontrada'}</div>
+          </div>
+        ):(
+          <div className="task-list">
+            {visible.map(task=>(
+              <TaskCard
+                key={task.id}
+                task={task}
+                isTrash={view==='lixeira'}
+                onCycle={()=>cycleStatus(task)}
+                onPrev={()=>prevStatus(task)}
+                onTrash={()=>toTrash(task)}
+                onRestore={()=>restore(task)}
+                onDelete={()=>permDelete(task)}
+                openComment={!!openComments[task.id]}
+                toggleComment={()=>setOpenComments(p=>({...p,[task.id]:!p[task.id]}))}
+                commentText={commentText[task.id]||''}
+                setCommentText={v=>setCommentText(p=>({...p,[task.id]:v}))}
+                onAddComment={()=>addComment(task)}
+                showPriorityPicker={priorityPickerTask===task.id}
+                onOpenPicker={e=>{e.stopPropagation();setPriorityPickerTask(task.id)}}
+                onSetPriority={p=>setPriority(task.id,p)}
+                onClosePicker={()=>setPriorityPickerTask(null)}
+              />
+            ))}
+          </div>
+        )}
+      </main>
+
+      {modal&&(
+        <div className="overlay" onClick={e=>e.target.className==='overlay'&&setModal(false)}>
+          <div className="modal">
+            <h3>Nova Tarefa</h3>
+            <div className="form-group">
+              <label className="form-label">Título *</label>
+              <input className="form-input" value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} placeholder="Descreva a tarefa..." autoFocus/>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Setor</label>
+              <select className="form-select" value={form.sector} onChange={e=>setForm(p=>({...p,sector:e.target.value}))}>
+                {SECTORS.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Prioridade (1 = mais urgente, 10 = menos urgente)</label>
+              <input type="range" min="1" max="10" value={form.priority} onChange={e=>setForm(p=>({...p,priority:Number(e.target.value)}))} style={{width:'100%',margin:'6px 0'}}/>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--muted)'}}>
+                <span>🔴 1 — Urgente</span>
+                <span style={{fontWeight:800,color:priorityColor(form.priority).tc}}>Nível {form.priority} — {priorityColor(form.priority).label}</span>
+                <span>🟢 10 — Baixa</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Observações</label>
+              <textarea className="form-textarea" value={form.description} onChange={e=>setForm(p=>({...p,description:e.target.value}))} placeholder="Detalhes opcionais..."/>
+            </div>
+            <div className="modal-btns">
+              <button className="btn-cancel" onClick={()=>setModal(false)}>Cancelar</button>
+              <button className="btn-save" onClick={addTask}>Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TaskCard({task,isTrash,onCycle,onPrev,onTrash,onRestore,onDelete,openComment,toggleComment,commentText,setCommentText,onAddComment,showPriorityPicker,onOpenPicker,onSetPriority,onClosePicker}){
+  const pc=priorityColor(task.priority);
+  return(
+    <div className={`task-card${task.status==='concluido'?' done':''}`} style={{'--pc':pc.tc}}>
+      <div className="task-top">
+        <div style={{flex:1}}>
+          <div className={`task-title${task.status==='concluido'?' done':''}`}>{task.title}</div>
+          {task.description&&<div className="task-desc">{task.description}</div>}
+        </div>
+
+        {/* Priority badge — clickable */}
+        <div style={{position:'relative'}}>
+          <span
+            className={`priority-badge ${pc.cls}`}
+            onClick={isTrash?undefined:onOpenPicker}
+            title={isTrash?'':"Clique para mudar prioridade"}
+            style={{cursor:isTrash?'default':'pointer'}}
+          >
+            <span className="priority-num" style={{background:pc.bg,color:pc.tc,width:20,height:20,fontSize:11}}>
+              {task.priority}
+            </span>
+            {pc.label}
+          </span>
+          {showPriorityPicker&&(
+            <div className="priority-picker" onClick={e=>e.stopPropagation()}>
+              <h4>Prioridade (1 = urgente, 10 = baixa)</h4>
+              <div className="prio-grid">
+                {[1,2,3,4,5,6,7,8,9,10].map(n=>{
+                  const c=priorityColor(n);
+                  return(
+                    <div key={n}
+                      className={`prio-cell${task.priority===n?' selected':''}`}
+                      style={{color:c.tc,borderColor:task.priority===n?c.tc:'var(--border)',background:task.priority===n?c.bg:'transparent'}}
+                      onClick={()=>onSetPriority(n)}
+                    >{n}</div>
+                  );
+                })}
+              </div>
+              <div className="prio-labels"><span>🔴 Urgente</span><span>🟢 Baixa</span></div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="task-meta">
+        {!isTrash&&(
+          <span className={`status-pill ${STATUS_CLASS[task.status]}`} onClick={onCycle} title="Avançar status">
+            {STATUS_LABEL[task.status]} →
+          </span>
+        )}
+        {task.created_at&&<span className="task-date">{fmt(task.created_at)}</span>}
+
+        {!isTrash&&task.status!=='concluido'&&(
+          <button className="action-btn" onClick={onPrev} title="Voltar status">← Anterior</button>
+        )}
+        {!isTrash&&(
+          <button className="action-btn danger" onClick={onTrash} title="Mover para lixeira">🗑️</button>
+        )}
+        {isTrash&&(
+          <>
+            <button className="action-btn restore" onClick={onRestore}>↩ Restaurar</button>
+            <button className="action-btn danger" onClick={onDelete}>❌ Excluir definitivo</button>
+          </>
+        )}
+        {!isTrash&&(
+          <button className="comment-toggle" onClick={toggleComment}>
+            💬 {(task.comments||[]).length} {openComment?'▲':'▼'}
+          </button>
+        )}
+      </div>
+
+      {openComment&&!isTrash&&(
+        <div className="comments-area">
+          {(task.comments||[]).map((c,i)=>(
+            <div key={i} className="comment-item">
+              <small>{fmt(c.date)}</small>{c.text}
+            </div>
+          ))}
+          <div className="comment-input-row">
+            <input className="comment-input" value={commentText} onChange={e=>setCommentText(e.target.value)} placeholder="Comentário..." onKeyDown={e=>e.key==='Enter'&&onAddComment()}/>
+            <button className="comment-send" onClick={onAddComment}>→</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
