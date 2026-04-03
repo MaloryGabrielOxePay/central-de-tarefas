@@ -2,611 +2,1318 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Hub · Grupo Malory</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1"/>
+<title>Central de Tarefas · Malory</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body,#root{height:100%}
-body{font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;transition:background .3s,color .3s}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
+html{height:100%}
+body{font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;transition:background .3s,color .3s;height:100%}
+h1,h2,h3,.font-syne{font-family:'Syne',sans-serif}
+#root{min-height:100vh}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-body.dark{
-  --bg:#0c0c14;--surface:#111118;--card:#16161f;--border:#1e1e2e;
-  --accent:#7c6af7;--accent2:#a78bfa;--text:#e8e6f0;--muted:#5a5870;
-  --green:#4ade80;--yellow:#fbbf24;--red:#f87171;--blue:#60a5fa;--orange:#fb923c;
+input,select,textarea,button{font-family:inherit}
+
+/* ─── LIGHT THEME (default) ─── */
+body, body.light {
+  --bg:#f4f3f8;--surface:#ffffff;--card:#ffffff;--border:#e4e2ee;
+  --accent:#6c5ce7;--accent-soft:#ede9fe;--text:#1e1b2e;--muted:#7b7794;
+  --green:#16a34a;--green-bg:#dcfce7;--yellow:#d97706;--yellow-bg:#fef3c7;
+  --red:#dc2626;--red-bg:#fee2e2;--blue:#2563eb;--blue-bg:#dbeafe;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.08);
+  --input-bg:#f8f7fc;
   background:var(--bg);color:var(--text)
 }
-body.light{
-  --bg:#f0eff8;--surface:#ffffff;--card:#ffffff;--border:#e0dff0;
-  --accent:#5b4de0;--accent2:#7c6af7;--text:#1a1a2e;--muted:#7b79a0;
-  --green:#16a34a;--yellow:#d97706;--red:#dc2626;--blue:#2563eb;--orange:#ea580c;
+/* ─── DARK THEME ─── */
+body.dark {
+  --bg:#0c0b12;--surface:#141320;--card:#1a1929;--border:#262438;
+  --accent:#8b7cf7;--accent-soft:#1e1a3a;--text:#e4e2f0;--muted:#6b6780;
+  --green:#4ade80;--green-bg:#052e16;--yellow:#fbbf24;--yellow-bg:#422006;
+  --red:#f87171;--red-bg:#450a0a;--blue:#60a5fa;--blue-bg:#172554;
+  --shadow:0 1px 3px rgba(0,0,0,.3);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.4);
+  --input-bg:#111020;
   background:var(--bg);color:var(--text)
 }
-a{color:inherit;text-decoration:none}
-button{cursor:pointer;border:none;background:none;font-family:inherit;font-size:inherit}
-input,textarea,select{font-family:inherit;font-size:inherit}
 
-/* LAYOUT */
-.app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;z-index:10}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:56px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px}
-.content{flex:1;overflow-y:auto;padding:24px}
+/* ─── LAYOUT ─── */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:240px;min-width:240px;background:var(--surface);
+  border-right:1px solid var(--border);padding:20px 0;
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+  overflow-y:auto;z-index:100;transition:transform .3s
+}
+.main{flex:1;padding:24px 28px;overflow-y:auto;min-width:0}
 
-/* SIDEBAR */
-.sidebar-logo{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
-.logo-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);line-height:1.1}
+/* Logo */
+.logo{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.logo h1{font-size:17px;font-weight:800;letter-spacing:-.3px}
 .logo-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.sidebar-section{padding:12px 8px 4px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-left:14px}
-.nav-btn{width:100%;display:flex;align-items:center;gap:9px;padding:8px 14px;border-radius:8px;margin:1px 4px;width:calc(100% - 8px);color:var(--muted);font-size:13px;font-weight:500;transition:all .15s;text-align:left}
-.nav-btn:hover{background:var(--border);color:var(--text)}
-.nav-btn.active{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);font-weight:600}
-.nav-btn .icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
-.nav-btn .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:700}
-.nav-btn .badge.red{background:var(--red)}
-.sidebar-footer{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border)}
-.add-sector-btn{width:100%;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;color:var(--accent);font-size:12px;font-weight:600;transition:all .15s;border:1.5px dashed color-mix(in srgb,var(--accent) 40%,transparent)}
-.add-sector-btn:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
 
-/* TOPBAR */
-.topbar-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;flex:1}
-.topbar-search{flex:1;max-width:300px;position:relative}
-.topbar-search input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 12px 7px 32px;color:var(--text);outline:none;font-size:13px;transition:border .15s}
-.topbar-search input:focus{border-color:var(--accent)}
-.topbar-search .ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
-.icon-btn{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;transition:all .15s}
-.icon-btn:hover{background:var(--border);color:var(--text)}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.sync-dot.syncing{background:var(--yellow);animation:pulse .8s ease-in-out infinite}
-.sync-dot.error{background:var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* CARDS */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:24px}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-.stat-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1}
-.stat-label{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
-.task-list{display:flex;flex-direction:column;gap:8px}
-.task-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:all .15s;position:relative}
-.task-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
-.task-card.concluido{opacity:.55}
-.task-card.excluido{display:none}
-.task-top{display:flex;align-items:flex-start;gap:10px}
-.task-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
-.task-check.done{background:var(--green);border-color:var(--green);color:#fff}
-.task-check.waiting{background:var(--yellow);border-color:var(--yellow);color:#fff}
-.task-info{flex:1;min-width:0}
-.task-title{font-weight:600;font-size:14px;line-height:1.3}
-.task-desc{font-size:12px;color:var(--muted);margin-top:3px;white-space:pre-wrap}
-.task-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
-.tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
-.prio-1{background:color-mix(in srgb,var(--red) 18%,transparent);color:var(--red)}
-.prio-2{background:color-mix(in srgb,var(--orange) 18%,transparent);color:var(--orange)}
-.prio-3{background:color-mix(in srgb,var(--yellow) 18%,transparent);color:var(--yellow)}
-.prio-4{background:color-mix(in srgb,var(--blue) 18%,transparent);color:var(--blue)}
-.prio-5,.prio-other{background:color-mix(in srgb,var(--muted) 18%,transparent);color:var(--muted)}
-.status-tag{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent)}
-.status-tag.done{background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green)}
-.status-tag.waiting{background:color-mix(in srgb,var(--yellow) 15%,transparent);color:var(--yellow)}
-.sector-tag{background:color-mix(in srgb,var(--border) 80%,transparent);color:var(--muted)}
-.task-actions{display:flex;gap:4px;margin-top:8px}
-.task-action-btn{font-size:11px;padding:3px 8px;border-radius:6px;color:var(--muted);background:var(--bg);border:1px solid var(--border);transition:all .15s}
-.task-action-btn:hover{color:var(--text);border-color:var(--text)}
-.task-action-btn.del:hover{color:var(--red);border-color:var(--red)}
-.comment-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.comment-input{display:flex;gap:6px}
-.comment-input input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text);outline:none;font-size:12px}
-.comment-input button{padding:5px 10px;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;transition:opacity .15s}
-.comment-input button:hover{opacity:.85}
-.comment-item{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border)}
-.comment-item:last-child{border:none}
-.comment-time{font-size:10px;opacity:.6;margin-left:6px}
-.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.section-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
-.section-count{font-size:12px;color:var(--muted);background:var(--border);padding:2px 8px;border-radius:20px}
-.empty{text-align:center;padding:40px;color:var(--muted)}
-.empty-icon{font-size:32px;margin-bottom:8px}
-
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:24px}
-.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px}
-.form-group{margin-bottom:16px}
-.form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.form-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);outline:none;transition:border .15s}
-.form-input:focus{border-color:var(--accent)}
-.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a5870' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-.form-textarea{min-height:80px;resize:vertical}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
-.btn{padding:9px 18px;border-radius:8px;font-weight:600;font-size:13px;transition:all .15s}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{opacity:.85}
-.btn-ghost{background:var(--border);color:var(--text)}
-.btn-ghost:hover{opacity:.8}
-.btn-danger{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red);border:1px solid color-mix(in srgb,var(--red) 30%,transparent)}
-.btn-danger:hover{background:color-mix(in srgb,var(--red) 25%,transparent)}
-.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:6px}
-.emoji-opt{font-size:20px;padding:6px;border-radius:6px;cursor:pointer;text-align:center;transition:background .1s}
-.emoji-opt:hover,.emoji-opt.sel{background:var(--border)}
-.color-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:6px}
-.color-opt{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .1s}
-.color-opt.sel{border-color:var(--text);transform:scale(1.15)}
-.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-btn{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:var(--surface);border:1px solid var(--border);color:var(--muted);transition:all .15s}
-.filter-btn.active{background:color-mix(in srgb,var(--accent) 15%,transparent);border-color:var(--accent);color:var(--accent);font-weight:600}
-.sector-header-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;user-select:none}
-.sector-collapse-icon{color:var(--muted);font-size:12px;transition:transform .2s}
-.sector-collapse-icon.open{transform:rotate(90deg)}
-@media(max-width:640px){
-  .sidebar{display:none}
-  .content{padding:16px}
-  .stats-row{grid-template-columns:repeat(2,1fr)}
+/* Nav */
+.nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;
+  border:none;background:transparent;color:var(--muted);cursor:pointer;
+  font-size:13px;text-align:left;width:100%;transition:all .15s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;font-weight:500;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:slideIn .2s ease}
-@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.delete-sector-btn{margin-left:auto;font-size:11px;color:var(--red);opacity:0;transition:opacity .15s;padding:2px 6px;border-radius:4px}
-.nav-btn:hover .delete-sector-btn{opacity:1}
+.nav-btn:hover{background:var(--accent-soft);color:var(--accent)}
+.nav-btn.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-btn .nav-icon{font-size:16px;min-width:20px;text-align:center}
+.nav-sep{height:1px;background:var(--border);margin:10px 14px}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:8px 14px 4px;font-weight:600}
+
+/* Sidebar footer */
+.sidebar-footer{border-top:1px solid var(--border);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.theme-toggle{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;
+  border:1px solid var(--border);background:var(--card);cursor:pointer;
+  color:var(--text);font-size:12px;transition:.15s;width:100%
+}
+.theme-toggle:hover{border-color:var(--accent)}
+.sync-badge{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;padding:4px 0}
+.sync-badge.offline{color:var(--yellow)}
+.sync-badge.error{color:var(--red)}
+
+/* ─── HEADER ─── */
+.page-header{margin-bottom:24px}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.page-subtitle{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ─── STAT CARDS ─── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;box-shadow:var(--shadow);cursor:pointer;transition:all .2s;
+  position:relative;overflow:hidden
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.stat-card.active-filter{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.stat-card .stat-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.stat-card .stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-top:4px}
+.stat-card .stat-dot{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%}
+
+/* ─── VIEW TABS ─── */
+.view-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px}
+.view-tab{
+  padding:8px 16px;border-radius:8px;border:none;background:transparent;
+  color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;gap:6px
+}
+.view-tab:hover{color:var(--text)}
+.view-tab.active{background:var(--accent);color:#fff;font-weight:600}
+
+/* ─── SEARCH BAR ─── */
+.search-row{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
+.search-input{
+  flex:1;min-width:200px;padding:10px 14px;border-radius:10px;
+  border:1px solid var(--border);background:var(--input-bg);color:var(--text);
+  font-size:13px;outline:none;transition:.2s
+}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.filter-select{
+  padding:10px 14px;border-radius:10px;border:1px solid var(--border);
+  background:var(--input-bg);color:var(--text);font-size:13px;outline:none;cursor:pointer
+}
+.btn-primary{
+  padding:10px 18px;border-radius:10px;border:none;
+  background:var(--accent);color:#fff;font-weight:600;font-size:13px;
+  cursor:pointer;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px
+}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+
+/* ─── TASK CARDS ─── */
+.task-list{display:flex;flex-direction:column;gap:8px}
+.section-divider{
+  display:flex;align-items:center;gap:10px;margin:16px 0 10px;
+  font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px
+}
+.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.task-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;
+  position:relative;overflow:hidden
+}
+.task-card:hover{box-shadow:var(--shadow-lg)}
+.task-card-inner{display:flex;align-items:flex-start;gap:12px}
+
+.task-priority-bar{
+  width:4px;min-height:40px;border-radius:4px;flex-shrink:0;margin-top:2px;
+  align-self:stretch
+}
+
+.task-body{flex:1;min-width:0}
+.task-header{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.task-title{font-size:13.5px;font-weight:500;line-height:1.4;word-break:break-word;flex:1;min-width:0}
+.task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;
+  font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent;
+  white-space:nowrap
+}
+.badge:hover{opacity:.85}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.badge-green{background:var(--green-bg);color:var(--green)}
+
+.sector-tag{
+  font-size:11px;color:var(--muted);background:var(--input-bg);
+  padding:2px 8px;border-radius:5px;white-space:nowrap
+}
+
+.task-date-tag{
+  font-size:11px;display:inline-flex;align-items:center;gap:3px;
+  color:var(--accent);background:var(--accent-soft);padding:2px 8px;
+  border-radius:5px;white-space:nowrap
+}
+.task-date-tag.overdue{color:var(--red);background:var(--red-bg)}
+
+.task-actions{display:flex;gap:4px;flex-shrink:0;margin-left:auto;align-items:flex-start}
+.task-actions button{
+  background:transparent;border:1px solid var(--border);border-radius:6px;
+  padding:4px 8px;cursor:pointer;color:var(--muted);font-size:12px;transition:.15s
+}
+.task-actions button:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+
+/* ─── PRIORITY PICKER ─── */
+.priority-picker{
+  position:absolute;top:100%;left:0;z-index:50;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;padding:8px;
+  box-shadow:var(--shadow-lg);display:flex;gap:4px;flex-wrap:wrap;width:200px
+}
+.priority-picker button{
+  width:32px;height:32px;border-radius:8px;border:2px solid transparent;
+  font-weight:700;font-size:12px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center
+}
+.priority-picker button:hover{transform:scale(1.1)}
+.priority-picker button.selected{border-color:var(--text);transform:scale(1.15)}
+
+/* ─── DATE PICKER inline ─── */
+.date-picker-inline{
+  margin-top:8px;padding:10px;background:var(--input-bg);border:1px solid var(--border);
+  border-radius:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap
+}
+.date-picker-inline input{
+  padding:6px 10px;border-radius:8px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-size:12px;outline:none
+}
+.date-picker-inline input:focus{border-color:var(--accent)}
+.date-picker-inline button{
+  padding:5px 12px;border-radius:8px;border:none;font-size:12px;
+  cursor:pointer;font-weight:600;transition:.15s
+}
+
+/* ─── COMMENTS ─── */
+.comments-area{
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--border)
+}
+.comment-item{
+  padding:6px 0;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)
+}
+.comment-item small{display:block;font-size:10px;color:var(--muted);opacity:.7;margin-bottom:2px}
+.comment-input-row{display:flex;gap:6px;margin-top:8px}
+.comment-input{
+  flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);
+  background:var(--input-bg);color:var(--text);font-size:12px;outline:none
+}
+.comment-input:focus{border-color:var(--accent)}
+.comment-send{
+  padding:6px 14px;border-radius:8px;border:none;background:var(--accent);
+  color:#fff;cursor:pointer;font-weight:600;font-size:13px
+}
+
+/* ─── CREATE TASK MODAL ─── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px)
+}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:28px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);
+  max-height:90vh;overflow-y:auto
+}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:16px}
+.modal label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px;margin-top:12px}
+.modal input,.modal select,.modal textarea{
+  width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--input-bg);color:var(--text);font-size:13px;outline:none
+}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--accent)}
+.modal textarea{min-height:60px;resize:vertical}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.btn-secondary{
+  padding:10px 18px;border-radius:10px;border:1px solid var(--border);
+  background:transparent;color:var(--text);font-weight:500;font-size:13px;cursor:pointer
+}
+.btn-secondary:hover{background:var(--input-bg)}
+
+/* ─── CALENDAR ─── */
+.calendar-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.calendar-header h3{font-size:16px;font-weight:700}
+.calendar-nav{display:flex;gap:6px}
+.calendar-nav button{
+  padding:6px 12px;border-radius:8px;border:1px solid var(--border);
+  background:var(--input-bg);color:var(--text);cursor:pointer;font-size:13px
+}
+.calendar-nav button:hover{border-color:var(--accent)}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.calendar-day-label{
+  text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:6px 0;
+  text-transform:uppercase
+}
+.calendar-cell{
+  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;border-radius:10px;font-size:13px;position:relative;
+  cursor:default;transition:.15s;min-height:40px;gap:2px
+}
+.calendar-cell.today{background:var(--accent-soft);font-weight:700;color:var(--accent)}
+.calendar-cell.other-month{opacity:.3}
+.calendar-cell.has-tasks{cursor:pointer}
+.calendar-cell.has-tasks:hover{background:var(--input-bg)}
+.calendar-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:28px}
+.calendar-dot{width:5px;height:5px;border-radius:50%}
+.calendar-cell-tooltip{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;font-size:11px;white-space:nowrap;z-index:50;
+  box-shadow:var(--shadow-lg);pointer-events:none;max-width:220px;
+  white-space:normal;line-height:1.3
+}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{
+  text-align:center;padding:40px 20px;color:var(--muted)
+}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-state p{font-size:14px}
+
+/* ─── MOBILE ─── */
+.mobile-header{
+  display:none;position:sticky;top:0;z-index:100;background:var(--surface);
+  border-bottom:1px solid var(--border);padding:12px 16px;
+  align-items:center;justify-content:space-between
+}
+.hamburger{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px}
+.mobile-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;
+  backdrop-filter:blur(2px)
+}
+
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);z-index:100;height:100vh;box-shadow:var(--shadow-lg)}
+  .sidebar.open{transform:translateX(0)}
+  .mobile-header{display:flex}
+  .mobile-overlay.show{display:block}
+  .main{padding:16px}
+  .stat-row{grid-template-columns:repeat(2,1fr);gap:8px}
+  .view-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .search-row{flex-direction:column}
+  .search-input{min-width:100%}
+  .task-card-inner{flex-direction:column;gap:8px}
+  .task-actions{margin-left:0;width:100%;justify-content:flex-end}
+  .calendar-cell{min-height:32px;font-size:11px}
+}
 </style>
 </head>
-<body class="dark">
+<body class="light">
 <div id="root"></div>
+
 <script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-const SUPABASE_URL = 'https://pyoabyuqbjivqgidrtpi.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5b2FieXVxYmppdnFnaWRydHBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NzA3NjcsImV4cCI6MjA5MDU0Njc2N30.lRC-1hcPqZv4ODHBOfkmbv9wlyDDpv7oNRC42YeuiV4';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ─── SUPABASE ──────────────────────────────────────────────
+const SB_URL = "https://pyoabyuqbjivqgidrtpi.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5b2FieXVxYmppdnFnaWRydHBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NzA3NjcsImV4cCI6MjA5MDU0Njc2N30.lRC-1hcPqZv4ODHBOfkmbv9wlyDDpv7oNRC42YeuiV4";
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-const DEFAULT_SECTORS = [
-  { key:'wowlog',       label:'Wowlog',        emoji:'🚛', color:'#7c6af7' },
-  { key:'iai',          label:'Agência IAI',   emoji:'📣', color:'#f472b6' },
-  { key:'entretenimento',label:'Entretenimento',emoji:'🎉', color:'#fb923c' },
-  { key:'oxepay',       label:'Oxepay',        emoji:'💳', color:'#4ade80' },
-  { key:'escritorio',   label:'Escritório',    emoji:'🏢', color:'#60a5fa' },
-  { key:'pessoal',      label:'Pessoal',       emoji:'👤', color:'#a78bfa' },
-];
-
-const EMOJIS = ['🚛','📣','🎉','💳','🏢','👤','🏪','🏗️','💡','🎯','⚡','🔥','🌟','💼','📊','🛠️','🎨','📱','🚀','💰','🏆','📦','🔑','🌍'];
-const COLORS = ['#7c6af7','#f472b6','#fb923c','#4ade80','#60a5fa','#a78bfa','#fbbf24','#34d399','#f87171','#38bdf8','#e879f9','#84cc16','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4'];
-
-const fmtDate = d => {
-  const dt = new Date(d);
-  return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+// ─── SECTORS ───────────────────────────────────────────────
+const DEFAULT_SECTORS = {
+  wowlog:         { label:"Wowlog",               icon:"📦", color:"#38bdf8" },
+  iai:            { label:"Agência IAI",           icon:"💡", color:"#eab308" },
+  entretenimento: { label:"Malory Entretenimento", icon:"🎪", color:"#ec4899" },
+  oxepay:         { label:"Oxepay",                icon:"💳", color:"#34d399" },
+  pessoal:        { label:"Pessoal / Malory",      icon:"👤", color:"#a78bfa" },
+  escritorio:     { label:"Escritório Geral",      icon:"🏢", color:"#fb923c" },
 };
 
-function Toast({msg,onDone}){
-  useEffect(()=>{const t=setTimeout(onDone,2500);return()=>clearTimeout(t)},[]);
-  return <div className="toast">{msg}</div>;
+// ─── HELPERS ───────────────────────────────────────────────
+function priorityColor(p) {
+  if(p<=2) return "var(--red)";
+  if(p<=4) return "var(--yellow)";
+  if(p<=7) return "var(--blue)";
+  return "var(--green)";
 }
-
-function TaskCard({task,sectors,onUpdate,onDelete}){
-  const [expanded,setExpanded]=useState(false);
-  const [comment,setComment]=useState('');
-  const sector=sectors.find(s=>s.key===task.sector)||{emoji:'📌',label:task.sector,color:'#7c6af7'};
-  const statusNext={pendente:'aguardando',aguardando:'concluido',concluido:'pendente'};
-  const statusIcon={pendente:'○',aguardando:'◐',concluido:'✓'};
-  const statusClass={pendente:'',aguardando:'waiting',concluido:'done'};
-  const prioClass=task.priority<=1?'prio-1':task.priority===2?'prio-2':task.priority===3?'prio-3':task.priority===4?'prio-4':'prio-other';
-  const prioLabel=task.priority===1?'🔴 Urgente':task.priority===2?'🟠 Alta':task.priority===3?'🟡 Média':task.priority===4?'🔵 Normal':'⚪ Baixa';
-
-  const cycleStatus=()=>onUpdate(task.id,{status:statusNext[task.status]});
-  const addComment=()=>{
-    if(!comment.trim())return;
-    const comments=[...(task.comments||[]),{text:comment.trim(),at:new Date().toISOString()}];
-    onUpdate(task.id,{comments});
-    setComment('');
-  };
-
-  return(
-    <div className={`task-card ${task.status==='concluido'?'concluido':''}`}>
-      <div className="task-top">
-        <div className={`task-check ${statusClass[task.status]}`} onClick={cycleStatus} title="Clique para mudar status">
-          {statusIcon[task.status]}
-        </div>
-        <div className="task-info">
-          <div className="task-title" style={{textDecoration:task.status==='concluido'?'line-through':'none'}}>{task.title}</div>
-          {task.description&&<div className="task-desc">{task.description}</div>}
-          <div className="task-meta">
-            <span className={`tag ${prioClass}`}>{prioLabel}</span>
-            <span className={`tag status-tag ${statusClass[task.status]}`}>{task.status}</span>
-            <span className="tag sector-tag">{sector.emoji} {sector.label}</span>
-            <span style={{fontSize:10,color:'var(--muted)',marginLeft:'auto'}}>{fmtDate(task.created_at)}</span>
-          </div>
-        </div>
-      </div>
-      <div className="task-actions">
-        <button className="task-action-btn" onClick={()=>setExpanded(!expanded)}>
-          💬 {(task.comments||[]).length} comentário{(task.comments||[]).length!==1?'s':''}
-        </button>
-        <button className="task-action-btn del" onClick={()=>onDelete(task.id)}>🗑 Remover</button>
-      </div>
-      {expanded&&(
-        <div className="comment-section">
-          {(task.comments||[]).map((c,i)=>(
-            <div key={i} className="comment-item">
-              {c.text}<span className="comment-time">{fmtDate(c.at)}</span>
-            </div>
-          ))}
-          <div className="comment-input" style={{marginTop:8}}>
-            <input value={comment} onChange={e=>setComment(e.target.value)} placeholder="Adicionar comentário..." onKeyDown={e=>e.key==='Enter'&&addComment()}/>
-            <button onClick={addComment}>Enviar</button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+function priorityBg(p) {
+  if(p<=2) return "var(--red-bg)";
+  if(p<=4) return "var(--yellow-bg)";
+  if(p<=7) return "var(--blue-bg)";
+  return "var(--green-bg)";
 }
-
-function NewTaskModal({sectors,defaultSector,onSave,onClose}){
-  const [title,setTitle]=useState('');
-  const [desc,setDesc]=useState('');
-  const [sector,setSector]=useState(defaultSector||sectors[0]?.key||'wowlog');
-  const [priority,setPriority]=useState(2);
-
-  const save=()=>{
-    if(!title.trim())return;
-    onSave({title:title.trim(),description:desc.trim(),sector,priority:+priority,status:'pendente',comments:[]});
-    onClose();
-  };
-
-  return(
-    <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal">
-        <div className="modal-title">➕ Nova Tarefa</div>
-        <div className="form-group">
-          <label className="form-label">Título *</label>
-          <input autoFocus className="form-input" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Descreva a tarefa..." onKeyDown={e=>e.key==='Enter'&&save()}/>
-        </div>
-        <div className="form-group">
-          <label className="form-label">Descrição (opcional)</label>
-          <textarea className="form-input form-textarea" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Detalhes adicionais..."/>
-        </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-          <div className="form-group">
-            <label className="form-label">Setor</label>
-            <select className="form-input form-select" value={sector} onChange={e=>setSector(e.target.value)}>
-              {sectors.map(s=><option key={s.key} value={s.key}>{s.emoji} {s.label}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Prioridade</label>
-            <select className="form-input form-select" value={priority} onChange={e=>setPriority(e.target.value)}>
-              <option value={1}>🔴 1 — Urgente</option>
-              <option value={2}>🟠 2 — Alta</option>
-              <option value={3}>🟡 3 — Média</option>
-              <option value={4}>🔵 4 — Normal</option>
-              <option value={5}>⚪ 5 — Baixa</option>
-            </select>
-          </div>
-        </div>
-        <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-          <button className="btn btn-primary" onClick={save} disabled={!title.trim()}>Criar Tarefa</button>
-        </div>
-      </div>
-    </div>
-  );
+function priorityLabel(p) {
+  if(p<=2) return "Urgente";
+  if(p<=4) return "Alta";
+  if(p<=7) return "Média";
+  return "Baixa";
 }
-
-function NewSectorModal({onSave,onClose,existingKeys}){
-  const [label,setLabel]=useState('');
-  const [emoji,setEmoji]=useState('🏢');
-  const [color,setColor]=useState('#7c6af7');
-  const key=label.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-  const conflict=existingKeys.includes(key);
-
-  const save=()=>{
-    if(!label.trim()||!key||conflict)return;
-    onSave({key,label:label.trim(),emoji,color});
-    onClose();
-  };
-
-  return(
-    <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal">
-        <div className="modal-title">🏗️ Criar Novo Setor</div>
-        <div className="form-group">
-          <label className="form-label">Nome do Setor *</label>
-          <input autoFocus className="form-input" value={label} onChange={e=>setLabel(e.target.value)} placeholder="Ex: Jurídico, RH, Financeiro..."/>
-          {key&&<div style={{fontSize:11,color:'var(--muted)',marginTop:4}}>ID: <code style={{color:'var(--accent)'}}>{key}</code>{conflict&&<span style={{color:'var(--red)'}}> — já existe!</span>}</div>}
-        </div>
-        <div className="form-group">
-          <label className="form-label">Ícone</label>
-          <div className="emoji-grid">
-            {EMOJIS.map(e=><span key={e} className={`emoji-opt ${e===emoji?'sel':''}`} onClick={()=>setEmoji(e)}>{e}</span>)}
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="form-label">Cor</label>
-          <div className="color-grid">
-            {COLORS.map(c=><div key={c} className={`color-opt ${c===color?'sel':''}`} style={{background:c}} onClick={()=>setColor(c)}/>)}
-          </div>
-        </div>
-        <div style={{background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 14px',marginBottom:16,display:'flex',alignItems:'center',gap:10}}>
-          <span style={{fontSize:22}}>{emoji}</span>
-          <span style={{fontWeight:600,color}}>{label||'Preview do setor'}</span>
-        </div>
-        <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-          <button className="btn btn-primary" onClick={save} disabled={!label.trim()||conflict}>Criar Setor</button>
-        </div>
-      </div>
-    </div>
-  );
+function statusLabel(s) {
+  if(s==="pendente") return "Pendente";
+  if(s==="aguardando") return "Aguardando";
+  if(s==="concluido") return "Concluído";
+  if(s==="excluido") return "Excluído";
+  return s;
 }
+function statusIcon(s) {
+  if(s==="pendente") return "⏳";
+  if(s==="aguardando") return "⏸";
+  if(s==="concluido") return "✅";
+  if(s==="excluido") return "🗑";
+  return "•";
+}
+function fmt(d){ if(!d) return ""; try{ return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); } catch(e){ return ""; } }
+function fmtShort(d){ if(!d) return ""; try{ return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); } catch(e){ return ""; } }
+function isOverdue(d){ if(!d) return false; return new Date(d) < new Date() }
+function isoDate(d){ if(!d) return null; return new Date(d).toISOString(); }
 
-function App(){
-  const [tasks,setTasks]=useState([]);
-  const [customSectors,setCustomSectors]=useState([]);
-  const [activeSector,setActiveSector]=useState('all');
-  const [statusFilter,setStatusFilter]=useState('all');
-  const [search,setSearch]=useState('');
-  const [theme,setTheme]=useState('dark');
-  const [sync,setSync]=useState('ok'); // ok | syncing | error
-  const [showNewTask,setShowNewTask]=useState(false);
-  const [showNewSector,setShowNewSector]=useState(false);
-  const [toast,setToast]=useState(null);
-  const [collapsed,setCollapsed]=useState({});
+const MONTHS_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DAYS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
-  const allSectors=[...DEFAULT_SECTORS,...customSectors];
+// ─── APP ───────────────────────────────────────────────────
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [sectors, setSectors] = useState(DEFAULT_SECTORS);
+  const [loading, setLoading] = useState(true);
+  const [syncStatus, setSyncStatus] = useState("loading");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  useEffect(()=>{document.body.className=theme},[theme]);
+  // Navigation
+  const [currentView, setCurrentView] = useState("geral");
+  const [currentSector, setCurrentSector] = useState(null);
 
-  const showToast=msg=>setToast(msg);
+  // View tabs in geral
+  const [geralTab, setGeralTab] = useState("urgente");
 
-  // Load data
-  useEffect(()=>{
-    loadAll();
-    // Realtime subscriptions
-    const taskSub=sb.channel('tasks-rt').on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks()).subscribe();
-    const sectorSub=sb.channel('sectors-rt').on('postgres_changes',{event:'*',schema:'public',table:'custom_sectors'},()=>loadSectors()).subscribe();
-    return()=>{sb.removeChannel(taskSub);sb.removeChannel(sectorSub)};
-  },[]);
+  // Search & filters
+  const [search, setSearch] = useState("");
+  const [sectorFilter, setSectorFilter] = useState("todos");
+  const [statusFilter, setStatusFilter] = useState(null); // from stat cards
 
-  const loadAll=async()=>{ await Promise.all([loadTasks(),loadSectors()]); };
+  // Theme
+  const [theme, setTheme] = useState("light");
 
-  const loadTasks=async()=>{
-    setSync('syncing');
-    const {data,error}=await sb.from('tasks').select('*').neq('status','excluido').order('priority').order('created_at',{ascending:false});
-    if(error){setSync('error');return;}
-    setTasks(data||[]);
-    setSync('ok');
-  };
+  // Modal
+  const [showModal, setShowModal] = useState(false);
+  const [editTask, setEditTask] = useState(null);
 
-  const loadSectors=async()=>{
-    const {data}=await sb.from('custom_sectors').select('*').order('created_at');
-    setCustomSectors(data||[]);
-  };
+  // Calendar
+  const [calMonth, setCalMonth] = useState(new Date().getMonth());
+  const [calYear, setCalYear] = useState(new Date().getFullYear());
+  const [hoveredDay, setHoveredDay] = useState(null);
 
-  const addTask=async(taskData)=>{
-    setSync('syncing');
-    const {error}=await sb.from('tasks').insert([taskData]);
-    if(error){setSync('error');showToast('❌ Erro ao criar tarefa');return;}
-    showToast('✅ Tarefa criada!');
-    await loadTasks();
-  };
+  // ─── LOAD ────────────────────────────────────
+  useEffect(() => {
+    loadTasks();
+    loadCustomSectors();
+    // Realtime
+    const channel = sb.channel('tasks-changes')
+      .on('postgres_changes', { event:'*', schema:'public', table:'tasks' }, (payload) => {
+        loadTasks();
+      })
+      .subscribe();
+    return () => sb.removeChannel(channel);
+  }, []);
 
-  const updateTask=async(id,updates)=>{
-    setSync('syncing');
-    await sb.from('tasks').update({...updates,updated_at:new Date().toISOString()}).eq('id',id);
-    await loadTasks();
-  };
+  async function loadTasks() {
+    try {
+      const { data, error } = await sb.from('tasks').select('*').order('priority', { ascending: true });
+      if(error) throw error;
+      setTasks(data || []);
+      setSyncStatus("synced");
+    } catch(e) {
+      console.error(e);
+      setSyncStatus("error");
+      // Try localStorage fallback
+      const cached = localStorage.getItem('tasks_cache');
+      if(cached) setTasks(JSON.parse(cached));
+    }
+    setLoading(false);
+  }
 
-  const deleteTask=async(id)=>{
-    setSync('syncing');
-    await sb.from('tasks').update({status:'excluido'}).eq('id',id);
-    showToast('🗑 Tarefa removida');
-    await loadTasks();
-  };
+  async function loadCustomSectors() {
+    try {
+      const { data } = await sb.from('custom_sectors').select('*');
+      if(data && data.length) {
+        const merged = { ...DEFAULT_SECTORS };
+        data.forEach(s => { merged[s.key] = { label: s.label, icon: s.emoji, color: s.color }; });
+        setSectors(merged);
+      }
+    } catch(e) { /* ignore */ }
+  }
 
-  const addSector=async(sectorData)=>{
-    const {error}=await sb.from('custom_sectors').insert([sectorData]);
-    if(error){showToast('❌ Erro ao criar setor');return;}
-    showToast(`✅ Setor "${sectorData.label}" criado!`);
-    await loadSectors();
-    setActiveSector(sectorData.key);
-  };
+  // Cache tasks locally as backup
+  useEffect(() => {
+    if(tasks.length > 0) localStorage.setItem('tasks_cache', JSON.stringify(tasks));
+  }, [tasks]);
 
-  const deleteSector=async(key,e)=>{
-    e.stopPropagation();
-    if(!confirm(`Remover setor "${key}"? As tarefas não serão apagadas.`))return;
-    await sb.from('custom_sectors').delete().eq('key',key);
-    showToast('🗑 Setor removido');
-    await loadSectors();
-    if(activeSector===key)setActiveSector('all');
-  };
+  // Theme
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
 
-  const filteredTasks=tasks.filter(t=>{
-    if(activeSector!=='all'&&t.sector!==activeSector)return false;
-    if(statusFilter!=='all'&&t.status!==statusFilter)return false;
-    if(search&&!t.title.toLowerCase().includes(search.toLowerCase())&&!t.description?.toLowerCase().includes(search.toLowerCase()))return false;
-    return true;
-  });
+  // ─── CRUD ────────────────────────────────────
+  async function saveTask(taskData) {
+    try {
+      if(taskData.id) {
+        const { error } = await sb.from('tasks').update({
+          title: taskData.title,
+          sector: taskData.sector,
+          priority: taskData.priority,
+          status: taskData.status,
+          description: taskData.description || '',
+          due_date: taskData.due_date || null,
+        }).eq('id', taskData.id);
+        if(error) throw error;
+      } else {
+        const { error } = await sb.from('tasks').insert({
+          title: taskData.title,
+          sector: taskData.sector,
+          priority: taskData.priority,
+          status: taskData.status || 'pendente',
+          description: taskData.description || '',
+          due_date: taskData.due_date || null,
+          comments: [],
+        });
+        if(error) throw error;
+      }
+      setSyncStatus("synced");
+      loadTasks();
+    } catch(e) {
+      console.error(e);
+      setSyncStatus("error");
+    }
+  }
 
-  const pendingCount=tasks.filter(t=>t.status==='pendente').length;
-  const urgentCount=tasks.filter(t=>t.priority===1&&t.status==='pendente').length;
-  const doneCount=tasks.filter(t=>t.status==='concluido').length;
-  const waitCount=tasks.filter(t=>t.status==='aguardando').length;
+  async function updateStatus(id, newStatus) {
+    try {
+      const { error } = await sb.from('tasks').update({ status: newStatus }).eq('id', id);
+      if(error) throw error;
+      loadTasks();
+    } catch(e) { console.error(e); }
+  }
 
-  const sectorTaskCount=key=>tasks.filter(t=>t.sector===key&&t.status==='pendente').length;
+  async function updatePriority(id, newP) {
+    try {
+      const { error } = await sb.from('tasks').update({ priority: newP }).eq('id', id);
+      if(error) throw error;
+      loadTasks();
+    } catch(e) { console.error(e); }
+  }
 
-  const groupBySector=()=>{
-    if(activeSector!=='all')return{[activeSector]:filteredTasks};
-    const groups={};
-    filteredTasks.forEach(t=>{
-      if(!groups[t.sector])groups[t.sector]=[];
-      groups[t.sector].push(t);
-    });
-    return groups;
-  };
+  async function updateDueDate(id, dateStr) {
+    try {
+      const due = dateStr ? new Date(dateStr).toISOString() : null;
+      const { error } = await sb.from('tasks').update({ due_date: due }).eq('id', id);
+      if(error) throw error;
+      loadTasks();
+    } catch(e) { console.error(e); }
+  }
 
-  const groups=groupBySector();
+  async function addComment(id, text) {
+    try {
+      const task = tasks.find(t => t.id === id);
+      const comments = [...(task.comments || []), { text, date: new Date().toISOString() }];
+      const { error } = await sb.from('tasks').update({ comments }).eq('id', id);
+      if(error) throw error;
+      loadTasks();
+    } catch(e) { console.error(e); }
+  }
 
-  const toggleCollapse=key=>setCollapsed(c=>({...c,[key]:!c[key]}));
+  async function deleteTask(id) {
+    try {
+      const { error } = await sb.from('tasks').update({ status: 'excluido' }).eq('id', id);
+      if(error) throw error;
+      loadTasks();
+    } catch(e) { console.error(e); }
+  }
 
-  return(
+  async function permanentDelete(id) {
+    try {
+      const { error } = await sb.from('tasks').delete().eq('id', id);
+      if(error) throw error;
+      loadTasks();
+    } catch(e) { console.error(e); }
+  }
+
+  async function restoreTask(id) {
+    try {
+      const { error } = await sb.from('tasks').update({ status: 'pendente' }).eq('id', id);
+      if(error) throw error;
+      loadTasks();
+    } catch(e) { console.error(e); }
+  }
+
+  // ─── DERIVED DATA ───────────────────────────
+  const activeTasks = useMemo(() => tasks.filter(t => t.status !== 'excluido'), [tasks]);
+  const nonCompletedTasks = useMemo(() => activeTasks.filter(t => t.status !== 'concluido'), [activeTasks]);
+  const completedTasks = useMemo(() => tasks.filter(t => t.status === 'concluido'), [tasks]);
+  const trashedTasks = useMemo(() => tasks.filter(t => t.status === 'excluido'), [tasks]);
+
+  const stats = useMemo(() => ({
+    urgentes: nonCompletedTasks.filter(t => t.priority <= 2).length,
+    pendentes: activeTasks.filter(t => t.status === 'pendente').length,
+    aguardando: activeTasks.filter(t => t.status === 'aguardando').length,
+    concluidas: completedTasks.length,
+  }), [activeTasks, nonCompletedTasks, completedTasks]);
+
+  // ─── FILTERED TASKS ─────────────────────────
+  const getFilteredTasks = useCallback(() => {
+    let pool;
+
+    // Base pool depends on view
+    if(currentView === "concluidos") {
+      pool = completedTasks;
+    } else if(currentView === "lixeira") {
+      pool = trashedTasks;
+    } else if(currentView === "setor" && currentSector) {
+      pool = nonCompletedTasks.filter(t => t.sector === currentSector);
+    } else {
+      // geral view
+      pool = nonCompletedTasks;
+    }
+
+    // Status filter from stat cards (only in geral)
+    if(currentView === "geral" && statusFilter) {
+      if(statusFilter === "urgentes") {
+        pool = pool.filter(t => t.priority <= 2);
+      } else if(statusFilter === "pendentes") {
+        pool = pool.filter(t => t.status === "pendente");
+      } else if(statusFilter === "aguardando") {
+        pool = pool.filter(t => t.status === "aguardando");
+      } else if(statusFilter === "concluidas") {
+        pool = completedTasks;
+      }
+    }
+
+    // Sector filter
+    if(sectorFilter !== "todos" && currentView !== "setor") {
+      pool = pool.filter(t => t.sector === sectorFilter);
+    }
+
+    // Search
+    if(search.trim()) {
+      const q = search.toLowerCase();
+      pool = pool.filter(t => t.title.toLowerCase().includes(q) || (t.description||'').toLowerCase().includes(q));
+    }
+
+    return pool.sort((a,b) => a.priority - b.priority);
+  }, [tasks, currentView, currentSector, statusFilter, sectorFilter, search, nonCompletedTasks, completedTasks, trashedTasks]);
+
+  const filteredTasks = useMemo(() => getFilteredTasks(), [getFilteredTasks]);
+
+  // Calendar tasks (only those with due_date)
+  const calendarTasks = useMemo(() => {
+    return nonCompletedTasks.filter(t => t.due_date);
+  }, [nonCompletedTasks]);
+
+  // ─── NAVIGATION ──────────────────────────────
+  function navigate(view, sector=null) {
+    setCurrentView(view);
+    setCurrentSector(sector);
+    setStatusFilter(null);
+    setGeralTab(view === "geral" ? "urgente" : geralTab);
+    setSidebarOpen(false);
+  }
+
+  function toggleStatFilter(filter) {
+    setGeralTab("todas");
+    setStatusFilter(prev => prev === filter ? null : filter);
+  }
+
+  // ─── RENDER ──────────────────────────────────
+  return (
     <div className="app">
-      {/* SIDEBAR */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <div className="logo-title">Grupo Malory</div>
-          <div className="logo-sub">Hub de Gestão</div>
-        </div>
-
-        <div className="sidebar-section">Visão Geral</div>
-        <button className={`nav-btn ${activeSector==='all'?'active':''}`} onClick={()=>setActiveSector('all')}>
-          <span className="icon">◉</span> Todas as Tarefas
-          {pendingCount>0&&<span className={`badge ${urgentCount>0?'red':''}`}>{pendingCount}</span>}
+      {/* Mobile Header */}
+      <div className="mobile-header">
+        <button className="hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
+        <span className="font-syne" style={{fontWeight:700,fontSize:15}}>Central de Tarefas</span>
+        <button className="hamburger" onClick={() => setTheme(t => t==='light'?'dark':'light')}>
+          {theme==='light'?'🌙':'☀️'}
         </button>
+      </div>
+      <div className={`mobile-overlay ${sidebarOpen?'show':''}`} onClick={() => setSidebarOpen(false)}/>
 
-        <div className="sidebar-section">Setores</div>
-        {allSectors.map(s=>{
-          const cnt=sectorTaskCount(s.key);
-          const isCustom=!DEFAULT_SECTORS.find(d=>d.key===s.key);
-          return(
-            <button key={s.key} className={`nav-btn ${activeSector===s.key?'active':''}`} onClick={()=>setActiveSector(s.key)}>
-              <span className="icon">{s.emoji}</span>
-              <span style={{flex:1}}>{s.label}</span>
-              {cnt>0&&<span className="badge">{cnt}</span>}
-              {isCustom&&<button className="delete-sector-btn" onClick={e=>deleteSector(s.key,e)} title="Remover setor">✕</button>}
-            </button>
-          );
-        })}
-
-        <div style={{padding:'4px 8px'}}>
-          <button className="add-sector-btn" onClick={()=>setShowNewSector(true)}>
-            <span>＋</span> Novo Setor
-          </button>
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen?'open':''}`}>
+        <div className="logo">
+          <h1>Central de Tarefas</h1>
+          <div className="logo-sub">Malory · 4 Empresas</div>
         </div>
+
+        <nav className="nav">
+          <button className={`nav-btn ${currentView==='geral'?'active':''}`} onClick={() => navigate('geral')}>
+            <span className="nav-icon">📊</span> Visão Geral
+          </button>
+
+          <div className="nav-sep"/>
+          <div className="nav-label">Setores</div>
+
+          {Object.entries(sectors).map(([key, s]) => (
+            <button key={key} className={`nav-btn ${currentView==='setor'&&currentSector===key?'active':''}`} onClick={() => navigate('setor', key)}>
+              <span className="nav-icon">{s.icon}</span> {s.label}
+            </button>
+          ))}
+
+          <div className="nav-sep"/>
+          <button className={`nav-btn ${currentView==='concluidos'?'active':''}`} onClick={() => navigate('concluidos')}>
+            <span className="nav-icon">✅</span> Concluídos
+            <span style={{marginLeft:'auto',fontSize:11,opacity:.6}}>{completedTasks.length}</span>
+          </button>
+          <button className={`nav-btn ${currentView==='lixeira'?'active':''}`} onClick={() => navigate('lixeira')}>
+            <span className="nav-icon">🗑</span> Lixeira
+            <span style={{marginLeft:'auto',fontSize:11,opacity:.6}}>{trashedTasks.length}</span>
+          </button>
+        </nav>
 
         <div className="sidebar-footer">
-          <button className="nav-btn" onClick={()=>setTheme(t=>t==='dark'?'light':'dark')}>
-            <span className="icon">{theme==='dark'?'☀️':'🌙'}</span>
-            {theme==='dark'?'Modo Claro':'Modo Escuro'}
+          <button className="theme-toggle" onClick={() => setTheme(t => t==='light'?'dark':'light')}>
+            {theme==='light'?'🌙':'☀️'} {theme==='light'?'Modo Escuro':'Modo Claro'}
           </button>
+          <div className={`sync-badge ${syncStatus==='synced'?'':syncStatus==='error'?'error':'offline'}`}>
+            {syncStatus==='synced'?'● Sincronizado':syncStatus==='error'?'● Erro de conexão':'● Carregando...'}
+          </div>
         </div>
       </aside>
 
-      {/* MAIN */}
-      <div className="main">
-        {/* TOPBAR */}
-        <div className="topbar">
-          <div className="topbar-search">
-            <span className="ico">🔍</span>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar tarefas..."/>
-          </div>
-          <div style={{flex:1}}/>
-          <div className={`sync-dot ${sync}`} title={sync==='ok'?'Sincronizado':sync==='syncing'?'Sincronizando...':'Erro de conexão'}/>
-          <button className="btn btn-primary" style={{fontSize:13,padding:'7px 14px'}} onClick={()=>setShowNewTask(true)}>
-            ＋ Nova Tarefa
-          </button>
+      {/* Main Content */}
+      <main className="main">
+        {loading ? (
+          <div className="empty-state"><div className="empty-icon">⏳</div><p>Carregando tarefas...</p></div>
+        ) : currentView === "geral" ? (
+          <GeralView
+            tasks={filteredTasks} allTasks={nonCompletedTasks} calendarTasks={calendarTasks}
+            stats={stats} search={search} setSearch={setSearch}
+            sectorFilter={sectorFilter} setSectorFilter={setSectorFilter}
+            statusFilter={statusFilter} toggleStatFilter={toggleStatFilter}
+            geralTab={geralTab} setGeralTab={setGeralTab}
+            sectors={sectors} onStatusChange={updateStatus} onPriorityChange={updatePriority}
+            onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
+            onNewTask={() => { setEditTask(null); setShowModal(true); }}
+            onEditTask={(t) => { setEditTask(t); setShowModal(true); }}
+            calMonth={calMonth} setCalMonth={setCalMonth}
+            calYear={calYear} setCalYear={setCalYear}
+            hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
+            completedTasks={completedTasks}
+          />
+        ) : currentView === "setor" ? (
+          <SectorView
+            sector={currentSector} sectorInfo={sectors[currentSector]}
+            tasks={filteredTasks} search={search} setSearch={setSearch}
+            onStatusChange={updateStatus} onPriorityChange={updatePriority}
+            onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
+            onNewTask={() => { setEditTask({ sector: currentSector }); setShowModal(true); }}
+            onEditTask={(t) => { setEditTask(t); setShowModal(true); }}
+            sectors={sectors}
+          />
+        ) : currentView === "concluidos" ? (
+          <ConcluView tasks={completedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
+        ) : currentView === "lixeira" ? (
+          <TrashView tasks={trashedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
+        ) : null}
+      </main>
+
+      {/* Create/Edit Modal */}
+      {showModal && (
+        <TaskModal
+          task={editTask} sectors={sectors}
+          onSave={(data) => { saveTask(data); setShowModal(false); }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── GERAL VIEW ────────────────────────────────
+function GeralView({
+  tasks, allTasks, calendarTasks, stats, search, setSearch,
+  sectorFilter, setSectorFilter, statusFilter, toggleStatFilter,
+  geralTab, setGeralTab, sectors, onStatusChange, onPriorityChange,
+  onDelete, onAddComment, onDueDateChange, onNewTask, onEditTask,
+  calMonth, setCalMonth, calYear, setCalYear, hoveredDay, setHoveredDay,
+  completedTasks
+}) {
+  const displayTasks = geralTab === "urgente"
+    ? allTasks.filter(t => {
+        if(sectorFilter !== "todos" && t.sector !== sectorFilter) return false;
+        if(search.trim() && !t.title.toLowerCase().includes(search.toLowerCase())) return false;
+        return true;
+      }).sort((a,b) => a.priority - b.priority)
+    : tasks;
+
+  // For urgent view: split into urgent + others
+  const urgentTasks = displayTasks.filter(t => t.priority <= 2);
+  const otherTasks = displayTasks.filter(t => t.priority > 2);
+
+  // For stat-card filter override
+  const finalTasks = statusFilter === "concluidas" ? completedTasks : (statusFilter ? tasks : null);
+
+  return (
+    <>
+      <div className="page-header">
+        <h2 className="page-title">Visão Geral</h2>
+        <div className="page-subtitle">{allTasks.length} tarefas ativas · {stats.urgentes} urgentes</div>
+      </div>
+
+      {/* View Tabs */}
+      <div className="view-tabs">
+        <button className={`view-tab ${geralTab==='urgente'&&!statusFilter?'active':''}`}
+          onClick={() => { setGeralTab('urgente'); toggleStatFilter(null); }}>
+          🔥 Urgente
+        </button>
+        <button className={`view-tab ${geralTab==='calendario'&&!statusFilter?'active':''}`}
+          onClick={() => { setGeralTab('calendario'); toggleStatFilter(null); }}>
+          📅 Calendário
+        </button>
+        <button className={`view-tab ${geralTab==='todas'&&!statusFilter?'active':''}`}
+          onClick={() => { setGeralTab('todas'); toggleStatFilter(null); }}>
+          📋 Todas as Tarefas
+        </button>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="stat-row">
+        <div className={`stat-card ${statusFilter==='urgentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('urgentes'); setGeralTab('todas'); }}>
+          <div className="stat-dot" style={{background:"var(--red)"}}/>
+          <div className="stat-label">Urgentes</div>
+          <div className="stat-num" style={{color:"var(--red)"}}>{stats.urgentes}</div>
         </div>
-
-        {/* CONTENT */}
-        <div className="content">
-          {/* STATS */}
-          <div className="stats-row">
-            <div className="stat-card">
-              <div className="stat-num" style={{color:'var(--red)'}}>{urgentCount}</div>
-              <div className="stat-label">🔴 Urgentes</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-num" style={{color:'var(--yellow)'}}>{pendingCount}</div>
-              <div className="stat-label">⏳ Pendentes</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-num" style={{color:'var(--blue)'}}>{waitCount}</div>
-              <div className="stat-label">⏸ Aguardando</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-num" style={{color:'var(--green)'}}>{doneCount}</div>
-              <div className="stat-label">✅ Concluídas</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-num">{tasks.length}</div>
-              <div className="stat-label">📋 Total</div>
-            </div>
-          </div>
-
-          {/* FILTERS */}
-          <div className="filters">
-            {['all','pendente','aguardando','concluido'].map(s=>(
-              <button key={s} className={`filter-btn ${statusFilter===s?'active':''}`} onClick={()=>setStatusFilter(s)}>
-                {s==='all'?'Todos':s==='pendente'?'⏳ Pendentes':s==='aguardando'?'⏸ Aguardando':'✅ Concluídos'}
-              </button>
-            ))}
-          </div>
-
-          {/* TASK GROUPS */}
-          {Object.keys(groups).length===0?(
-            <div className="empty">
-              <div className="empty-icon">📭</div>
-              <div>Nenhuma tarefa encontrada</div>
-            </div>
-          ):(
-            Object.entries(groups).sort(([a],[b])=>{
-              const orderA=allSectors.findIndex(s=>s.key===a);
-              const orderB=allSectors.findIndex(s=>s.key===b);
-              return orderA-orderB;
-            }).map(([key,items])=>{
-              const sector=allSectors.find(s=>s.key===key)||{emoji:'📌',label:key,color:'#7c6af7'};
-              const isOpen=!collapsed[key];
-              return(
-                <div key={key} style={{marginBottom:24}}>
-                  {activeSector==='all'&&(
-                    <div className="sector-header-bar" onClick={()=>toggleCollapse(key)}>
-                      <span style={{fontSize:18}}>{sector.emoji}</span>
-                      <span style={{fontFamily:'Syne,sans-serif',fontWeight:800,fontSize:15,color:sector.color}}>{sector.label}</span>
-                      <span className="section-count">{items.length}</span>
-                      <span className={`sector-collapse-icon ${isOpen?'open':''}`}>▶</span>
-                    </div>
-                  )}
-                  {(activeSector!=='all'||isOpen)&&(
-                    <>
-                      {activeSector!=='all'&&(
-                        <div className="section-header">
-                          <span style={{fontSize:24}}>{sector.emoji}</span>
-                          <span className="section-title" style={{color:sector.color}}>{sector.label}</span>
-                          <span className="section-count">{items.length} tarefa{items.length!==1?'s':''}</span>
-                        </div>
-                      )}
-                      <div className="task-list">
-                        {items.sort((a,b)=>a.priority-b.priority).map(t=>(
-                          <TaskCard key={t.id} task={t} sectors={allSectors} onUpdate={updateTask} onDelete={deleteTask}/>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })
-          )}
+        <div className={`stat-card ${statusFilter==='pendentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('pendentes'); setGeralTab('todas'); }}>
+          <div className="stat-dot" style={{background:"var(--yellow)"}}/>
+          <div className="stat-label">Pendentes</div>
+          <div className="stat-num" style={{color:"var(--yellow)"}}>{stats.pendentes}</div>
+        </div>
+        <div className={`stat-card ${statusFilter==='aguardando'?'active-filter':''}`} onClick={() => { toggleStatFilter('aguardando'); setGeralTab('todas'); }}>
+          <div className="stat-dot" style={{background:"var(--blue)"}}/>
+          <div className="stat-label">Aguardando</div>
+          <div className="stat-num" style={{color:"var(--blue)"}}>{stats.aguardando}</div>
+        </div>
+        <div className={`stat-card ${statusFilter==='concluidas'?'active-filter':''}`} onClick={() => { toggleStatFilter('concluidas'); setGeralTab('todas'); }}>
+          <div className="stat-dot" style={{background:"var(--green)"}}/>
+          <div className="stat-label">Concluídas</div>
+          <div className="stat-num" style={{color:"var(--green)"}}>{stats.concluidas}</div>
         </div>
       </div>
 
-      {/* MODALS */}
-      {showNewTask&&(
-        <NewTaskModal
-          sectors={allSectors}
-          defaultSector={activeSector!=='all'?activeSector:allSectors[0]?.key}
-          onSave={addTask}
-          onClose={()=>setShowNewTask(false)}
+      {/* Search */}
+      <div className="search-row">
+        <input className="search-input" placeholder="🔍 Buscar tarefas..." value={search} onChange={e => setSearch(e.target.value)}/>
+        <select className="filter-select" value={sectorFilter} onChange={e => setSectorFilter(e.target.value)}>
+          <option value="todos">Todos os setores</option>
+          {Object.entries(sectors).map(([k,v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
+        </select>
+        <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
+      </div>
+
+      {/* Content based on tab */}
+      {geralTab === "calendario" && !statusFilter ? (
+        <CalendarWidget
+          tasks={calendarTasks} sectors={sectors}
+          month={calMonth} year={calYear}
+          setMonth={setCalMonth} setYear={setCalYear}
+          hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
         />
+      ) : geralTab === "urgente" && !statusFilter ? (
+        <>
+          {urgentTasks.length > 0 ? (
+            <>
+              <div className="section-divider">🔴 Urgentes ({urgentTasks.length})</div>
+              <div className="task-list">
+                {urgentTasks.map(t => (
+                  <TaskCard key={t.id} task={t} sectors={sectors}
+                    onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+                    onDelete={onDelete} onAddComment={onAddComment}
+                    onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
+                ))}
+              </div>
+            </>
+          ) : null}
+          {otherTasks.length > 0 ? (
+            <>
+              <div className="section-divider">Demais tarefas por prioridade ({otherTasks.length})</div>
+              <div className="task-list">
+                {otherTasks.map(t => (
+                  <TaskCard key={t.id} task={t} sectors={sectors}
+                    onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+                    onDelete={onDelete} onAddComment={onAddComment}
+                    onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
+                ))}
+              </div>
+            </>
+          ) : null}
+          {urgentTasks.length === 0 && otherTasks.length === 0 && (
+            <div className="empty-state"><div className="empty-icon">🎉</div><p>Nenhuma tarefa encontrada</p></div>
+          )}
+        </>
+      ) : (
+        <div className="task-list">
+          {(finalTasks || tasks).length > 0 ? (finalTasks || tasks).map(t => (
+            <TaskCard key={t.id} task={t} sectors={sectors}
+              onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+              onDelete={onDelete} onAddComment={onAddComment}
+              onDueDateChange={onDueDateChange} onEdit={onEditTask}
+              isCompleted={t.status==='concluido'}/>
+          )) : (
+            <div className="empty-state"><div className="empty-icon">📭</div><p>Nenhuma tarefa encontrada</p></div>
+          )}
+        </div>
       )}
-      {showNewSector&&(
-        <NewSectorModal
-          existingKeys={allSectors.map(s=>s.key)}
-          onSave={addSector}
-          onClose={()=>setShowNewSector(false)}
-        />
-      )}
-      {toast&&<Toast msg={toast} onDone={()=>setToast(null)}/>}
+    </>
+  );
+}
+
+// ─── SECTOR VIEW ───────────────────────────────
+function SectorView({ sector, sectorInfo, tasks, search, setSearch, onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onNewTask, onEditTask, sectors }) {
+  if(!sectorInfo) return <div className="empty-state"><p>Setor não encontrado</p></div>;
+  return (
+    <>
+      <div className="page-header">
+        <h2 className="page-title">{sectorInfo.icon} {sectorInfo.label}</h2>
+        <div className="page-subtitle">{tasks.length} tarefas ativas</div>
+      </div>
+      <div className="search-row">
+        <input className="search-input" placeholder="🔍 Buscar neste setor..." value={search} onChange={e => setSearch(e.target.value)}/>
+        <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
+      </div>
+      <div className="task-list">
+        {tasks.length > 0 ? tasks.map(t => (
+          <TaskCard key={t.id} task={t} sectors={sectors}
+            onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+            onDelete={onDelete} onAddComment={onAddComment}
+            onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
+        )) : (
+          <div className="empty-state"><div className="empty-icon">✨</div><p>Nenhuma tarefa neste setor</p></div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ─── CONCLUIDOS VIEW ───────────────────────────
+function ConcluView({ tasks, sectors, onRestore, onDelete, search, setSearch }) {
+  const filtered = search.trim()
+    ? tasks.filter(t => t.title.toLowerCase().includes(search.toLowerCase()))
+    : tasks;
+  return (
+    <>
+      <div className="page-header">
+        <h2 className="page-title">✅ Tarefas Concluídas</h2>
+        <div className="page-subtitle">{tasks.length} tarefas concluídas</div>
+      </div>
+      <div className="search-row">
+        <input className="search-input" placeholder="🔍 Buscar concluídas..." value={search} onChange={e => setSearch(e.target.value)}/>
+      </div>
+      <div className="task-list">
+        {filtered.map(t => (
+          <div key={t.id} className="task-card" style={{opacity:.8}}>
+            <div className="task-card-inner">
+              <div className="task-priority-bar" style={{background:priorityColor(t.priority),opacity:.4}}/>
+              <div className="task-body">
+                <div className="task-title" style={{textDecoration:'line-through'}}>{t.title}</div>
+                <div className="task-meta">
+                  <span className="sector-tag">{(sectors[t.sector]||{}).icon} {(sectors[t.sector]||{}).label||t.sector}</span>
+                  <span style={{fontSize:11,color:"var(--muted)"}}>Prioridade {t.priority}</span>
+                </div>
+              </div>
+              <div className="task-actions">
+                <button title="Restaurar" onClick={() => onRestore(t.id)}>↩️</button>
+                <button title="Excluir permanente" onClick={() => onDelete(t.id)} style={{color:"var(--red)"}}>🗑</button>
+              </div>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && <div className="empty-state"><div className="empty-icon">📭</div><p>Nenhuma tarefa concluída</p></div>}
+      </div>
+    </>
+  );
+}
+
+// ─── TRASH VIEW ────────────────────────────────
+function TrashView({ tasks, sectors, onRestore, onDelete, search, setSearch }) {
+  const filtered = search.trim()
+    ? tasks.filter(t => t.title.toLowerCase().includes(search.toLowerCase()))
+    : tasks;
+  return (
+    <>
+      <div className="page-header">
+        <h2 className="page-title">🗑 Lixeira</h2>
+        <div className="page-subtitle">{tasks.length} itens na lixeira</div>
+      </div>
+      <div className="search-row">
+        <input className="search-input" placeholder="🔍 Buscar na lixeira..." value={search} onChange={e => setSearch(e.target.value)}/>
+      </div>
+      <div className="task-list">
+        {filtered.map(t => (
+          <div key={t.id} className="task-card" style={{opacity:.7}}>
+            <div className="task-card-inner">
+              <div className="task-priority-bar" style={{background:"var(--muted)",opacity:.3}}/>
+              <div className="task-body">
+                <div className="task-title" style={{textDecoration:'line-through'}}>{t.title}</div>
+                <div className="task-meta">
+                  <span className="sector-tag">{(sectors[t.sector]||{}).icon} {(sectors[t.sector]||{}).label||t.sector}</span>
+                </div>
+              </div>
+              <div className="task-actions">
+                <button title="Restaurar" onClick={() => onRestore(t.id)}>↩️ Restaurar</button>
+                <button title="Excluir permanente" onClick={() => { if(confirm('Excluir permanentemente?')) onDelete(t.id); }} style={{color:"var(--red)"}}>❌ Deletar</button>
+              </div>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && <div className="empty-state"><div className="empty-icon">🗑</div><p>Lixeira vazia</p></div>}
+      </div>
+    </>
+  );
+}
+
+// ─── CALENDAR WIDGET ───────────────────────────
+function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hoveredDay, setHoveredDay }) {
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  const today = new Date();
+
+  // Group tasks by day
+  const tasksByDay = {};
+  tasks.forEach(t => {
+    if(!t.due_date) return;
+    const d = new Date(t.due_date);
+    if(d.getMonth() === month && d.getFullYear() === year) {
+      const day = d.getDate();
+      if(!tasksByDay[day]) tasksByDay[day] = [];
+      tasksByDay[day].push(t);
+    }
+  });
+
+  function prevMonth() {
+    if(month === 0) { setMonth(11); setYear(year-1); }
+    else setMonth(month-1);
+  }
+  function nextMonth() {
+    if(month === 11) { setMonth(0); setYear(year+1); }
+    else setMonth(month+1);
+  }
+
+  const cells = [];
+  // Previous month padding
+  for(let i = firstDay - 1; i >= 0; i--) {
+    cells.push({ day: prevDays - i, isOther: true });
+  }
+  // Current month
+  for(let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, isOther: false, isToday: d === today.getDate() && month === today.getMonth() && year === today.getFullYear() });
+  }
+  // Next month padding
+  const remaining = 42 - cells.length;
+  for(let d = 1; d <= remaining; d++) {
+    cells.push({ day: d, isOther: true });
+  }
+
+  return (
+    <div className="calendar-wrap">
+      <div className="calendar-header">
+        <div className="calendar-nav">
+          <button onClick={prevMonth}>◀</button>
+        </div>
+        <h3>{MONTHS_PT[month]} {year}</h3>
+        <div className="calendar-nav">
+          <button onClick={nextMonth}>▶</button>
+        </div>
+      </div>
+      <div className="calendar-grid">
+        {DAYS_PT.map(d => <div key={d} className="calendar-day-label">{d}</div>)}
+        {cells.map((cell, i) => {
+          const dayTasks = !cell.isOther ? (tasksByDay[cell.day] || []) : [];
+          const hasTasks = dayTasks.length > 0;
+          return (
+            <div key={i}
+              className={`calendar-cell ${cell.isOther?'other-month':''} ${cell.isToday?'today':''} ${hasTasks?'has-tasks':''}`}
+              onMouseEnter={() => hasTasks && setHoveredDay(`${year}-${month}-${cell.day}`)}
+              onMouseLeave={() => setHoveredDay(null)}
+              style={{position:'relative'}}
+            >
+              <span>{cell.day}</span>
+              {hasTasks && (
+                <div className="calendar-dots">
+                  {dayTasks.slice(0,4).map((t,j) => (
+                    <div key={j} className="calendar-dot" style={{background:priorityColor(t.priority)}}/>
+                  ))}
+                </div>
+              )}
+              {hoveredDay === `${year}-${month}-${cell.day}` && hasTasks && (
+                <div className="calendar-cell-tooltip">
+                  {dayTasks.map((t,j) => (
+                    <div key={j} style={{marginBottom:j<dayTasks.length-1?4:0}}>
+                      <span style={{color:priorityColor(t.priority),fontWeight:700}}>●</span> {t.title.substring(0,50)}{t.title.length>50?'...':''}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── TASK CARD ─────────────────────────────────
+function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEdit, isCompleted }) {
+  const [openComment, setOpenComment] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateVal, setDateVal] = useState(task.due_date ? task.due_date.substring(0,16) : "");
+  const pickerRef = useRef(null);
+
+  const sectorInfo = sectors[task.sector] || { icon:"📌", label:task.sector, color:"#888" };
+
+  const statusFlow = ["pendente","aguardando","concluido"];
+  const currentIdx = statusFlow.indexOf(task.status);
+
+  function nextStatus() {
+    if(currentIdx < statusFlow.length - 1) {
+      onStatusChange(task.id, statusFlow[currentIdx + 1]);
+    }
+  }
+  function prevStatus() {
+    if(currentIdx > 0) {
+      onStatusChange(task.id, statusFlow[currentIdx - 1]);
+    }
+  }
+
+  function handleAddComment() {
+    if(!commentText.trim()) return;
+    onAddComment(task.id, commentText.trim());
+    setCommentText("");
+  }
+
+  function handleDateSave() {
+    onDueDateChange(task.id, dateVal || null);
+    setShowDatePicker(false);
+  }
+
+  // Close picker on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if(pickerRef.current && !pickerRef.current.contains(e.target)) setShowPicker(false);
+    }
+    if(showPicker) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showPicker]);
+
+  return (
+    <div className="task-card">
+      <div className="task-card-inner">
+        <div className="task-priority-bar" style={{background: priorityColor(task.priority)}}/>
+        <div className="task-body">
+          <div className="task-header">
+            <span className="task-title" style={isCompleted?{textDecoration:'line-through',opacity:.7}:{}}>
+              {task.title}
+            </span>
+          </div>
+          <div className="task-meta">
+            <span className="sector-tag">{sectorInfo.icon} {sectorInfo.label}</span>
+
+            {/* Priority badge - clickable */}
+            <span style={{position:'relative'}} ref={pickerRef}>
+              <span className={`badge ${task.priority<=2?'badge-red':task.priority<=4?'badge-yellow':task.priority<=7?'badge-blue':'badge-green'}`}
+                onClick={() => setShowPicker(!showPicker)} title="Clique para alterar prioridade">
+                {priorityLabel(task.priority)} · {task.priority}
+              </span>
+              {showPicker && (
+                <div className="priority-picker">
+                  {[1,2,3,4,5,6,7,8,9,10].map(p => (
+                    <button key={p}
+                      className={task.priority===p?'selected':''}
+                      style={{background: priorityBg(p), color: priorityColor(p)}}
+                      onClick={() => { onPriorityChange(task.id, p); setShowPicker(false); }}>
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </span>
+
+            {/* Status badge */}
+            <span className="badge" style={{background:"var(--input-bg)",color:"var(--muted)",cursor:"default"}}>
+              {statusIcon(task.status)} {statusLabel(task.status)}
+            </span>
+
+            {/* Due date tag */}
+            {task.due_date && (
+              <span className={`task-date-tag ${isOverdue(task.due_date)&&task.status!=='concluido'?'overdue':''}`}
+                onClick={() => setShowDatePicker(!showDatePicker)} style={{cursor:'pointer'}}>
+                📅 {fmtShort(task.due_date)}
+              </span>
+            )}
+          </div>
+
+          {/* Date picker */}
+          {showDatePicker && (
+            <div className="date-picker-inline">
+              <input type="datetime-local" value={dateVal} onChange={e => setDateVal(e.target.value)}/>
+              <button style={{background:"var(--accent)",color:"#fff"}} onClick={handleDateSave}>Salvar</button>
+              <button style={{background:"var(--red-bg)",color:"var(--red)"}} onClick={() => { setDateVal(""); onDueDateChange(task.id, null); setShowDatePicker(false); }}>Remover</button>
+              <button style={{background:"var(--input-bg)",color:"var(--muted)"}} onClick={() => setShowDatePicker(false)}>Cancelar</button>
+            </div>
+          )}
+
+          {/* Comments toggle */}
+          {!isCompleted && (
+            <div style={{marginTop:6,display:'flex',gap:6,flexWrap:'wrap'}}>
+              {task.status !== 'concluido' && currentIdx > 0 && (
+                <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}} onClick={prevStatus}>
+                  ← {statusLabel(statusFlow[currentIdx-1])}
+                </button>
+              )}
+              {task.status !== 'concluido' && currentIdx < statusFlow.length - 1 && (
+                <button style={{fontSize:11,color:"var(--accent)",background:"var(--accent-soft)",border:"1px solid transparent",borderRadius:6,padding:"2px 8px",cursor:"pointer",fontWeight:600}} onClick={nextStatus}>
+                  {statusLabel(statusFlow[currentIdx+1])} →
+                </button>
+              )}
+              <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
+                onClick={() => setShowDatePicker(!showDatePicker)}>
+                📅 {task.due_date ? 'Editar data' : 'Definir data'}
+              </button>
+              <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
+                onClick={() => setOpenComment(!openComment)}>
+                💬 {(task.comments||[]).length || ''} {openComment ? '▲' : '▼'}
+              </button>
+            </div>
+          )}
+
+          {/* Comments area */}
+          {openComment && !isCompleted && (
+            <div className="comments-area">
+              {(task.comments||[]).map((c,i) => (
+                <div key={i} className="comment-item">
+                  <small>{fmt(c.date)}</small>{c.text}
+                </div>
+              ))}
+              <div className="comment-input-row">
+                <input className="comment-input" value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  placeholder="Adicionar comentário..."
+                  onKeyDown={e => e.key==='Enter' && handleAddComment()}/>
+                <button className="comment-send" onClick={handleAddComment}>→</button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        {!isCompleted && (
+          <div className="task-actions">
+            <button title="Editar" onClick={() => onEdit(task)}>✏️</button>
+            <button title="Excluir" onClick={() => onDelete(task.id)} style={{color:"var(--red)"}}>🗑</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── TASK MODAL ────────────────────────────────
+function TaskModal({ task, sectors, onSave, onClose }) {
+  const isEdit = task && task.id;
+  const [title, setTitle] = useState(task?.title || "");
+  const [sector, setSector] = useState(task?.sector || Object.keys(sectors)[0]);
+  const [priority, setPriority] = useState(task?.priority || 5);
+  const [status, setStatus] = useState(task?.status || "pendente");
+  const [description, setDescription] = useState(task?.description || "");
+  const [dueDate, setDueDate] = useState(task?.due_date ? task.due_date.substring(0,16) : "");
+
+  function handleSave() {
+    if(!title.trim()) return;
+    onSave({
+      id: task?.id || null,
+      title: title.trim(),
+      sector,
+      priority,
+      status,
+      description,
+      due_date: dueDate || null,
+    });
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <h2>{isEdit ? '✏️ Editar Tarefa' : '➕ Nova Tarefa'}</h2>
+
+        <label>Título *</label>
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="O que precisa ser feito?"
+          autoFocus onKeyDown={e => e.key==='Enter' && handleSave()}/>
+
+        <label>Setor</label>
+        <select value={sector} onChange={e => setSector(e.target.value)}>
+          {Object.entries(sectors).map(([k,v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
+        </select>
+
+        <label>Prioridade (1 = mais urgente)</label>
+        <div style={{display:'flex',gap:4,marginTop:4}}>
+          {[1,2,3,4,5,6,7,8,9,10].map(p => (
+            <button key={p}
+              style={{
+                width:36,height:36,borderRadius:8,
+                border: priority===p ? '2px solid var(--text)' : '2px solid transparent',
+                background: priorityBg(p), color: priorityColor(p),
+                fontWeight:700,fontSize:13,cursor:'pointer',transition:'.15s',
+                transform: priority===p ? 'scale(1.15)' : 'scale(1)'
+              }}
+              onClick={() => setPriority(p)}>
+              {p}
+            </button>
+          ))}
+        </div>
+
+        {isEdit && (
+          <>
+            <label>Status</label>
+            <select value={status} onChange={e => setStatus(e.target.value)}>
+              <option value="pendente">⏳ Pendente</option>
+              <option value="aguardando">⏸ Aguardando</option>
+              <option value="concluido">✅ Concluído</option>
+            </select>
+          </>
+        )}
+
+        <label>Data / Prazo (opcional)</label>
+        <input type="datetime-local" value={dueDate} onChange={e => setDueDate(e.target.value)}/>
+
+        <label>Descrição (opcional)</label>
+        <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Detalhes adicionais..."/>
+
+        <div className="modal-actions">
+          <button className="btn-secondary" onClick={onClose}>Cancelar</button>
+          <button className="btn-primary" onClick={handleSave}>{isEdit?'Salvar':'Criar Tarefa'}</button>
+        </div>
+      </div>
     </div>
   );
 }
