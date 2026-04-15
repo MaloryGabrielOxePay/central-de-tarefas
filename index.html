@@ -320,7 +320,8 @@ body.dark {
   width:28px;min-width:28px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:1px;
   cursor:grab;color:var(--muted);opacity:.35;
-  transition:opacity .15s;user-select:none;flex-shrink:0
+  transition:opacity .15s;user-select:none;flex-shrink:0;
+  touch-action:none
 }
 .drag-dots{font-size:18px;line-height:1;letter-spacing:-2px}
 .minha-ordem-card:hover .drag-handle{opacity:.75}
@@ -1360,7 +1361,10 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
 // DOM wrapper is added — layout is identical to a regular TaskCard.
 function DraggableTaskCard({ task, draggingId, position, handlers, ...taskProps }) {
   const dragSlot = (
-    <div className="drag-handle" title={`#${position} — arrastar para reordenar`}>
+    <div className="drag-handle" title={`#${position} — arrastar para reordenar`}
+      onTouchStart={e => handlers.onTouchStart(e, task.id)}
+      onTouchEnd={handlers.onTouchEnd}
+    >
       <span className="drag-dots">⠿</span>
       <span className="minha-ordem-pos">#{position}</span>
     </div>
@@ -1373,9 +1377,6 @@ function DraggableTaskCard({ task, draggingId, position, handlers, ...taskProps 
     onDragOver:   handlers.onDragOver,
     onDrop:       handlers.onDrop,
     onDragEnd:    handlers.onDragEnd,
-    onTouchStart: e => handlers.onTouchStart(e, task.id),
-    onTouchMove:  handlers.onTouchMove,
-    onTouchEnd:   handlers.onTouchEnd,
   };
   return (
     <TaskCard
@@ -1482,6 +1483,7 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder,
   const dropSucceededRef = useRef(false);
   const lastEnterRef = useRef(null);
   const saveTimerRef = useRef(null);
+  const listRef = useRef(null);
   const filterRef = useRef('todas');
   const searchRef = useRef('');
 
@@ -1610,21 +1612,6 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder,
     setDraggingId(id);
   }
 
-  function handleTouchMove(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const card = el && el.closest('[data-task-id]');
-    if(card) {
-      const targetId = Number(card.dataset.taskId);
-      const fromId = draggingIdRef.current;
-      if(fromId && targetId && targetId !== fromId && lastEnterRef.current !== targetId) {
-        lastEnterRef.current = targetId;
-        reorderById(fromId, targetId);
-      }
-    }
-  }
-
   function handleTouchEnd() {
     if(draggingIdRef.current) scheduleSave();
     setDraggingId(null);
@@ -1640,9 +1627,41 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder,
     onDrop:       handleDrop,
     onDragEnd:    handleDragEnd,
     onTouchStart: handleTouchStart,
-    onTouchMove:  handleTouchMove,
     onTouchEnd:   handleTouchEnd,
   };
+
+  // ── Non-passive touchmove: React synthetic events são passivos e não podem
+  // chamar preventDefault(), então registramos diretamente no DOM com { passive: false }
+  // para impedir o scroll da página durante o arraste no mobile.
+  useEffect(() => {
+    const el = listRef.current;
+    if(!el) return;
+    function onTouchMove(e) {
+      if(!draggingIdRef.current) return; // sem drag ativo → deixa scroll normal
+      e.preventDefault();
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      const card = target && target.closest('[data-task-id]');
+      if(card) {
+        const targetId = Number(card.dataset.taskId);
+        const fromId = draggingIdRef.current;
+        if(fromId && targetId && targetId !== fromId && lastEnterRef.current !== targetId) {
+          lastEnterRef.current = targetId;
+          const list = [...fullListRef.current];
+          const fi = list.findIndex(t => t.id === fromId);
+          const ti = list.findIndex(t => t.id === targetId);
+          if(fi !== -1 && ti !== -1) {
+            const [item] = list.splice(fi, 1);
+            list.splice(ti, 0, item);
+            fullListRef.current = list;
+            setFullList(list);
+          }
+        }
+      }
+    }
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', onTouchMove);
+  }, []); // deps vazias: só refs e setters estáveis são usados
 
   const hasFilter = filter !== 'todas' || search.trim();
 
@@ -1697,6 +1716,7 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder,
         </div>
       ) : (
         <div
+          ref={listRef}
           className="minha-ordem-list"
           style={draggingId ? {touchAction:'none',userSelect:'none'} : {}}
         >
