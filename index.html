@@ -317,16 +317,17 @@ body.dark {
   cursor:grabbing
 }
 .drag-handle{
-  width:22px;min-width:22px;height:100%;display:flex;align-items:center;
-  justify-content:center;cursor:grab;color:var(--muted);
-  font-size:20px;opacity:.35;transition:opacity .15s;
-  user-select:none;flex-shrink:0;letter-spacing:-2px
+  width:28px;min-width:28px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+  cursor:grab;color:var(--muted);opacity:.35;
+  transition:opacity .15s;user-select:none;flex-shrink:0
 }
-.minha-ordem-card:hover .drag-handle{opacity:.7}
+.drag-dots{font-size:18px;line-height:1;letter-spacing:-2px}
+.minha-ordem-card:hover .drag-handle{opacity:.75}
 .drag-handle:active{cursor:grabbing}
 .minha-ordem-pos{
-  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
-  color:var(--muted);opacity:.4;flex-shrink:0;white-space:nowrap
+  font-family:'Syne',sans-serif;font-size:10px;font-weight:700;
+  color:var(--muted);white-space:nowrap;line-height:1
 }
 
 /* ─── MOBILE ─── */
@@ -354,6 +355,11 @@ body.dark {
   .task-card-inner{flex-direction:column;gap:8px}
   .task-actions{margin-left:0;width:100%;justify-content:flex-end}
   .calendar-cell{min-height:32px;font-size:11px}
+  .drag-handle{min-width:44px;min-height:44px;font-size:22px}
+  /* keep minha-ordem cards in row layout — override the global column rule */
+  .minha-ordem-card .task-card-inner{flex-direction:row;flex-wrap:wrap}
+  .minha-ordem-card .task-body{min-width:0}
+  .minha-ordem-card .task-actions{width:auto;margin-left:0}
 }
 </style>
 </head>
@@ -787,7 +793,12 @@ function App() {
         ) : currentView === "lixeira" ? (
           <TrashView tasks={trashedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
         ) : currentView === "minhaordem" ? (
-          <MinhaOrdemView tasks={nonCompletedTasks} sectors={sectors} onSaveOrder={saveManualOrder}/>
+          <MinhaOrdemView
+            tasks={nonCompletedTasks} sectors={sectors} onSaveOrder={saveManualOrder}
+            onStatusChange={updateStatus} onPriorityChange={updatePriority}
+            onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
+            onEditTask={(t) => { setEditTask(t); setShowModal(true); }}
+          />
         ) : null}
       </main>
 
@@ -1137,7 +1148,8 @@ function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hovere
 }
 
 // ─── TASK CARD ─────────────────────────────────
-function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEdit, isCompleted }) {
+function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEdit, isCompleted,
+  dragSlot, wrapperClassName, dragEvents }) {
   const [openComment, setOpenComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
@@ -1182,8 +1194,9 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
   }, [showPicker]);
 
   return (
-    <div className="task-card">
+    <div className={`task-card${wrapperClassName ? ' '+wrapperClassName : ''}`} {...(dragEvents||{})}>
       <div className="task-card-inner">
+        {dragSlot}
         <div className="task-priority-bar" style={{background: priorityColor(task.priority)}}/>
         <div className="task-body">
           <div className="task-header">
@@ -1293,6 +1306,41 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
   );
 }
 
+// ─── DRAGGABLE TASK CARD ───────────────────────
+// Wraps the existing TaskCard with drag-and-drop behaviour.
+// Injects the drag handle to the left of the priority bar via dragSlot;
+// all drag event props are spread onto TaskCard's outer div so no extra
+// DOM wrapper is added — layout is identical to a regular TaskCard.
+function DraggableTaskCard({ task, draggingId, position, handlers, ...taskProps }) {
+  const dragSlot = (
+    <div className="drag-handle" title={`#${position} — arrastar para reordenar`}>
+      <span className="drag-dots">⠿</span>
+      <span className="minha-ordem-pos">#{position}</span>
+    </div>
+  );
+  const dragEvents = {
+    'data-task-id': task.id,
+    draggable: true,
+    onDragStart:  e => handlers.onDragStart(e, task.id),
+    onDragEnter:  e => handlers.onDragEnter(e, task.id),
+    onDragOver:   handlers.onDragOver,
+    onDrop:       handlers.onDrop,
+    onDragEnd:    handlers.onDragEnd,
+    onTouchStart: e => handlers.onTouchStart(e, task.id),
+    onTouchMove:  handlers.onTouchMove,
+    onTouchEnd:   handlers.onTouchEnd,
+  };
+  return (
+    <TaskCard
+      task={task}
+      {...taskProps}
+      dragSlot={dragSlot}
+      wrapperClassName={`minha-ordem-card${draggingId === task.id ? ' is-dragging' : ''}`}
+      dragEvents={dragEvents}
+    />
+  );
+}
+
 // ─── TASK MODAL ────────────────────────────────
 function TaskModal({ task, sectors, onSave, onClose }) {
   const isEdit = task && task.id;
@@ -1374,17 +1422,28 @@ function TaskModal({ task, sectors, onSave, onClose }) {
 }
 
 // ─── MINHA ORDEM VIEW ─────────────────────────
-function MinhaOrdemView({ tasks, sectors, onSaveOrder }) {
-  const [list, setList] = useState([]);
-  const listRef = useRef([]);
+function MinhaOrdemView({ tasks, sectors, onSaveOrder,
+  onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEditTask }) {
+  const [fullList, setFullList] = useState([]);
+  const [filter, setFilter] = useState('todas');
+  const [search, setSearch] = useState('');
+  const [draggingId, setDraggingId] = useState(null);
+
+  const fullListRef = useRef([]);
   const prevListRef = useRef([]);
   const draggingIdRef = useRef(null);
   const dropSucceededRef = useRef(false);
   const lastEnterRef = useRef(null);
   const saveTimerRef = useRef(null);
-  const [draggingId, setDraggingId] = useState(null);
+  const filterRef = useRef('todas');
+  const searchRef = useRef('');
 
-  // ── Sync tasks → sorted list (skip during active drag)
+  // ── Keep refs in sync with state
+  useEffect(() => { filterRef.current = filter; }, [filter]);
+  useEffect(() => { searchRef.current = search; }, [search]);
+  useEffect(() => { fullListRef.current = fullList; }, [fullList]);
+
+  // ── Sync tasks prop → full ordered list (skip during active drag)
   useEffect(() => {
     if(draggingIdRef.current) return;
     const sorted = [...tasks].sort((a, b) => {
@@ -1393,34 +1452,72 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder }) {
       if(b.manual_order == null) return -1;
       return a.manual_order - b.manual_order;
     });
-    setList(sorted);
-    listRef.current = sorted;
+    setFullList(sorted);
+    fullListRef.current = sorted;
   }, [tasks]);
 
-  useEffect(() => { listRef.current = list; }, [list]);
+  // ── Apply filter + search to a list
+  function applyFilters(list, f, s) {
+    let pool = list;
+    if(f === 'urgentes') pool = pool.filter(t => t.priority <= 2);
+    else if(f === 'pendentes') pool = pool.filter(t => t.status === 'pendente');
+    else if(f === 'aguardando') pool = pool.filter(t => t.status === 'aguardando');
+    if(s && s.trim()) {
+      const q = s.toLowerCase();
+      pool = pool.filter(t => t.title.toLowerCase().includes(q));
+    }
+    return pool;
+  }
 
+  // ── Derived: visible list for render
+  const displayList = useMemo(
+    () => applyFilters(fullList, filter, search),
+    [fullList, filter, search]
+  );
+
+  // ── Stats for tab badges
+  const tabStats = useMemo(() => ({
+    urgentes:  fullList.filter(t => t.priority <= 2).length,
+    pendentes: fullList.filter(t => t.status === 'pendente').length,
+    aguardando:fullList.filter(t => t.status === 'aguardando').length,
+  }), [fullList]);
+
+  // ── Reorder using slot algorithm: works correctly even when filtered
+  // Filtered items occupy specific "slots" in the full list; reordering
+  // only reassigns those slots — non-visible tasks are untouched.
   function reorderById(fromId, toId) {
-    setList(prev => {
-      const items = [...prev];
-      const fromIdx = items.findIndex(t => t.id === fromId);
-      const toIdx = items.findIndex(t => t.id === toId);
+    setFullList(prev => {
+      const currentDisplay = applyFilters(prev, filterRef.current, searchRef.current);
+      const fromIdx = currentDisplay.findIndex(t => t.id === fromId);
+      const toIdx = currentDisplay.findIndex(t => t.id === toId);
       if(fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return prev;
-      const [moved] = items.splice(fromIdx, 1);
-      items.splice(toIdx, 0, moved);
-      return items;
+
+      const newDisplay = [...currentDisplay];
+      const [moved] = newDisplay.splice(fromIdx, 1);
+      newDisplay.splice(toIdx, 0, moved);
+
+      // Find which indices in fullList the filtered items occupy
+      const filteredIds = new Set(currentDisplay.map(t => t.id));
+      const slots = [];
+      prev.forEach((t, idx) => { if(filteredIds.has(t.id)) slots.push(idx); });
+
+      // Place the reordered display items back into those slots
+      const result = [...prev];
+      slots.forEach((slotIdx, i) => { result[slotIdx] = newDisplay[i]; });
+      return result;
     });
   }
 
   function scheduleSave() {
     if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      onSaveOrder(listRef.current);
+      onSaveOrder(fullListRef.current);
     }, 500);
   }
 
   // ── HTML5 DnD (mouse / desktop)
   function handleDragStart(e, id) {
-    prevListRef.current = [...listRef.current];
+    prevListRef.current = [...fullListRef.current];
     dropSucceededRef.current = false;
     lastEnterRef.current = null;
     draggingIdRef.current = id;
@@ -1450,8 +1547,8 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder }) {
   function handleDragEnd() {
     if(!dropSucceededRef.current) {
       if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      setList(prevListRef.current);
-      listRef.current = prevListRef.current;
+      setFullList(prevListRef.current);
+      fullListRef.current = prevListRef.current;
     }
     setDraggingId(null);
     draggingIdRef.current = null;
@@ -1461,7 +1558,7 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder }) {
 
   // ── Touch (mobile)
   function handleTouchStart(e, id) {
-    prevListRef.current = [...listRef.current];
+    prevListRef.current = [...fullListRef.current];
     draggingIdRef.current = id;
     setDraggingId(id);
   }
@@ -1474,11 +1571,9 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder }) {
     if(card) {
       const targetId = Number(card.dataset.taskId);
       const fromId = draggingIdRef.current;
-      if(fromId && targetId && targetId !== fromId) {
-        if(lastEnterRef.current !== targetId) {
-          lastEnterRef.current = targetId;
-          reorderById(fromId, targetId);
-        }
+      if(fromId && targetId && targetId !== fromId && lastEnterRef.current !== targetId) {
+        lastEnterRef.current = targetId;
+        reorderById(fromId, targetId);
       }
     }
   }
@@ -1490,60 +1585,89 @@ function MinhaOrdemView({ tasks, sectors, onSaveOrder }) {
     lastEnterRef.current = null;
   }
 
+  // ── Collect drag handlers into one object for DraggableTaskCard
+  const dragHandlers = {
+    onDragStart:  handleDragStart,
+    onDragEnter:  handleDragEnter,
+    onDragOver:   handleDragOver,
+    onDrop:       handleDrop,
+    onDragEnd:    handleDragEnd,
+    onTouchStart: handleTouchStart,
+    onTouchMove:  handleTouchMove,
+    onTouchEnd:   handleTouchEnd,
+  };
+
+  const hasFilter = filter !== 'todas' || search.trim();
+
   return (
     <>
       <div className="page-header">
         <h2 className="page-title">↕ Minha Ordem</h2>
-        <div className="page-subtitle">{list.length} tarefas · arraste para reordenar</div>
+        <div className="page-subtitle">
+          {hasFilter
+            ? `${displayList.length} de ${fullList.length} tarefas · arraste para reordenar`
+            : `${fullList.length} tarefas · arraste para reordenar`}
+        </div>
       </div>
 
-      {list.length === 0 ? (
+      {/* ── Filter tabs */}
+      <div className="view-tabs" style={{marginBottom:14}}>
+        <button className={`view-tab ${filter==='todas'?'active':''}`} onClick={() => setFilter('todas')}>
+          📋 Todas <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({fullList.length})</span>
+        </button>
+        <button className={`view-tab ${filter==='urgentes'?'active':''}`} onClick={() => setFilter('urgentes')}>
+          🔴 Urgentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.urgentes})</span>
+        </button>
+        <button className={`view-tab ${filter==='pendentes'?'active':''}`} onClick={() => setFilter('pendentes')}>
+          ⏳ Pendentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.pendentes})</span>
+        </button>
+        <button className={`view-tab ${filter==='aguardando'?'active':''}`} onClick={() => setFilter('aguardando')}>
+          ⏸ Aguardando <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.aguardando})</span>
+        </button>
+      </div>
+
+      {/* ── Search row */}
+      <div className="search-row" style={{marginBottom:14}}>
+        <input
+          className="search-input"
+          placeholder="🔍 Buscar para filtrar..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        {hasFilter && (
+          <button className="btn-secondary" onClick={() => { setFilter('todas'); setSearch(''); }}
+            style={{whiteSpace:'nowrap'}}>
+            ✕ Limpar
+          </button>
+        )}
+      </div>
+
+      {/* ── List */}
+      {displayList.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">↕️</div>
-          <p>Nenhuma tarefa ativa para ordenar</p>
+          <p>{fullList.length === 0 ? 'Nenhuma tarefa ativa' : 'Nenhuma tarefa para este filtro'}</p>
         </div>
       ) : (
         <div
           className="minha-ordem-list"
           style={draggingId ? {touchAction:'none',userSelect:'none'} : {}}
         >
-          {list.map((task, idx) => (
-            <div
+          {displayList.map(task => (
+            <DraggableTaskCard
               key={task.id}
-              data-task-id={task.id}
-              className={`task-card minha-ordem-card${draggingId === task.id ? ' is-dragging' : ''}`}
-              draggable
-              onDragStart={e => handleDragStart(e, task.id)}
-              onDragEnter={e => handleDragEnter(e, task.id)}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              onDragEnd={handleDragEnd}
-              onTouchStart={e => handleTouchStart(e, task.id)}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              <div className="task-card-inner">
-                <div className="drag-handle" title="Arrastar para reordenar">⠿</div>
-                <div className="task-priority-bar" style={{background: priorityColor(task.priority)}}/>
-                <div className="task-body">
-                  <div className="task-title">{task.title}</div>
-                  <div className="task-meta">
-                    <span className="sector-tag">
-                      {(sectors[task.sector]||{}).icon} {(sectors[task.sector]||{}).label||task.sector}
-                    </span>
-                    <span className={`badge ${task.priority<=2?'badge-red':task.priority<=4?'badge-yellow':task.priority<=7?'badge-blue':'badge-green'}`}>
-                      {priorityLabel(task.priority)} · {task.priority}
-                    </span>
-                    {task.due_date && (
-                      <span className={`task-date-tag${isOverdue(task.due_date)?' overdue':''}`}>
-                        📅 {fmtShort(task.due_date)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <span className="minha-ordem-pos">#{idx + 1}</span>
-              </div>
-            </div>
+              task={task}
+              sectors={sectors}
+              draggingId={draggingId}
+              position={fullList.findIndex(t => t.id === task.id) + 1}
+              handlers={dragHandlers}
+              onStatusChange={onStatusChange}
+              onPriorityChange={onPriorityChange}
+              onDelete={onDelete}
+              onAddComment={onAddComment}
+              onDueDateChange={onDueDateChange}
+              onEdit={onEditTask}
+            />
           ))}
         </div>
       )}
