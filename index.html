@@ -303,6 +303,32 @@ body.dark {
 .empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
 .empty-state p{font-size:14px}
 
+/* ─── MINHA ORDEM ─── */
+.minha-ordem-list{display:flex;flex-direction:column;gap:8px}
+.minha-ordem-card{
+  transition:transform 150ms ease,box-shadow 150ms ease,opacity 150ms ease;
+  cursor:default
+}
+.minha-ordem-card.is-dragging{
+  opacity:.55;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  transform:scale(1.02) rotate(.5deg);
+  z-index:10;
+  cursor:grabbing
+}
+.drag-handle{
+  width:22px;min-width:22px;height:100%;display:flex;align-items:center;
+  justify-content:center;cursor:grab;color:var(--muted);
+  font-size:20px;opacity:.35;transition:opacity .15s;
+  user-select:none;flex-shrink:0;letter-spacing:-2px
+}
+.minha-ordem-card:hover .drag-handle{opacity:.7}
+.drag-handle:active{cursor:grabbing}
+.minha-ordem-pos{
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  color:var(--muted);opacity:.4;flex-shrink:0;white-space:nowrap
+}
+
 /* ─── MOBILE ─── */
 .mobile-header{
   display:none;position:sticky;top:0;z-index:100;background:var(--surface);
@@ -567,6 +593,28 @@ function App() {
     } catch(e) { console.error(e); }
   }
 
+  async function saveManualOrder(orderedList) {
+    try {
+      const updates = orderedList.map((t, idx) => ({ id: t.id, manual_order: idx + 1 }));
+      const changed = updates.filter(u => {
+        const existing = tasks.find(t => t.id === u.id);
+        return !existing || existing.manual_order !== u.manual_order;
+      });
+      if(!changed.length) return;
+      await Promise.all(changed.map(({ id, manual_order }) =>
+        sb.from('tasks').update({ manual_order }).eq('id', id)
+      ));
+      setTasks(prev => prev.map(t => {
+        const upd = updates.find(u => u.id === t.id);
+        return upd ? { ...t, manual_order: upd.manual_order } : t;
+      }));
+      setSyncStatus("synced");
+    } catch(e) {
+      console.error(e);
+      setSyncStatus("error");
+    }
+  }
+
   // ─── DERIVED DATA ───────────────────────────
   const activeTasks = useMemo(() => tasks.filter(t => t.status !== 'excluido'), [tasks]);
   const nonCompletedTasks = useMemo(() => activeTasks.filter(t => t.status !== 'concluido'), [activeTasks]);
@@ -687,6 +735,11 @@ function App() {
             <span className="nav-icon">🗑</span> Lixeira
             <span style={{marginLeft:'auto',fontSize:11,opacity:.6}}>{trashedTasks.length}</span>
           </button>
+
+          <div className="nav-sep"/>
+          <button className={`nav-btn ${currentView==='minhaordem'?'active':''}`} onClick={() => navigate('minhaordem')}>
+            <span className="nav-icon">↕️</span> Minha Ordem
+          </button>
         </nav>
 
         <div className="sidebar-footer">
@@ -733,6 +786,8 @@ function App() {
           <ConcluView tasks={completedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
         ) : currentView === "lixeira" ? (
           <TrashView tasks={trashedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
+        ) : currentView === "minhaordem" ? (
+          <MinhaOrdemView tasks={nonCompletedTasks} sectors={sectors} onSaveOrder={saveManualOrder}/>
         ) : null}
       </main>
 
@@ -1315,6 +1370,184 @@ function TaskModal({ task, sectors, onSave, onClose }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── MINHA ORDEM VIEW ─────────────────────────
+function MinhaOrdemView({ tasks, sectors, onSaveOrder }) {
+  const [list, setList] = useState([]);
+  const listRef = useRef([]);
+  const prevListRef = useRef([]);
+  const draggingIdRef = useRef(null);
+  const dropSucceededRef = useRef(false);
+  const lastEnterRef = useRef(null);
+  const saveTimerRef = useRef(null);
+  const [draggingId, setDraggingId] = useState(null);
+
+  // ── Sync tasks → sorted list (skip during active drag)
+  useEffect(() => {
+    if(draggingIdRef.current) return;
+    const sorted = [...tasks].sort((a, b) => {
+      if(a.manual_order == null && b.manual_order == null) return a.priority - b.priority;
+      if(a.manual_order == null) return 1;
+      if(b.manual_order == null) return -1;
+      return a.manual_order - b.manual_order;
+    });
+    setList(sorted);
+    listRef.current = sorted;
+  }, [tasks]);
+
+  useEffect(() => { listRef.current = list; }, [list]);
+
+  function reorderById(fromId, toId) {
+    setList(prev => {
+      const items = [...prev];
+      const fromIdx = items.findIndex(t => t.id === fromId);
+      const toIdx = items.findIndex(t => t.id === toId);
+      if(fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return prev;
+      const [moved] = items.splice(fromIdx, 1);
+      items.splice(toIdx, 0, moved);
+      return items;
+    });
+  }
+
+  function scheduleSave() {
+    if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      onSaveOrder(listRef.current);
+    }, 500);
+  }
+
+  // ── HTML5 DnD (mouse / desktop)
+  function handleDragStart(e, id) {
+    prevListRef.current = [...listRef.current];
+    dropSucceededRef.current = false;
+    lastEnterRef.current = null;
+    draggingIdRef.current = id;
+    setDraggingId(id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(id));
+  }
+
+  function handleDragEnter(e, id) {
+    if(lastEnterRef.current === id) return;
+    lastEnterRef.current = id;
+    const fromId = draggingIdRef.current;
+    if(fromId && id !== fromId) reorderById(fromId, id);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    dropSucceededRef.current = true;
+    scheduleSave();
+  }
+
+  function handleDragEnd() {
+    if(!dropSucceededRef.current) {
+      if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      setList(prevListRef.current);
+      listRef.current = prevListRef.current;
+    }
+    setDraggingId(null);
+    draggingIdRef.current = null;
+    dropSucceededRef.current = false;
+    lastEnterRef.current = null;
+  }
+
+  // ── Touch (mobile)
+  function handleTouchStart(e, id) {
+    prevListRef.current = [...listRef.current];
+    draggingIdRef.current = id;
+    setDraggingId(id);
+  }
+
+  function handleTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const card = el && el.closest('[data-task-id]');
+    if(card) {
+      const targetId = Number(card.dataset.taskId);
+      const fromId = draggingIdRef.current;
+      if(fromId && targetId && targetId !== fromId) {
+        if(lastEnterRef.current !== targetId) {
+          lastEnterRef.current = targetId;
+          reorderById(fromId, targetId);
+        }
+      }
+    }
+  }
+
+  function handleTouchEnd() {
+    if(draggingIdRef.current) scheduleSave();
+    setDraggingId(null);
+    draggingIdRef.current = null;
+    lastEnterRef.current = null;
+  }
+
+  return (
+    <>
+      <div className="page-header">
+        <h2 className="page-title">↕ Minha Ordem</h2>
+        <div className="page-subtitle">{list.length} tarefas · arraste para reordenar</div>
+      </div>
+
+      {list.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">↕️</div>
+          <p>Nenhuma tarefa ativa para ordenar</p>
+        </div>
+      ) : (
+        <div
+          className="minha-ordem-list"
+          style={draggingId ? {touchAction:'none',userSelect:'none'} : {}}
+        >
+          {list.map((task, idx) => (
+            <div
+              key={task.id}
+              data-task-id={task.id}
+              className={`task-card minha-ordem-card${draggingId === task.id ? ' is-dragging' : ''}`}
+              draggable
+              onDragStart={e => handleDragStart(e, task.id)}
+              onDragEnter={e => handleDragEnter(e, task.id)}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onDragEnd={handleDragEnd}
+              onTouchStart={e => handleTouchStart(e, task.id)}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div className="task-card-inner">
+                <div className="drag-handle" title="Arrastar para reordenar">⠿</div>
+                <div className="task-priority-bar" style={{background: priorityColor(task.priority)}}/>
+                <div className="task-body">
+                  <div className="task-title">{task.title}</div>
+                  <div className="task-meta">
+                    <span className="sector-tag">
+                      {(sectors[task.sector]||{}).icon} {(sectors[task.sector]||{}).label||task.sector}
+                    </span>
+                    <span className={`badge ${task.priority<=2?'badge-red':task.priority<=4?'badge-yellow':task.priority<=7?'badge-blue':'badge-green'}`}>
+                      {priorityLabel(task.priority)} · {task.priority}
+                    </span>
+                    {task.due_date && (
+                      <span className={`task-date-tag${isOverdue(task.due_date)?' overdue':''}`}>
+                        📅 {fmtShort(task.due_date)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <span className="minha-ordem-pos">#{idx + 1}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
