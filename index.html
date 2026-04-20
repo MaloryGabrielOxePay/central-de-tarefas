@@ -155,7 +155,8 @@ body.dark {
 
 .task-body{flex:1;min-width:0}
 .task-header{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
-.task-title{font-size:13.5px;font-weight:500;line-height:1.4;word-break:break-word;flex:1;min-width:0}
+.task-title{font-size:15px;font-weight:600;line-height:1.4;word-break:break-word;flex:1;min-width:0;cursor:pointer}
+.task-title:hover{color:var(--accent)}
 .task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
 
 .badge{
@@ -201,6 +202,26 @@ body.dark {
 }
 .priority-picker button:hover{transform:scale(1.1)}
 .priority-picker button.selected{border-color:var(--text);transform:scale(1.15)}
+
+/* ─── STATUS PICKER ─── */
+.status-picker{
+  position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;padding:6px;
+  box-shadow:var(--shadow-lg);display:flex;flex-direction:column;gap:3px;min-width:155px
+}
+.status-picker button{
+  padding:7px 12px;border-radius:8px;border:none;background:transparent;
+  color:var(--text);cursor:pointer;font-size:12px;text-align:left;
+  transition:.15s;font-weight:500
+}
+.status-picker button:hover{background:var(--input-bg)}
+
+/* ─── COMMENT BADGE COUNT ─── */
+.comment-badge-count{
+  position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;
+  font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;line-height:1
+}
 
 /* ─── DATE PICKER inline ─── */
 .date-picker-inline{
@@ -965,6 +986,9 @@ function GeralView({
           month={calMonth} year={calYear}
           setMonth={setCalMonth} setYear={setCalYear}
           hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
+          onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+          onDelete={onDelete} onAddComment={onAddComment}
+          onDueDateChange={onDueDateChange} onEdit={onEditTask}
         />
       ) : geralTab === "urgente" && !statusFilter ? (
         <>
@@ -1120,11 +1144,17 @@ function TrashView({ tasks, sectors, onRestore, onDelete, search, setSearch }) {
 }
 
 // ─── CALENDAR WIDGET ───────────────────────────
-function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hoveredDay, setHoveredDay }) {
+function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hoveredDay, setHoveredDay,
+  onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEdit }) {
+  const [selectedDay, setSelectedDay] = useState(null);
+
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month+1, 0).getDate();
   const prevDays = new Date(year, month, 0).getDate();
   const today = new Date();
+
+  // Reset selectedDay when month/year changes
+  useEffect(() => { setSelectedDay(null); }, [month, year]);
 
   // Group tasks by day
   const tasksByDay = {};
@@ -1148,64 +1178,93 @@ function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hovere
   }
 
   const cells = [];
-  // Previous month padding
   for(let i = firstDay - 1; i >= 0; i--) {
     cells.push({ day: prevDays - i, isOther: true });
   }
-  // Current month
   for(let d = 1; d <= daysInMonth; d++) {
     cells.push({ day: d, isOther: false, isToday: d === today.getDate() && month === today.getMonth() && year === today.getFullYear() });
   }
-  // Next month padding
   const remaining = 42 - cells.length;
   for(let d = 1; d <= remaining; d++) {
     cells.push({ day: d, isOther: true });
   }
 
+  const selectedDayTasks = selectedDay ? (tasksByDay[selectedDay] || []) : [];
+
   return (
-    <div className="calendar-wrap">
-      <div className="calendar-header">
-        <div className="calendar-nav">
-          <button onClick={prevMonth}>◀</button>
+    <div>
+      <div className="calendar-wrap">
+        <div className="calendar-header">
+          <div className="calendar-nav">
+            <button onClick={prevMonth}>◀</button>
+          </div>
+          <h3>{MONTHS_PT[month]} {year}</h3>
+          <div className="calendar-nav">
+            <button onClick={nextMonth}>▶</button>
+          </div>
         </div>
-        <h3>{MONTHS_PT[month]} {year}</h3>
-        <div className="calendar-nav">
-          <button onClick={nextMonth}>▶</button>
+        <div className="calendar-grid">
+          {DAYS_PT.map(d => <div key={d} className="calendar-day-label">{d}</div>)}
+          {cells.map((cell, i) => {
+            const dayTasks = !cell.isOther ? (tasksByDay[cell.day] || []) : [];
+            const hasTasks = dayTasks.length > 0;
+            const isSelected = !cell.isOther && selectedDay === cell.day;
+            return (
+              <div key={i}
+                className={`calendar-cell ${cell.isOther?'other-month':''} ${cell.isToday?'today':''} ${hasTasks?'has-tasks':''}`}
+                onMouseEnter={() => hasTasks && setHoveredDay(`${year}-${month}-${cell.day}`)}
+                onMouseLeave={() => setHoveredDay(null)}
+                onClick={() => !cell.isOther && hasTasks && setSelectedDay(isSelected ? null : cell.day)}
+                style={{position:'relative', outline: isSelected ? '2px solid var(--accent)' : 'none', borderRadius: isSelected ? 10 : undefined}}
+              >
+                <span>{cell.day}</span>
+                {hasTasks && (
+                  <div className="calendar-dots">
+                    {dayTasks.slice(0,4).map((t,j) => (
+                      <div key={j} className="calendar-dot" style={{background:priorityColor(t.priority)}}/>
+                    ))}
+                  </div>
+                )}
+                {hoveredDay === `${year}-${month}-${cell.day}` && hasTasks && !isSelected && (
+                  <div className="calendar-cell-tooltip">
+                    {dayTasks.map((t,j) => (
+                      <div key={j} style={{marginBottom:j<dayTasks.length-1?4:0}}>
+                        <span style={{color:priorityColor(t.priority),fontWeight:700}}>●</span> {t.title.substring(0,50)}{t.title.length>50?'...':''}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
+        {tasks.length === 0 && (
+          <div className="empty-state" style={{padding:'20px 0'}}>
+            <div className="empty-icon">📅</div>
+            <p>Nenhuma tarefa com data definida</p>
+          </div>
+        )}
       </div>
-      <div className="calendar-grid">
-        {DAYS_PT.map(d => <div key={d} className="calendar-day-label">{d}</div>)}
-        {cells.map((cell, i) => {
-          const dayTasks = !cell.isOther ? (tasksByDay[cell.day] || []) : [];
-          const hasTasks = dayTasks.length > 0;
-          return (
-            <div key={i}
-              className={`calendar-cell ${cell.isOther?'other-month':''} ${cell.isToday?'today':''} ${hasTasks?'has-tasks':''}`}
-              onMouseEnter={() => hasTasks && setHoveredDay(`${year}-${month}-${cell.day}`)}
-              onMouseLeave={() => setHoveredDay(null)}
-              style={{position:'relative'}}
-            >
-              <span>{cell.day}</span>
-              {hasTasks && (
-                <div className="calendar-dots">
-                  {dayTasks.slice(0,4).map((t,j) => (
-                    <div key={j} className="calendar-dot" style={{background:priorityColor(t.priority)}}/>
-                  ))}
-                </div>
-              )}
-              {hoveredDay === `${year}-${month}-${cell.day}` && hasTasks && (
-                <div className="calendar-cell-tooltip">
-                  {dayTasks.map((t,j) => (
-                    <div key={j} style={{marginBottom:j<dayTasks.length-1?4:0}}>
-                      <span style={{color:priorityColor(t.priority),fontWeight:700}}>●</span> {t.title.substring(0,50)}{t.title.length>50?'...':''}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+
+      {/* Lista de tasks do dia selecionado */}
+      {selectedDay && (
+        <div style={{marginTop:16}}>
+          <div className="section-divider">
+            📅 Tarefas de {selectedDay} de {MONTHS_PT[month]}
+            <span style={{fontSize:11,opacity:.7,marginLeft:6,fontWeight:400,textTransform:'none'}}>
+              ({selectedDayTasks.length} {selectedDayTasks.length===1?'tarefa':'tarefas'})
+            </span>
+          </div>
+          <div className="task-list">
+            {selectedDayTasks.map(t => (
+              <TaskCard key={t.id} task={t} sectors={sectors}
+                onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+                onDelete={onDelete} onAddComment={onAddComment}
+                onDueDateChange={onDueDateChange} onEdit={onEdit}/>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1216,25 +1275,14 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
   const [openComment, setOpenComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
+  const [showStatusPicker, setShowStatusPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateVal, setDateVal] = useState(task.due_date ? task.due_date.substring(0,16) : "");
   const pickerRef = useRef(null);
+  const statusPickerRef = useRef(null);
 
   const sectorInfo = sectors[task.sector] || { icon:"📌", label:task.sector, color:"#888" };
-
-  const statusFlow = ["pendente","aguardando","concluido"];
-  const currentIdx = statusFlow.indexOf(task.status);
-
-  function nextStatus() {
-    if(currentIdx < statusFlow.length - 1) {
-      onStatusChange(task.id, statusFlow[currentIdx + 1]);
-    }
-  }
-  function prevStatus() {
-    if(currentIdx > 0) {
-      onStatusChange(task.id, statusFlow[currentIdx - 1]);
-    }
-  }
+  const commentCount = (task.comments||[]).length;
 
   function handleAddComment() {
     if(!commentText.trim()) return;
@@ -1247,7 +1295,7 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
     setShowDatePicker(false);
   }
 
-  // Close picker on outside click
+  // Close priority picker on outside click
   useEffect(() => {
     function handleClick(e) {
       if(pickerRef.current && !pickerRef.current.contains(e.target)) setShowPicker(false);
@@ -1256,6 +1304,18 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showPicker]);
 
+  // Close status picker on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if(statusPickerRef.current && !statusPickerRef.current.contains(e.target)) setShowStatusPicker(false);
+    }
+    if(showStatusPicker) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showStatusPicker]);
+
+  const statusBg = task.status==='pendente' ? 'var(--yellow-bg)' : task.status==='aguardando' ? 'var(--blue-bg)' : 'var(--green-bg)';
+  const statusColor = task.status==='pendente' ? 'var(--yellow)' : task.status==='aguardando' ? 'var(--blue)' : 'var(--green)';
+
   return (
     <div className={`task-card${wrapperClassName ? ' '+wrapperClassName : ''}`} {...(dragEvents||{})}>
       <div className="task-card-inner">
@@ -1263,14 +1323,31 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
         <div className="task-priority-bar" style={{background: priorityColor(task.priority)}}/>
         <div className="task-body">
           <div className="task-header">
-            <span className="task-title" style={isCompleted?{textDecoration:'line-through',opacity:.7}:{}}>
+            <span className="task-title"
+              onClick={() => onEdit && onEdit(task)}
+              style={isCompleted?{textDecoration:'line-through',opacity:.7}:{}}>
               {task.title}
             </span>
           </div>
           <div className="task-meta">
-            <span className="sector-tag">{sectorInfo.icon} {sectorInfo.label}</span>
+            {/* 1. Status badge — clicável, com popover */}
+            <span style={{position:'relative'}} ref={statusPickerRef}>
+              <span className="badge"
+                style={{background:statusBg,color:statusColor,padding:'5px 12px',fontSize:'12.5px',cursor:'pointer'}}
+                onClick={() => setShowStatusPicker(!showStatusPicker)}
+                title="Clique para alterar status">
+                {statusIcon(task.status)} {statusLabel(task.status)}
+              </span>
+              {showStatusPicker && (
+                <div className="status-picker">
+                  <button onClick={() => { onStatusChange(task.id,'pendente'); setShowStatusPicker(false); }}>⏳ Pendente</button>
+                  <button onClick={() => { onStatusChange(task.id,'aguardando'); setShowStatusPicker(false); }}>⏸ Aguardando</button>
+                  <button onClick={() => { onStatusChange(task.id,'concluido'); setShowStatusPicker(false); }}>✅ Concluído</button>
+                </div>
+              )}
+            </span>
 
-            {/* Priority badge - clickable */}
+            {/* 2. Priority badge — clicável */}
             <span style={{position:'relative'}} ref={pickerRef}>
               <span className={`badge ${task.priority<=2?'badge-red':task.priority<=4?'badge-yellow':task.priority<=7?'badge-blue':'badge-green'}`}
                 onClick={() => setShowPicker(!showPicker)} title="Clique para alterar prioridade">
@@ -1290,18 +1367,40 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
               )}
             </span>
 
-            {/* Status badge */}
-            <span className="badge" style={{background:"var(--input-bg)",color:"var(--muted)",cursor:"default"}}>
-              {statusIcon(task.status)} {statusLabel(task.status)}
-            </span>
-
-            {/* Due date tag */}
-            {task.due_date && (
+            {/* 3. Data — clicável se existe; botão discreto se não existe */}
+            {task.due_date ? (
               <span className={`task-date-tag ${isOverdue(task.due_date)&&task.status!=='concluido'?'overdue':''}`}
                 onClick={() => setShowDatePicker(!showDatePicker)} style={{cursor:'pointer'}}>
                 📅 {fmtShort(task.due_date)}
               </span>
+            ) : (
+              !isCompleted && (
+                <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
+                  onClick={() => setShowDatePicker(!showDatePicker)}>
+                  📅 Definir data
+                </button>
+              )
             )}
+
+            {/* 4. Botão de comentários com badge de contagem */}
+            {!isCompleted && (
+              <span style={{position:'relative',display:'inline-flex'}}>
+                <button
+                  style={{fontSize:12,color:"var(--accent)",background:"var(--accent-soft)",border:"none",borderRadius:8,padding:"4px 10px",cursor:"pointer",display:'flex',alignItems:'center',gap:4}}
+                  onClick={() => setOpenComment(!openComment)}
+                  title="Comentários">
+                  💬
+                </button>
+                {commentCount > 0 && (
+                  <span className="comment-badge-count">{commentCount}</span>
+                )}
+              </span>
+            )}
+
+            {/* 5. Badge de setor — menor, por último, opacidade 0.7 */}
+            <span className="sector-tag" style={{fontSize:'10px',opacity:0.7,padding:'2px 6px'}}>
+              {sectorInfo.icon} {sectorInfo.label}
+            </span>
           </div>
 
           {/* Date picker */}
@@ -1311,30 +1410,6 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
               <button style={{background:"var(--accent)",color:"#fff"}} onClick={handleDateSave}>Salvar</button>
               <button style={{background:"var(--red-bg)",color:"var(--red)"}} onClick={() => { setDateVal(""); onDueDateChange(task.id, null); setShowDatePicker(false); }}>Remover</button>
               <button style={{background:"var(--input-bg)",color:"var(--muted)"}} onClick={() => setShowDatePicker(false)}>Cancelar</button>
-            </div>
-          )}
-
-          {/* Comments toggle */}
-          {!isCompleted && (
-            <div style={{marginTop:6,display:'flex',gap:6,flexWrap:'wrap'}}>
-              {task.status !== 'concluido' && currentIdx > 0 && (
-                <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}} onClick={prevStatus}>
-                  ← {statusLabel(statusFlow[currentIdx-1])}
-                </button>
-              )}
-              {task.status !== 'concluido' && currentIdx < statusFlow.length - 1 && (
-                <button style={{fontSize:11,color:"var(--accent)",background:"var(--accent-soft)",border:"1px solid transparent",borderRadius:6,padding:"2px 8px",cursor:"pointer",fontWeight:600}} onClick={nextStatus}>
-                  {statusLabel(statusFlow[currentIdx+1])} →
-                </button>
-              )}
-              <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
-                onClick={() => setShowDatePicker(!showDatePicker)}>
-                📅 {task.due_date ? 'Editar data' : 'Definir data'}
-              </button>
-              <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
-                onClick={() => setOpenComment(!openComment)}>
-                💬 {(task.comments||[]).length || ''} {openComment ? '▲' : '▼'}
-              </button>
             </div>
           )}
 
