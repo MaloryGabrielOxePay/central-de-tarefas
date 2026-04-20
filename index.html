@@ -734,11 +734,11 @@ function App() {
   }, [nonCompletedTasks]);
 
   // ─── NAVIGATION ──────────────────────────────
-  function navigate(view, sector=null) {
+  function navigate(view, sector=null, tab=null) {
     setCurrentView(view);
     setCurrentSector(sector);
     setStatusFilter(null);
-    setGeralTab(view === "geral" ? "urgente" : geralTab);
+    setGeralTab(tab || (view === "geral" ? "urgente" : geralTab));
     setSidebarOpen(false);
   }
 
@@ -768,7 +768,7 @@ function App() {
         </div>
 
         <nav className="nav">
-          <button className={`nav-btn ${currentView==='minhaordem'?'active':''}`} onClick={() => navigate('minhaordem')}>
+          <button className={`nav-btn ${currentView==='geral'&&geralTab==='programacao'?'active':''}`} onClick={() => navigate('geral', null, 'programacao')}>
             <span className="nav-icon">🗓️</span> Programação
           </button>
           <button className={`nav-btn ${currentView==='geral'?'active':''}`} onClick={() => navigate('geral')}>
@@ -824,7 +824,7 @@ function App() {
             calMonth={calMonth} setCalMonth={setCalMonth}
             calYear={calYear} setCalYear={setCalYear}
             hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
-            completedTasks={completedTasks}
+            completedTasks={completedTasks} onSaveOrder={saveManualOrder}
           />
         ) : currentView === "setor" ? (
           <SectorView
@@ -840,13 +840,6 @@ function App() {
           <ConcluView tasks={completedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
         ) : currentView === "lixeira" ? (
           <TrashView tasks={trashedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
-        ) : currentView === "minhaordem" ? (
-          <MinhaOrdemView
-            tasks={nonCompletedTasks} sectors={sectors} onSaveOrder={saveManualOrder}
-            onStatusChange={updateStatus} onPriorityChange={updatePriority}
-            onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
-            onEditTask={(t) => { setEditTask(t); setShowModal(true); }}
-          />
         ) : null}
       </main>
 
@@ -869,8 +862,10 @@ function GeralView({
   geralTab, setGeralTab, sectors, onStatusChange, onPriorityChange,
   onDelete, onAddComment, onDueDateChange, onNewTask, onEditTask,
   calMonth, setCalMonth, calYear, setCalYear, hoveredDay, setHoveredDay,
-  completedTasks
+  completedTasks, onSaveOrder
 }) {
+  const isProgramacao = geralTab === 'programacao';
+
   const displayTasks = geralTab === "urgente"
     ? allTasks.filter(t => {
         if(sectorFilter !== "todos" && t.sector !== sectorFilter) return false;
@@ -879,22 +874,27 @@ function GeralView({
       }).sort((a,b) => a.priority - b.priority)
     : tasks;
 
-  // For urgent view: split into urgent + others
   const urgentTasks = displayTasks.filter(t => t.priority <= 2);
   const otherTasks = displayTasks.filter(t => t.priority > 2);
-
-  // For stat-card filter override
   const finalTasks = statusFilter === "concluidas" ? completedTasks : (statusFilter ? tasks : null);
 
   return (
     <>
       <div className="page-header">
-        <h2 className="page-title">Visão Geral</h2>
-        <div className="page-subtitle">{allTasks.length} tarefas ativas · {stats.urgentes} urgentes</div>
+        <h2 className="page-title">{isProgramacao ? '🗓️ Programação' : 'Visão Geral'}</h2>
+        <div className="page-subtitle">
+          {isProgramacao
+            ? 'Arraste para reordenar · prioridade inteligente'
+            : `${allTasks.length} tarefas ativas · ${stats.urgentes} urgentes`}
+        </div>
       </div>
 
       {/* View Tabs */}
       <div className="view-tabs">
+        <button className={`view-tab ${geralTab==='programacao'?'active':''}`}
+          onClick={() => { setGeralTab('programacao'); toggleStatFilter(null); }}>
+          🗓️ Programação
+        </button>
         <button className={`view-tab ${geralTab==='urgente'&&!statusFilter?'active':''}`}
           onClick={() => { setGeralTab('urgente'); toggleStatFilter(null); }}>
           🔥 Urgente
@@ -909,42 +909,57 @@ function GeralView({
         </button>
       </div>
 
-      {/* Stat Cards */}
-      <div className="stat-row">
-        <div className={`stat-card ${statusFilter==='urgentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('urgentes'); setGeralTab('todas'); }}>
-          <div className="stat-dot" style={{background:"var(--red)"}}/>
-          <div className="stat-label">Urgentes</div>
-          <div className="stat-num" style={{color:"var(--red)"}}>{stats.urgentes}</div>
-        </div>
-        <div className={`stat-card ${statusFilter==='pendentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('pendentes'); setGeralTab('todas'); }}>
-          <div className="stat-dot" style={{background:"var(--yellow)"}}/>
-          <div className="stat-label">Pendentes</div>
-          <div className="stat-num" style={{color:"var(--yellow)"}}>{stats.pendentes}</div>
-        </div>
-        <div className={`stat-card ${statusFilter==='aguardando'?'active-filter':''}`} onClick={() => { toggleStatFilter('aguardando'); setGeralTab('todas'); }}>
-          <div className="stat-dot" style={{background:"var(--blue)"}}/>
-          <div className="stat-label">Aguardando</div>
-          <div className="stat-num" style={{color:"var(--blue)"}}>{stats.aguardando}</div>
-        </div>
-        <div className={`stat-card ${statusFilter==='concluidas'?'active-filter':''}`} onClick={() => { toggleStatFilter('concluidas'); setGeralTab('todas'); }}>
-          <div className="stat-dot" style={{background:"var(--green)"}}/>
-          <div className="stat-label">Concluídas</div>
-          <div className="stat-num" style={{color:"var(--green)"}}>{stats.concluidas}</div>
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="search-row">
-        <input className="search-input" placeholder="🔍 Buscar tarefas..." value={search} onChange={e => setSearch(e.target.value)}/>
-        <select className="filter-select" value={sectorFilter} onChange={e => setSectorFilter(e.target.value)}>
-          <option value="todos">Todos os setores</option>
-          {Object.entries(sectors).map(([k,v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
-        </select>
-        <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
-      </div>
+      {/* Stat Cards + Search — hidden on Programação tab */}
+      {!isProgramacao && (
+        <>
+          <div className="stat-row">
+            <div className={`stat-card ${statusFilter==='urgentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('urgentes'); setGeralTab('todas'); }}>
+              <div className="stat-dot" style={{background:"var(--red)"}}/>
+              <div className="stat-label">Urgentes</div>
+              <div className="stat-num" style={{color:"var(--red)"}}>{stats.urgentes}</div>
+            </div>
+            <div className={`stat-card ${statusFilter==='pendentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('pendentes'); setGeralTab('todas'); }}>
+              <div className="stat-dot" style={{background:"var(--yellow)"}}/>
+              <div className="stat-label">Pendentes</div>
+              <div className="stat-num" style={{color:"var(--yellow)"}}>{stats.pendentes}</div>
+            </div>
+            <div className={`stat-card ${statusFilter==='aguardando'?'active-filter':''}`} onClick={() => { toggleStatFilter('aguardando'); setGeralTab('todas'); }}>
+              <div className="stat-dot" style={{background:"var(--blue)"}}/>
+              <div className="stat-label">Aguardando</div>
+              <div className="stat-num" style={{color:"var(--blue)"}}>{stats.aguardando}</div>
+            </div>
+            <div className={`stat-card ${statusFilter==='concluidas'?'active-filter':''}`} onClick={() => { toggleStatFilter('concluidas'); setGeralTab('todas'); }}>
+              <div className="stat-dot" style={{background:"var(--green)"}}/>
+              <div className="stat-label">Concluídas</div>
+              <div className="stat-num" style={{color:"var(--green)"}}>{stats.concluidas}</div>
+            </div>
+          </div>
+          <div className="search-row">
+            <input className="search-input" placeholder="🔍 Buscar tarefas..." value={search} onChange={e => setSearch(e.target.value)}/>
+            <select className="filter-select" value={sectorFilter} onChange={e => setSectorFilter(e.target.value)}>
+              <option value="todos">Todos os setores</option>
+              {Object.entries(sectors).map(([k,v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
+            </select>
+            <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
+          </div>
+        </>
+      )}
 
       {/* Content based on tab */}
-      {geralTab === "calendario" && !statusFilter ? (
+      {isProgramacao ? (
+        <ProgrTab
+          tasks={allTasks}
+          sectors={sectors}
+          onSaveOrder={onSaveOrder}
+          onStatusChange={onStatusChange}
+          onPriorityChange={onPriorityChange}
+          onDelete={onDelete}
+          onAddComment={onAddComment}
+          onDueDateChange={onDueDateChange}
+          onEditTask={onEditTask}
+          onNewTask={onNewTask}
+        />
+      ) : geralTab === "calendario" && !statusFilter ? (
         <CalendarWidget
           tasks={calendarTasks} sectors={sectors}
           month={calMonth} year={calYear}
@@ -1389,6 +1404,333 @@ function DraggableTaskCard({ task, draggingId, position, handlers, ...taskProps 
   );
 }
 
+// ─── PROGR TAB ─────────────────────────────────
+function ProgrTab({ tasks, sectors, onSaveOrder,
+  onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEditTask, onNewTask }) {
+  const [fullList, setFullList] = useState([]);
+  const [filter, setFilter] = useState('todas');
+  const [search, setSearch] = useState('');
+  const [draggingId, setDraggingId] = useState(null);
+  const [prioDlg, setPrioDlg] = useState(null); // { task, suggested, pendingList }
+
+  const fullListRef = useRef([]);
+  const prevListRef = useRef([]);
+  const draggingIdRef = useRef(null);
+  const dropSucceededRef = useRef(false);
+  const lastEnterRef = useRef(null);
+  const saveTimerRef = useRef(null);
+  const listRef = useRef(null);
+  const filterRef = useRef('todas');
+  const searchRef = useRef('');
+
+  useEffect(() => { filterRef.current = filter; }, [filter]);
+  useEffect(() => { searchRef.current = search; }, [search]);
+  useEffect(() => { fullListRef.current = fullList; }, [fullList]);
+
+  // Sync tasks prop → ordered list (skip during active drag)
+  useEffect(() => {
+    if(draggingIdRef.current) return;
+    const sorted = [...tasks].sort((a, b) => {
+      if(a.manual_order == null && b.manual_order == null) return a.priority - b.priority;
+      if(a.manual_order == null) return 1;
+      if(b.manual_order == null) return -1;
+      return a.manual_order - b.manual_order;
+    });
+    setFullList(sorted);
+    fullListRef.current = sorted;
+  }, [tasks]);
+
+  function applyFilters(list, f, s) {
+    let pool = list;
+    if(f === 'urgentes') pool = pool.filter(t => t.priority <= 2);
+    else if(f === 'pendentes') pool = pool.filter(t => t.status === 'pendente');
+    else if(f === 'aguardando') pool = pool.filter(t => t.status === 'aguardando');
+    if(s && s.trim()) {
+      const q = s.toLowerCase();
+      pool = pool.filter(t => t.title.toLowerCase().includes(q));
+    }
+    return pool;
+  }
+
+  const displayList = useMemo(
+    () => applyFilters(fullList, filter, search),
+    [fullList, filter, search]
+  );
+
+  const tabStats = useMemo(() => ({
+    urgentes:  fullList.filter(t => t.priority <= 2).length,
+    pendentes: fullList.filter(t => t.status === 'pendente').length,
+    aguardando:fullList.filter(t => t.status === 'aguardando').length,
+  }), [fullList]);
+
+  // Reorder using slot algorithm — works correctly even when filtered
+  function reorderById(fromId, toId) {
+    setFullList(prev => {
+      const currentDisplay = applyFilters(prev, filterRef.current, searchRef.current);
+      const fromIdx = currentDisplay.findIndex(t => t.id === fromId);
+      const toIdx = currentDisplay.findIndex(t => t.id === toId);
+      if(fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return prev;
+      const newDisplay = [...currentDisplay];
+      const [moved] = newDisplay.splice(fromIdx, 1);
+      newDisplay.splice(toIdx, 0, moved);
+      const filteredIds = new Set(currentDisplay.map(t => t.id));
+      const slots = [];
+      prev.forEach((t, idx) => { if(filteredIds.has(t.id)) slots.push(idx); });
+      const result = [...prev];
+      slots.forEach((slotIdx, i) => { result[slotIdx] = newDisplay[i]; });
+      return result;
+    });
+  }
+
+  function scheduleSave() {
+    if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => { onSaveOrder(fullListRef.current); }, 500);
+  }
+
+  // Smart priority: check if dragged task crossed a priority band boundary
+  function getSuggestedPriority(taskId, orderedList) {
+    const displayed = applyFilters(orderedList, filterRef.current, searchRef.current);
+    const idx = displayed.findIndex(t => t.id === taskId);
+    if(idx === -1) return null;
+    const task = displayed[idx];
+    const prev = displayed[idx - 1];
+    const next = displayed[idx + 1];
+    let suggested;
+    if(prev && next) {
+      suggested = Math.round((prev.priority + next.priority) / 2);
+    } else if(prev) {
+      suggested = Math.min(10, prev.priority + 1);
+    } else if(next) {
+      suggested = Math.max(1, next.priority - 1);
+    } else {
+      return null;
+    }
+    suggested = Math.max(1, Math.min(10, suggested));
+    function band(p) { return p <= 2 ? 0 : p <= 4 ? 1 : p <= 7 ? 2 : 3; }
+    if(band(suggested) !== band(task.priority)) return { task, suggested };
+    return null;
+  }
+
+  // ── HTML5 DnD (desktop)
+  function handleDragStart(e, id) {
+    prevListRef.current = [...fullListRef.current];
+    dropSucceededRef.current = false;
+    lastEnterRef.current = null;
+    draggingIdRef.current = id;
+    setDraggingId(id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(id));
+  }
+
+  function handleDragEnter(e, id) {
+    if(lastEnterRef.current === id) return;
+    lastEnterRef.current = id;
+    const fromId = draggingIdRef.current;
+    if(fromId && id !== fromId) reorderById(fromId, id);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    dropSucceededRef.current = true;
+    const fromId = draggingIdRef.current;
+    const currentList = [...fullListRef.current];
+    const dlg = getSuggestedPriority(fromId, currentList);
+    if(dlg) {
+      setPrioDlg({ ...dlg, pendingList: currentList });
+    } else {
+      scheduleSave();
+    }
+  }
+
+  function handleDragEnd() {
+    if(!dropSucceededRef.current) {
+      if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      setFullList(prevListRef.current);
+      fullListRef.current = prevListRef.current;
+    }
+    setDraggingId(null);
+    draggingIdRef.current = null;
+    dropSucceededRef.current = false;
+    lastEnterRef.current = null;
+  }
+
+  // ── Touch (mobile)
+  function handleTouchStart(e, id) {
+    prevListRef.current = [...fullListRef.current];
+    draggingIdRef.current = id;
+    setDraggingId(id);
+  }
+
+  function handleTouchEnd() {
+    if(draggingIdRef.current) {
+      const fromId = draggingIdRef.current;
+      const currentList = [...fullListRef.current];
+      const dlg = getSuggestedPriority(fromId, currentList);
+      if(dlg) {
+        setPrioDlg({ ...dlg, pendingList: currentList });
+      } else {
+        scheduleSave();
+      }
+    }
+    setDraggingId(null);
+    draggingIdRef.current = null;
+    lastEnterRef.current = null;
+  }
+
+  const dragHandlers = {
+    onDragStart: handleDragStart, onDragEnter: handleDragEnter,
+    onDragOver: handleDragOver, onDrop: handleDrop, onDragEnd: handleDragEnd,
+    onTouchStart: handleTouchStart, onTouchEnd: handleTouchEnd,
+  };
+
+  // Non-passive touchmove to prevent page scroll during drag
+  useEffect(() => {
+    const el = listRef.current;
+    if(!el) return;
+    function onTouchMove(e) {
+      if(!draggingIdRef.current) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      const card = target && target.closest('[data-task-id]');
+      if(card) {
+        const targetId = Number(card.dataset.taskId);
+        const fromId = draggingIdRef.current;
+        if(fromId && targetId && targetId !== fromId && lastEnterRef.current !== targetId) {
+          lastEnterRef.current = targetId;
+          const list = [...fullListRef.current];
+          const fi = list.findIndex(t => t.id === fromId);
+          const ti = list.findIndex(t => t.id === targetId);
+          if(fi !== -1 && ti !== -1) {
+            const [item] = list.splice(fi, 1);
+            list.splice(ti, 0, item);
+            fullListRef.current = list;
+            setFullList(list);
+          }
+        }
+      }
+    }
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', onTouchMove);
+  }, []);
+
+  function confirmPrioUpdate() {
+    const { task, suggested, pendingList } = prioDlg;
+    setPrioDlg(null);
+    onPriorityChange(task.id, suggested);
+    onSaveOrder(pendingList);
+  }
+
+  function declinePrioUpdate() {
+    const { pendingList } = prioDlg;
+    setPrioDlg(null);
+    onSaveOrder(pendingList);
+  }
+
+  const hasFilter = filter !== 'todas' || search.trim();
+
+  return (
+    <>
+      {/* Filter tabs */}
+      <div className="view-tabs" style={{marginBottom:14}}>
+        <button className={`view-tab ${filter==='todas'?'active':''}`} onClick={() => setFilter('todas')}>
+          📋 Todas <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({fullList.length})</span>
+        </button>
+        <button className={`view-tab ${filter==='urgentes'?'active':''}`} onClick={() => setFilter('urgentes')}>
+          🔴 Urgentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.urgentes})</span>
+        </button>
+        <button className={`view-tab ${filter==='pendentes'?'active':''}`} onClick={() => setFilter('pendentes')}>
+          ⏳ Pendentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.pendentes})</span>
+        </button>
+        <button className={`view-tab ${filter==='aguardando'?'active':''}`} onClick={() => setFilter('aguardando')}>
+          ⏸ Aguardando <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.aguardando})</span>
+        </button>
+      </div>
+
+      {/* Search row */}
+      <div className="search-row" style={{marginBottom:14}}>
+        <input
+          className="search-input"
+          placeholder="🔍 Buscar para filtrar..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        {hasFilter && (
+          <button className="btn-secondary" onClick={() => { setFilter('todas'); setSearch(''); }}
+            style={{whiteSpace:'nowrap'}}>
+            ✕ Limpar
+          </button>
+        )}
+        <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
+      </div>
+
+      {/* List */}
+      {displayList.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">↕️</div>
+          <p>{fullList.length === 0 ? 'Nenhuma tarefa ativa' : 'Nenhuma tarefa para este filtro'}</p>
+        </div>
+      ) : (
+        <div
+          ref={listRef}
+          className="minha-ordem-list"
+          style={draggingId ? {touchAction:'none',userSelect:'none'} : {}}
+        >
+          {displayList.map(task => (
+            <DraggableTaskCard
+              key={task.id}
+              task={task}
+              sectors={sectors}
+              draggingId={draggingId}
+              position={fullList.findIndex(t => t.id === task.id) + 1}
+              handlers={dragHandlers}
+              onStatusChange={onStatusChange}
+              onPriorityChange={onPriorityChange}
+              onDelete={onDelete}
+              onAddComment={onAddComment}
+              onDueDateChange={onDueDateChange}
+              onEdit={onEditTask}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Smart priority dialog */}
+      {prioDlg && (
+        <div className="modal-overlay" onClick={declinePrioUpdate}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{maxWidth:380}}>
+            <h2>Atualizar Prioridade?</h2>
+            <p style={{margin:'12px 0',fontSize:13,color:'var(--muted)'}}>
+              Você moveu <strong style={{color:'var(--text)'}}>{prioDlg.task.title}</strong> para uma nova posição na lista.
+            </p>
+            <p style={{fontSize:13}}>
+              Deseja atualizar a prioridade de{' '}
+              <span style={{color:priorityColor(prioDlg.task.priority),fontWeight:600}}>
+                {priorityLabel(prioDlg.task.priority)} ({prioDlg.task.priority})
+              </span>{' '}
+              para{' '}
+              <span style={{color:priorityColor(prioDlg.suggested),fontWeight:600}}>
+                {priorityLabel(prioDlg.suggested)} ({prioDlg.suggested})
+              </span>?
+            </p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={declinePrioUpdate}>Manter prioridade</button>
+              <button className="btn-primary" onClick={confirmPrioUpdate}>
+                Atualizar para {prioDlg.suggested}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ─── TASK MODAL ────────────────────────────────
 function TaskModal({ task, sectors, onSave, onClose }) {
   const isEdit = task && task.id;
@@ -1466,279 +1808,6 @@ function TaskModal({ task, sectors, onSave, onClose }) {
         </div>
       </div>
     </div>
-  );
-}
-
-// ─── MINHA ORDEM VIEW ─────────────────────────
-function MinhaOrdemView({ tasks, sectors, onSaveOrder,
-  onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEditTask }) {
-  const [fullList, setFullList] = useState([]);
-  const [filter, setFilter] = useState('todas');
-  const [search, setSearch] = useState('');
-  const [draggingId, setDraggingId] = useState(null);
-
-  const fullListRef = useRef([]);
-  const prevListRef = useRef([]);
-  const draggingIdRef = useRef(null);
-  const dropSucceededRef = useRef(false);
-  const lastEnterRef = useRef(null);
-  const saveTimerRef = useRef(null);
-  const listRef = useRef(null);
-  const filterRef = useRef('todas');
-  const searchRef = useRef('');
-
-  // ── Keep refs in sync with state
-  useEffect(() => { filterRef.current = filter; }, [filter]);
-  useEffect(() => { searchRef.current = search; }, [search]);
-  useEffect(() => { fullListRef.current = fullList; }, [fullList]);
-
-  // ── Sync tasks prop → full ordered list (skip during active drag)
-  useEffect(() => {
-    if(draggingIdRef.current) return;
-    const sorted = [...tasks].sort((a, b) => {
-      if(a.manual_order == null && b.manual_order == null) return a.priority - b.priority;
-      if(a.manual_order == null) return 1;
-      if(b.manual_order == null) return -1;
-      return a.manual_order - b.manual_order;
-    });
-    setFullList(sorted);
-    fullListRef.current = sorted;
-  }, [tasks]);
-
-  // ── Apply filter + search to a list
-  function applyFilters(list, f, s) {
-    let pool = list;
-    if(f === 'urgentes') pool = pool.filter(t => t.priority <= 2);
-    else if(f === 'pendentes') pool = pool.filter(t => t.status === 'pendente');
-    else if(f === 'aguardando') pool = pool.filter(t => t.status === 'aguardando');
-    if(s && s.trim()) {
-      const q = s.toLowerCase();
-      pool = pool.filter(t => t.title.toLowerCase().includes(q));
-    }
-    return pool;
-  }
-
-  // ── Derived: visible list for render
-  const displayList = useMemo(
-    () => applyFilters(fullList, filter, search),
-    [fullList, filter, search]
-  );
-
-  // ── Stats for tab badges
-  const tabStats = useMemo(() => ({
-    urgentes:  fullList.filter(t => t.priority <= 2).length,
-    pendentes: fullList.filter(t => t.status === 'pendente').length,
-    aguardando:fullList.filter(t => t.status === 'aguardando').length,
-  }), [fullList]);
-
-  // ── Reorder using slot algorithm: works correctly even when filtered
-  // Filtered items occupy specific "slots" in the full list; reordering
-  // only reassigns those slots — non-visible tasks are untouched.
-  function reorderById(fromId, toId) {
-    setFullList(prev => {
-      const currentDisplay = applyFilters(prev, filterRef.current, searchRef.current);
-      const fromIdx = currentDisplay.findIndex(t => t.id === fromId);
-      const toIdx = currentDisplay.findIndex(t => t.id === toId);
-      if(fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return prev;
-
-      const newDisplay = [...currentDisplay];
-      const [moved] = newDisplay.splice(fromIdx, 1);
-      newDisplay.splice(toIdx, 0, moved);
-
-      // Find which indices in fullList the filtered items occupy
-      const filteredIds = new Set(currentDisplay.map(t => t.id));
-      const slots = [];
-      prev.forEach((t, idx) => { if(filteredIds.has(t.id)) slots.push(idx); });
-
-      // Place the reordered display items back into those slots
-      const result = [...prev];
-      slots.forEach((slotIdx, i) => { result[slotIdx] = newDisplay[i]; });
-      return result;
-    });
-  }
-
-  function scheduleSave() {
-    if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      onSaveOrder(fullListRef.current);
-    }, 500);
-  }
-
-  // ── HTML5 DnD (mouse / desktop)
-  function handleDragStart(e, id) {
-    prevListRef.current = [...fullListRef.current];
-    dropSucceededRef.current = false;
-    lastEnterRef.current = null;
-    draggingIdRef.current = id;
-    setDraggingId(id);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', String(id));
-  }
-
-  function handleDragEnter(e, id) {
-    if(lastEnterRef.current === id) return;
-    lastEnterRef.current = id;
-    const fromId = draggingIdRef.current;
-    if(fromId && id !== fromId) reorderById(fromId, id);
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  }
-
-  function handleDrop(e) {
-    e.preventDefault();
-    dropSucceededRef.current = true;
-    scheduleSave();
-  }
-
-  function handleDragEnd() {
-    if(!dropSucceededRef.current) {
-      if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      setFullList(prevListRef.current);
-      fullListRef.current = prevListRef.current;
-    }
-    setDraggingId(null);
-    draggingIdRef.current = null;
-    dropSucceededRef.current = false;
-    lastEnterRef.current = null;
-  }
-
-  // ── Touch (mobile)
-  function handleTouchStart(e, id) {
-    prevListRef.current = [...fullListRef.current];
-    draggingIdRef.current = id;
-    setDraggingId(id);
-  }
-
-  function handleTouchEnd() {
-    if(draggingIdRef.current) scheduleSave();
-    setDraggingId(null);
-    draggingIdRef.current = null;
-    lastEnterRef.current = null;
-  }
-
-  // ── Collect drag handlers into one object for DraggableTaskCard
-  const dragHandlers = {
-    onDragStart:  handleDragStart,
-    onDragEnter:  handleDragEnter,
-    onDragOver:   handleDragOver,
-    onDrop:       handleDrop,
-    onDragEnd:    handleDragEnd,
-    onTouchStart: handleTouchStart,
-    onTouchEnd:   handleTouchEnd,
-  };
-
-  // ── Non-passive touchmove: React synthetic events são passivos e não podem
-  // chamar preventDefault(), então registramos diretamente no DOM com { passive: false }
-  // para impedir o scroll da página durante o arraste no mobile.
-  useEffect(() => {
-    const el = listRef.current;
-    if(!el) return;
-    function onTouchMove(e) {
-      if(!draggingIdRef.current) return; // sem drag ativo → deixa scroll normal
-      e.preventDefault();
-      const touch = e.touches[0];
-      const target = document.elementFromPoint(touch.clientX, touch.clientY);
-      const card = target && target.closest('[data-task-id]');
-      if(card) {
-        const targetId = Number(card.dataset.taskId);
-        const fromId = draggingIdRef.current;
-        if(fromId && targetId && targetId !== fromId && lastEnterRef.current !== targetId) {
-          lastEnterRef.current = targetId;
-          const list = [...fullListRef.current];
-          const fi = list.findIndex(t => t.id === fromId);
-          const ti = list.findIndex(t => t.id === targetId);
-          if(fi !== -1 && ti !== -1) {
-            const [item] = list.splice(fi, 1);
-            list.splice(ti, 0, item);
-            fullListRef.current = list;
-            setFullList(list);
-          }
-        }
-      }
-    }
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    return () => el.removeEventListener('touchmove', onTouchMove);
-  }, []); // deps vazias: só refs e setters estáveis são usados
-
-  const hasFilter = filter !== 'todas' || search.trim();
-
-  return (
-    <>
-      <div className="page-header">
-        <h2 className="page-title">🗓️ Programação</h2>
-        <div className="page-subtitle">
-          {hasFilter
-            ? `${displayList.length} de ${fullList.length} tarefas · arraste para reordenar`
-            : `${fullList.length} tarefas · arraste para reordenar`}
-        </div>
-      </div>
-
-      {/* ── Filter tabs */}
-      <div className="view-tabs" style={{marginBottom:14}}>
-        <button className={`view-tab ${filter==='todas'?'active':''}`} onClick={() => setFilter('todas')}>
-          📋 Todas <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({fullList.length})</span>
-        </button>
-        <button className={`view-tab ${filter==='urgentes'?'active':''}`} onClick={() => setFilter('urgentes')}>
-          🔴 Urgentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.urgentes})</span>
-        </button>
-        <button className={`view-tab ${filter==='pendentes'?'active':''}`} onClick={() => setFilter('pendentes')}>
-          ⏳ Pendentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.pendentes})</span>
-        </button>
-        <button className={`view-tab ${filter==='aguardando'?'active':''}`} onClick={() => setFilter('aguardando')}>
-          ⏸ Aguardando <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.aguardando})</span>
-        </button>
-      </div>
-
-      {/* ── Search row */}
-      <div className="search-row" style={{marginBottom:14}}>
-        <input
-          className="search-input"
-          placeholder="🔍 Buscar para filtrar..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        {hasFilter && (
-          <button className="btn-secondary" onClick={() => { setFilter('todas'); setSearch(''); }}
-            style={{whiteSpace:'nowrap'}}>
-            ✕ Limpar
-          </button>
-        )}
-      </div>
-
-      {/* ── List */}
-      {displayList.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">↕️</div>
-          <p>{fullList.length === 0 ? 'Nenhuma tarefa ativa' : 'Nenhuma tarefa para este filtro'}</p>
-        </div>
-      ) : (
-        <div
-          ref={listRef}
-          className="minha-ordem-list"
-          style={draggingId ? {touchAction:'none',userSelect:'none'} : {}}
-        >
-          {displayList.map(task => (
-            <DraggableTaskCard
-              key={task.id}
-              task={task}
-              sectors={sectors}
-              draggingId={draggingId}
-              position={fullList.findIndex(t => t.id === task.id) + 1}
-              handlers={dragHandlers}
-              onStatusChange={onStatusChange}
-              onPriorityChange={onPriorityChange}
-              onDelete={onDelete}
-              onAddComment={onAddComment}
-              onDueDateChange={onDueDateChange}
-              onEdit={onEditTask}
-            />
-          ))}
-        </div>
-      )}
-    </>
   );
 }
 
