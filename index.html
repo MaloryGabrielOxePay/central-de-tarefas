@@ -3,18 +3,17 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Central de Tarefas · Malory</title>
+<title>HUB · Grupo Malory</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{height:100%}
-body{font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;transition:background .3s,color .3s;height:100%}
-h1,h2,h3,.font-syne{font-family:'Syne',sans-serif}
+body{font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;transition:background .3s,color .3s;height:100%}
+h1,h2,h3,.font-display{font-family:'Space Grotesk',sans-serif}
 #root{min-height:100vh}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -100,7 +99,7 @@ body.dark {
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
 .stat-card.active-filter{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .stat-card .stat-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-.stat-card .stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-top:4px}
+.stat-card .stat-num{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;margin-top:4px}
 .stat-card .stat-dot{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%}
 
 /* ─── VIEW TABS ─── */
@@ -348,7 +347,7 @@ body.dark {
 .minha-ordem-card:hover .drag-handle{opacity:.75}
 .drag-handle:active{cursor:grabbing}
 .minha-ordem-pos{
-  font-family:'Syne',sans-serif;font-size:10px;font-weight:700;
+  font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;
   color:var(--muted);white-space:nowrap;line-height:1
 }
 
@@ -698,7 +697,7 @@ function App() {
   const trashedTasks = useMemo(() => tasks.filter(t => t.status === 'excluido'), [tasks]);
 
   const stats = useMemo(() => ({
-    urgentes: nonCompletedTasks.filter(t => t.priority <= 2).length,
+    todas: nonCompletedTasks.length,
     pendentes: activeTasks.filter(t => t.status === 'pendente').length,
     aguardando: activeTasks.filter(t => t.status === 'aguardando').length,
     concluidas: completedTasks.length,
@@ -764,7 +763,7 @@ function App() {
   }
 
   function toggleStatFilter(filter) {
-    setGeralTab("todas");
+    setGeralTab("urgente");
     setStatusFilter(prev => prev === filter ? null : filter);
   }
 
@@ -774,7 +773,7 @@ function App() {
       {/* Mobile Header */}
       <div className="mobile-header">
         <button className="hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
-        <span className="font-syne" style={{fontWeight:700,fontSize:15}}>Central de Tarefas</span>
+        <span className="font-display" style={{fontWeight:700,fontSize:16,letterSpacing:2}}>HUB</span>
         <button className="hamburger" onClick={() => setTheme(t => t==='light'?'dark':'light')}>
           {theme==='light'?'🌙':'☀️'}
         </button>
@@ -784,8 +783,8 @@ function App() {
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen?'open':''}`}>
         <div className="logo">
-          <h1>Central de Tarefas</h1>
-          <div className="logo-sub">Malory · 4 Empresas</div>
+          <h1 style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:28,fontWeight:700,letterSpacing:3}}>HUB</h1>
+          <div className="logo-sub">GRUPO MALORY</div>
         </div>
 
         <nav className="nav">
@@ -906,16 +905,12 @@ function GeralView({
         <div className="page-subtitle">
           {isProgramacao
             ? 'Arraste para reordenar · prioridade inteligente'
-            : `${allTasks.length} tarefas ativas · ${stats.urgentes} urgentes`}
+            : `${stats.todas} tarefas ativas · ${allTasks.filter(t => t.priority <= 2).length} urgentes`}
         </div>
       </div>
 
       {/* View Tabs */}
       <div className="view-tabs">
-        <button className={`view-tab ${geralTab==='programacao'?'active':''}`}
-          onClick={() => { setGeralTab('programacao'); toggleStatFilter(null); }}>
-          🗓️ Programação
-        </button>
         <button className={`view-tab ${geralTab==='urgente'&&!statusFilter?'active':''}`}
           onClick={() => { setGeralTab('urgente'); toggleStatFilter(null); }}>
           🔥 Urgente
@@ -924,20 +919,16 @@ function GeralView({
           onClick={() => { setGeralTab('calendario'); toggleStatFilter(null); }}>
           📅 Calendário
         </button>
-        <button className={`view-tab ${geralTab==='todas'&&!statusFilter?'active':''}`}
-          onClick={() => { setGeralTab('todas'); toggleStatFilter(null); }}>
-          📋 Todas as Tarefas
-        </button>
       </div>
 
       {/* Stat Cards + Search — hidden on Programação tab */}
       {!isProgramacao && (
         <>
           <div className="stat-row">
-            <div className={`stat-card ${statusFilter==='urgentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('urgentes'); setGeralTab('todas'); }}>
-              <div className="stat-dot" style={{background:"var(--red)"}}/>
-              <div className="stat-label">Urgentes</div>
-              <div className="stat-num" style={{color:"var(--red)"}}>{stats.urgentes}</div>
+            <div className={`stat-card ${statusFilter==='todas'?'active-filter':''}`} onClick={() => toggleStatFilter('todas')}>
+              <div className="stat-dot" style={{background:"var(--accent)"}}/>
+              <div className="stat-label">Todas</div>
+              <div className="stat-num" style={{color:"var(--accent)"}}>{stats.todas}</div>
             </div>
             <div className={`stat-card ${statusFilter==='pendentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('pendentes'); setGeralTab('todas'); }}>
               <div className="stat-dot" style={{background:"var(--yellow)"}}/>
