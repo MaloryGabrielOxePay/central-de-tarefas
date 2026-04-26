@@ -20,15 +20,14 @@ h1,h2,h3,.font-display{font-family:'Space Grotesk',sans-serif}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 input,select,textarea,button{font-family:inherit}
 
-/* ─── LIGHT THEME (default) ─── */
+/* ─── LIGHT THEME ─── */
 body, body.light {
   --bg:#f4f3f8;--surface:#ffffff;--card:#ffffff;--border:#e4e2ee;
   --accent:#6c5ce7;--accent-soft:#ede9fe;--text:#1e1b2e;--muted:#7b7794;
   --green:#16a34a;--green-bg:#dcfce7;--yellow:#d97706;--yellow-bg:#fef3c7;
   --red:#dc2626;--red-bg:#fee2e2;--blue:#2563eb;--blue-bg:#dbeafe;
   --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-lg:0 4px 12px rgba(0,0,0,.08);
-  --input-bg:#f8f7fc;
+  --shadow-lg:0 4px 12px rgba(0,0,0,.08);--input-bg:#f8f7fc;
   background:var(--bg);color:var(--text)
 }
 /* ─── DARK THEME ─── */
@@ -37,35 +36,22 @@ body.dark {
   --accent:#8b7cf7;--accent-soft:#1e1a3a;--text:#e4e2f0;--muted:#6b6780;
   --green:#4ade80;--green-bg:#052e16;--yellow:#fbbf24;--yellow-bg:#422006;
   --red:#f87171;--red-bg:#450a0a;--blue:#60a5fa;--blue-bg:#172554;
-  --shadow:0 1px 3px rgba(0,0,0,.3);
-  --shadow-lg:0 4px 12px rgba(0,0,0,.4);
-  --input-bg:#111020;
-  background:var(--bg);color:var(--text)
+  --shadow:0 1px 3px rgba(0,0,0,.3);--shadow-lg:0 4px 12px rgba(0,0,0,.4);
+  --input-bg:#111020;background:var(--bg);color:var(--text)
 }
 
 /* ─── LAYOUT ─── */
 .app{display:flex;min-height:100vh}
-.sidebar{
-  width:240px;min-width:240px;background:var(--surface);
-  border-right:1px solid var(--border);padding:20px 0;
-  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
-  overflow-y:auto;z-index:100;transition:transform .3s
-}
+.sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;transition:transform .3s}
 .main{flex:1;padding:24px 28px;overflow-y:auto;min-width:0}
 
 /* Logo */
 .logo{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
-.logo h1{font-size:17px;font-weight:800;letter-spacing:-.3px}
-.logo-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.logo-sub{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:1.5px}
 
 /* Nav */
 .nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px}
-.nav-btn{
-  display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;
-  border:none;background:transparent;color:var(--muted);cursor:pointer;
-  font-size:13px;text-align:left;width:100%;transition:all .15s;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;text-align:left;width:100%;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav-btn:hover{background:var(--accent-soft);color:var(--accent)}
 .nav-btn.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
 .nav-btn .nav-icon{font-size:16px;min-width:20px;text-align:center}
@@ -74,11 +60,7 @@ body.dark {
 
 /* Sidebar footer */
 .sidebar-footer{border-top:1px solid var(--border);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
-.theme-toggle{
-  display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;
-  border:1px solid var(--border);background:var(--card);cursor:pointer;
-  color:var(--text);font-size:12px;transition:.15s;width:100%
-}
+.theme-toggle{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--text);font-size:12px;transition:.15s;width:100%}
 .theme-toggle:hover{border-color:var(--accent)}
 .sync-badge{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;padding:4px 0}
 .sync-badge.offline{color:var(--yellow)}
@@ -91,11 +73,7 @@ body.dark {
 
 /* ─── STAT CARDS ─── */
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.stat-card{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:14px 16px;box-shadow:var(--shadow);cursor:pointer;transition:all .2s;
-  position:relative;overflow:hidden
-}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
 .stat-card.active-filter{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .stat-card .stat-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
@@ -104,182 +82,87 @@ body.dark {
 
 /* ─── VIEW TABS ─── */
 .view-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px}
-.view-tab{
-  padding:8px 16px;border-radius:8px;border:none;background:transparent;
-  color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:.15s;
-  display:flex;align-items:center;gap:6px
-}
+.view-tab{padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px}
 .view-tab:hover{color:var(--text)}
 .view-tab.active{background:var(--accent);color:#fff;font-weight:600}
 
 /* ─── SEARCH BAR ─── */
 .search-row{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
-.search-input{
-  flex:1;min-width:200px;padding:10px 14px;border-radius:10px;
-  border:1px solid var(--border);background:var(--input-bg);color:var(--text);
-  font-size:13px;outline:none;transition:.2s
-}
+.search-input{flex:1;min-width:200px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;outline:none;transition:.2s}
 .search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.filter-select{
-  padding:10px 14px;border-radius:10px;border:1px solid var(--border);
-  background:var(--input-bg);color:var(--text);font-size:13px;outline:none;cursor:pointer
-}
-.btn-primary{
-  padding:10px 18px;border-radius:10px;border:none;
-  background:var(--accent);color:#fff;font-weight:600;font-size:13px;
-  cursor:pointer;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px
-}
+.filter-select{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;outline:none;cursor:pointer}
+.btn-primary{padding:10px 18px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:600;font-size:13px;cursor:pointer;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
 .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
 
 /* ─── TASK CARDS ─── */
 .task-list{display:flex;flex-direction:column;gap:8px}
-.section-divider{
-  display:flex;align-items:center;gap:10px;margin:16px 0 10px;
-  font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px
-}
+.section-divider{display:flex;align-items:center;gap:10px;margin:16px 0 10px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
-.task-card{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;
-  position:relative;overflow:hidden
-}
+.task-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;position:relative;overflow:hidden}
 .task-card:hover{box-shadow:var(--shadow-lg)}
 .task-card-inner{display:flex;align-items:flex-start;gap:12px}
-
-.task-priority-bar{
-  width:4px;min-height:40px;border-radius:4px;flex-shrink:0;margin-top:2px;
-  align-self:stretch
-}
-
+.task-priority-bar{width:4px;min-height:40px;border-radius:4px;flex-shrink:0;margin-top:2px;align-self:stretch}
 .task-body{flex:1;min-width:0}
 .task-header{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
-.task-title{font-size:15px;font-weight:600;line-height:1.4;word-break:break-word;flex:1;min-width:0;cursor:pointer}
+.task-title{font-size:15px;font-weight:600;line-height:1.4;word-break:break-word;flex:1;min-width:0;cursor:pointer;transition:color .15s}
 .task-title:hover{color:var(--accent)}
 .task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
 
-.badge{
-  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;
-  font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent;
-  white-space:nowrap
-}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent;white-space:nowrap}
 .badge:hover{opacity:.85}
 .badge-red{background:var(--red-bg);color:var(--red)}
 .badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
 .badge-blue{background:var(--blue-bg);color:var(--blue)}
 .badge-green{background:var(--green-bg);color:var(--green)}
 
-.sector-tag{
-  font-size:11px;color:var(--muted);background:var(--input-bg);
-  padding:2px 8px;border-radius:5px;white-space:nowrap
-}
-
-.task-date-tag{
-  font-size:11px;display:inline-flex;align-items:center;gap:3px;
-  color:var(--accent);background:var(--accent-soft);padding:2px 8px;
-  border-radius:5px;white-space:nowrap
-}
+.sector-tag{font-size:10px;color:var(--muted);background:var(--input-bg);padding:2px 6px;border-radius:5px;white-space:nowrap;opacity:.7}
+.task-date-tag{font-size:11px;display:inline-flex;align-items:center;gap:3px;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:5px;white-space:nowrap;cursor:pointer}
 .task-date-tag.overdue{color:var(--red);background:var(--red-bg)}
 
 .task-actions{display:flex;gap:4px;flex-shrink:0;margin-left:auto;align-items:flex-start}
-.task-actions button{
-  background:transparent;border:1px solid var(--border);border-radius:6px;
-  padding:4px 8px;cursor:pointer;color:var(--muted);font-size:12px;transition:.15s
-}
+.task-actions button{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--muted);font-size:12px;transition:.15s}
 .task-actions button:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
 
 /* ─── PRIORITY PICKER ─── */
-.priority-picker{
-  position:absolute;top:100%;left:0;z-index:50;background:var(--card);
-  border:1px solid var(--border);border-radius:10px;padding:8px;
-  box-shadow:var(--shadow-lg);display:flex;gap:4px;flex-wrap:wrap;width:200px
-}
-.priority-picker button{
-  width:32px;height:32px;border-radius:8px;border:2px solid transparent;
-  font-weight:700;font-size:12px;cursor:pointer;transition:.15s;
-  display:flex;align-items:center;justify-content:center
-}
+.priority-picker{position:absolute;top:100%;left:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;box-shadow:var(--shadow-lg);display:flex;gap:4px;flex-wrap:wrap;width:200px}
+.priority-picker button{width:32px;height:32px;border-radius:8px;border:2px solid transparent;font-weight:700;font-size:12px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center}
 .priority-picker button:hover{transform:scale(1.1)}
 .priority-picker button.selected{border-color:var(--text);transform:scale(1.15)}
 
 /* ─── STATUS PICKER ─── */
-.status-picker{
-  position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:var(--card);
-  border:1px solid var(--border);border-radius:10px;padding:6px;
-  box-shadow:var(--shadow-lg);display:flex;flex-direction:column;gap:3px;min-width:155px
-}
-.status-picker button{
-  padding:7px 12px;border-radius:8px;border:none;background:transparent;
-  color:var(--text);cursor:pointer;font-size:12px;text-align:left;
-  transition:.15s;font-weight:500
-}
+.status-picker{position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;gap:3px;min-width:155px}
+.status-picker button{padding:7px 12px;border-radius:8px;border:none;background:transparent;color:var(--text);cursor:pointer;font-size:12px;text-align:left;transition:.15s;font-weight:500}
 .status-picker button:hover{background:var(--input-bg)}
 
-/* ─── COMMENT BADGE COUNT ─── */
-.comment-badge-count{
-  position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;
-  font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;line-height:1
-}
+/* ─── COMMENT BADGE ─── */
+.comment-badge-count{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1}
 
 /* ─── DATE PICKER inline ─── */
-.date-picker-inline{
-  margin-top:8px;padding:10px;background:var(--input-bg);border:1px solid var(--border);
-  border-radius:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap
-}
-.date-picker-inline input{
-  padding:6px 10px;border-radius:8px;border:1px solid var(--border);
-  background:var(--card);color:var(--text);font-size:12px;outline:none
-}
+.date-picker-inline{margin-top:8px;padding:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.date-picker-inline input{padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px;outline:none}
 .date-picker-inline input:focus{border-color:var(--accent)}
-.date-picker-inline button{
-  padding:5px 12px;border-radius:8px;border:none;font-size:12px;
-  cursor:pointer;font-weight:600;transition:.15s
-}
+.date-picker-inline button{padding:5px 12px;border-radius:8px;border:none;font-size:12px;cursor:pointer;font-weight:600;transition:.15s}
 
 /* ─── COMMENTS ─── */
-.comments-area{
-  margin-top:10px;padding-top:10px;border-top:1px solid var(--border)
-}
-.comment-item{
-  padding:6px 0;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)
-}
+.comments-area{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.comment-item{padding:6px 0;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
 .comment-item small{display:block;font-size:10px;color:var(--muted);opacity:.7;margin-bottom:2px}
 .comment-input-row{display:flex;gap:6px;margin-top:8px}
-.comment-input{
-  flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);
-  background:var(--input-bg);color:var(--text);font-size:12px;outline:none
-}
+.comment-input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:12px;outline:none}
 .comment-input:focus{border-color:var(--accent)}
-.comment-send{
-  padding:6px 14px;border-radius:8px;border:none;background:var(--accent);
-  color:#fff;cursor:pointer;font-weight:600;font-size:13px
-}
+.comment-send{padding:6px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600;font-size:13px}
 
-/* ─── CREATE TASK MODAL ─── */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  backdrop-filter:blur(4px)
-}
-.modal{
-  background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:28px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);
-  max-height:90vh;overflow-y:auto
-}
+/* ─── MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto}
 .modal h2{font-size:18px;font-weight:700;margin-bottom:16px}
 .modal label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px;margin-top:12px}
-.modal input,.modal select,.modal textarea{
-  width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
-  background:var(--input-bg);color:var(--text);font-size:13px;outline:none
-}
+.modal input,.modal select,.modal textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;outline:none}
 .modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--accent)}
 .modal textarea{min-height:60px;resize:vertical}
 .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
-.btn-secondary{
-  padding:10px 18px;border-radius:10px;border:1px solid var(--border);
-  background:transparent;color:var(--text);font-weight:500;font-size:13px;cursor:pointer
-}
+.btn-secondary{padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-weight:500;font-size:13px;cursor:pointer}
 .btn-secondary:hover{background:var(--input-bg)}
 
 /* ─── CALENDAR ─── */
@@ -287,147 +170,72 @@ body.dark {
 .calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .calendar-header h3{font-size:16px;font-weight:700}
 .calendar-nav{display:flex;gap:6px}
-.calendar-nav button{
-  padding:6px 12px;border-radius:8px;border:1px solid var(--border);
-  background:var(--input-bg);color:var(--text);cursor:pointer;font-size:13px
-}
+.calendar-nav button{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);cursor:pointer;font-size:13px}
 .calendar-nav button:hover{border-color:var(--accent)}
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.calendar-day-label{
-  text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:6px 0;
-  text-transform:uppercase
-}
-.calendar-cell{
-  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;border-radius:10px;font-size:13px;position:relative;
-  cursor:default;transition:.15s;min-height:40px;gap:2px
-}
+.calendar-day-label{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:6px 0;text-transform:uppercase}
+.calendar-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:13px;position:relative;cursor:default;transition:.15s;min-height:40px;gap:2px}
 .calendar-cell.today{background:var(--accent-soft);font-weight:700;color:var(--accent)}
 .calendar-cell.other-month{opacity:.3}
 .calendar-cell.has-tasks{cursor:pointer}
 .calendar-cell.has-tasks:hover{background:var(--input-bg)}
+.calendar-cell.selected-day{outline:2px solid var(--accent);border-radius:10px}
 .calendar-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:28px}
 .calendar-dot{width:5px;height:5px;border-radius:50%}
-.calendar-cell-tooltip{
-  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
-  background:var(--card);border:1px solid var(--border);border-radius:8px;
-  padding:8px 10px;font-size:11px;white-space:nowrap;z-index:50;
-  box-shadow:var(--shadow-lg);pointer-events:none;max-width:220px;
-  white-space:normal;line-height:1.3
-}
+.calendar-cell-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;z-index:50;box-shadow:var(--shadow-lg);pointer-events:none;max-width:220px;white-space:normal;line-height:1.3}
 
-/* ─── EMPTY STATE ─── */
-.empty-state{
-  text-align:center;padding:40px 20px;color:var(--muted)
-}
-.empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
-.empty-state p{font-size:14px}
-
-/* ─── MINHA ORDEM ─── */
+/* ─── DRAG & DROP ─── */
 .minha-ordem-list{display:flex;flex-direction:column;gap:8px}
-.minha-ordem-card{
-  transition:transform 150ms ease,box-shadow 150ms ease,opacity 150ms ease;
-  cursor:default
-}
-.minha-ordem-card.is-dragging{
-  opacity:.55;
-  box-shadow:0 8px 24px rgba(0,0,0,.18);
-  transform:scale(1.02) rotate(.5deg);
-  z-index:10;
-  cursor:grabbing
-}
-.drag-handle{
-  width:28px;min-width:28px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:1px;
-  cursor:grab;color:var(--muted);opacity:.35;
-  transition:opacity .15s;user-select:none;flex-shrink:0;
-  touch-action:none
-}
+.minha-ordem-card{transition:transform 150ms ease,box-shadow 150ms ease,opacity 150ms ease;cursor:default}
+.minha-ordem-card.is-dragging{opacity:.55;box-shadow:0 8px 24px rgba(0,0,0,.18);transform:scale(1.02) rotate(.5deg);z-index:10;cursor:grabbing}
+.drag-handle{width:28px;min-width:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:grab;color:var(--muted);opacity:.35;transition:opacity .15s;user-select:none;flex-shrink:0;touch-action:none}
 .drag-dots{font-size:18px;line-height:1;letter-spacing:-2px}
 .minha-ordem-card:hover .drag-handle{opacity:.75}
 .drag-handle:active{cursor:grabbing}
-.minha-ordem-pos{
-  font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;
-  color:var(--muted);white-space:nowrap;line-height:1
-}
+.minha-ordem-pos{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;line-height:1}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-state p{font-size:14px}
 
 /* ─── MOBILE ─── */
-.mobile-header{
-  display:none;position:sticky;top:0;z-index:100;background:var(--surface);
-  border-bottom:1px solid var(--border);padding:12px 16px;
-  align-items:center;justify-content:space-between
-}
+.mobile-header{display:none;position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;align-items:center;justify-content:space-between}
 .hamburger{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px}
-.mobile-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;
-  backdrop-filter:blur(2px)
-}
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;backdrop-filter:blur(2px)}
 
 @media(max-width:768px){
-  /* ── Root layout: stack mobile-header above main content */
   .app{flex-direction:column}
   html,body{height:100%;overflow:hidden}
   #root{height:100%;display:flex;flex-direction:column}
-
-  /* ── Mobile top bar */
   .mobile-header{display:flex;width:100%;flex-shrink:0}
-
-  /* ── Sidebar: slide in from left as overlay */
-  .sidebar{
-    position:fixed;left:0;top:0;transform:translateX(-100%);
-    z-index:200;height:100%;box-shadow:var(--shadow-lg);
-    width:260px;min-width:260px
-  }
+  .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);z-index:200;height:100%;box-shadow:var(--shadow-lg);width:260px;min-width:260px}
   .sidebar.open{transform:translateX(0)}
   .mobile-overlay.show{display:block}
-
-  /* ── Main area: fills remaining height, scrolls internally */
-  .main{
-    flex:1;min-height:0;overflow-y:auto;
-    padding:16px;-webkit-overflow-scrolling:touch
-  }
-
-  /* ── Stat cards: 2 columns */
+  .main{flex:1;min-height:0;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
   .stat-row{grid-template-columns:repeat(2,1fr);gap:8px}
   .stat-card .stat-num{font-size:22px}
-
-  /* ── View tabs: horizontal scroll, hide scrollbar */
-  .view-tabs{
-    overflow-x:auto;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none;flex-wrap:nowrap
-  }
+  .view-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .view-tabs::-webkit-scrollbar{display:none}
   .view-tab{flex-shrink:0;padding:8px 12px;font-size:12px}
-
-  /* ── Search row */
   .search-row{flex-direction:column;gap:8px}
   .search-input{min-width:0;width:100%}
   .filter-select{width:100%}
   .btn-primary{width:100%;justify-content:center;padding:12px 18px}
-
-  /* ── Task cards: keep row layout — column breaks the priority bar */
   .task-card{padding:12px 14px}
   .task-card-inner{flex-direction:row;gap:10px;flex-wrap:nowrap}
   .task-priority-bar{align-self:stretch}
   .task-body{min-width:0;flex:1}
   .task-actions{flex-shrink:0;margin-left:auto;width:auto}
   .task-actions button{padding:8px 10px;min-width:36px;min-height:36px}
-
-  /* ── Buttons: adequate touch targets */
   .nav-btn{min-height:44px;padding:10px 14px}
   .hamburger{min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
-
-  /* ── Modal: full-width, bottom sheet feel */
   .modal-overlay{align-items:flex-end;padding:0}
   .modal{border-radius:16px 16px 0 0;padding:20px;max-height:92vh}
   .modal-actions{flex-direction:column-reverse;gap:8px}
   .modal-actions .btn-primary,.modal-actions .btn-secondary{width:100%;justify-content:center}
-
-  /* ── Calendar */
   .calendar-cell{min-height:32px;font-size:11px}
   .calendar-wrap{padding:14px}
-
-  /* ── Drag handle: 44px touch area */
   .drag-handle{min-width:44px;min-height:44px;font-size:22px}
 }
 </style>
@@ -454,45 +262,17 @@ const DEFAULT_SECTORS = {
 };
 
 // ─── HELPERS ───────────────────────────────────────────────
-function priorityColor(p) {
-  if(p<=2) return "var(--red)";
-  if(p<=4) return "var(--yellow)";
-  if(p<=7) return "var(--blue)";
-  return "var(--green)";
-}
-function priorityBg(p) {
-  if(p<=2) return "var(--red-bg)";
-  if(p<=4) return "var(--yellow-bg)";
-  if(p<=7) return "var(--blue-bg)";
-  return "var(--green-bg)";
-}
-function priorityLabel(p) {
-  if(p<=2) return "Urgente";
-  if(p<=4) return "Alta";
-  if(p<=7) return "Média";
-  return "Baixa";
-}
-function statusLabel(s) {
-  if(s==="pendente") return "Pendente";
-  if(s==="aguardando") return "Aguardando";
-  if(s==="concluido") return "Concluído";
-  if(s==="excluido") return "Excluído";
-  return s;
-}
-function statusIcon(s) {
-  if(s==="pendente") return "⏳";
-  if(s==="aguardando") return "⏸";
-  if(s==="concluido") return "✅";
-  if(s==="excluido") return "🗑";
-  return "•";
-}
-function fmt(d){ if(!d) return ""; try{ return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); } catch(e){ return ""; } }
-function fmtShort(d){ if(!d) return ""; try{ return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); } catch(e){ return ""; } }
-function isOverdue(d){ if(!d) return false; return new Date(d) < new Date() }
-function isoDate(d){ if(!d) return null; return new Date(d).toISOString(); }
+function priorityColor(p){if(p<=2)return"var(--red)";if(p<=4)return"var(--yellow)";if(p<=7)return"var(--blue)";return"var(--green)";}
+function priorityBg(p){if(p<=2)return"var(--red-bg)";if(p<=4)return"var(--yellow-bg)";if(p<=7)return"var(--blue-bg)";return"var(--green-bg)";}
+function priorityLabel(p){if(p<=2)return"Urgente";if(p<=4)return"Alta";if(p<=7)return"Média";return"Baixa";}
+function statusLabel(s){if(s==="pendente")return"Pendente";if(s==="aguardando")return"Aguardando";if(s==="concluido")return"Concluído";if(s==="excluido")return"Excluído";return s;}
+function statusIcon(s){if(s==="pendente")return"⏳";if(s==="aguardando")return"⏸";if(s==="concluido")return"✅";if(s==="excluido")return"🗑";return"•";}
+function fmt(d){if(!d)return"";try{return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return"";}}
+function fmtShort(d){if(!d)return"";try{return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});}catch(e){return"";}}
+function isOverdue(d){if(!d)return false;return new Date(d)<new Date();}
 
-const MONTHS_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const DAYS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTHS_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DAYS_PT=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
 // ─── APP ───────────────────────────────────────────────────
 function App() {
@@ -501,54 +281,37 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState("loading");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Navigation
   const [currentView, setCurrentView] = useState("geral");
   const [currentSector, setCurrentSector] = useState(null);
-
-  // View tabs in geral
   const [geralTab, setGeralTab] = useState("urgente");
-
-  // Search & filters
   const [search, setSearch] = useState("");
   const [sectorFilter, setSectorFilter] = useState("todos");
-  const [statusFilter, setStatusFilter] = useState(null); // from stat cards
-
-  // Theme
+  const [statusFilter, setStatusFilter] = useState(null);
   const [theme, setTheme] = useState("light");
-
-  // Modal
   const [showModal, setShowModal] = useState(false);
   const [editTask, setEditTask] = useState(null);
-
-  // Calendar
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [hoveredDay, setHoveredDay] = useState(null);
 
-  // ─── LOAD ────────────────────────────────────
   useEffect(() => {
     loadTasks();
     loadCustomSectors();
-    // Realtime
     const channel = sb.channel('tasks-changes')
-      .on('postgres_changes', { event:'*', schema:'public', table:'tasks' }, (payload) => {
-        loadTasks();
-      })
+      .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks())
       .subscribe();
     return () => sb.removeChannel(channel);
   }, []);
 
   async function loadTasks() {
     try {
-      const { data, error } = await sb.from('tasks').select('*').order('priority', { ascending: true });
+      const {data,error} = await sb.from('tasks').select('*').order('priority',{ascending:true});
       if(error) throw error;
-      setTasks(data || []);
+      setTasks(data||[]);
       setSyncStatus("synced");
     } catch(e) {
       console.error(e);
       setSyncStatus("error");
-      // Try localStorage fallback
       const cached = localStorage.getItem('tasks_cache');
       if(cached) setTasks(JSON.parse(cached));
     }
@@ -557,267 +320,147 @@ function App() {
 
   async function loadCustomSectors() {
     try {
-      const { data } = await sb.from('custom_sectors').select('*');
-      if(data && data.length) {
-        const merged = { ...DEFAULT_SECTORS };
-        data.forEach(s => { merged[s.key] = { label: s.label, icon: s.emoji, color: s.color }; });
+      const {data} = await sb.from('custom_sectors').select('*');
+      if(data&&data.length){
+        const merged={...DEFAULT_SECTORS};
+        data.forEach(s=>{merged[s.key]={label:s.label,icon:s.emoji,color:s.color};});
         setSectors(merged);
       }
-    } catch(e) { /* ignore */ }
+    } catch(e){}
   }
 
-  // Cache tasks locally as backup
-  useEffect(() => {
-    if(tasks.length > 0) localStorage.setItem('tasks_cache', JSON.stringify(tasks));
-  }, [tasks]);
-
-  // Theme
-  useEffect(() => {
-    document.body.className = theme;
-  }, [theme]);
+  useEffect(()=>{if(tasks.length>0)localStorage.setItem('tasks_cache',JSON.stringify(tasks));},[tasks]);
+  useEffect(()=>{document.body.className=theme;},[theme]);
 
   // ─── CRUD ────────────────────────────────────
   async function saveTask(taskData) {
     try {
-      if(taskData.id) {
-        const { error } = await sb.from('tasks').update({
-          title: taskData.title,
-          sector: taskData.sector,
-          priority: taskData.priority,
-          status: taskData.status,
-          description: taskData.description || '',
-          due_date: taskData.due_date || null,
-        }).eq('id', taskData.id);
+      if(taskData.id){
+        const {error}=await sb.from('tasks').update({title:taskData.title,sector:taskData.sector,priority:taskData.priority,status:taskData.status,description:taskData.description||'',due_date:taskData.due_date||null}).eq('id',taskData.id);
         if(error) throw error;
       } else {
-        const { error } = await sb.from('tasks').insert({
-          title: taskData.title,
-          sector: taskData.sector,
-          priority: taskData.priority,
-          status: taskData.status || 'pendente',
-          description: taskData.description || '',
-          due_date: taskData.due_date || null,
-          comments: [],
-        });
+        const {error}=await sb.from('tasks').insert({title:taskData.title,sector:taskData.sector,priority:taskData.priority,status:taskData.status||'pendente',description:taskData.description||'',due_date:taskData.due_date||null,comments:[]});
         if(error) throw error;
       }
-      setSyncStatus("synced");
-      loadTasks();
-    } catch(e) {
-      console.error(e);
-      setSyncStatus("error");
-    }
+      setSyncStatus("synced");loadTasks();
+    } catch(e){console.error(e);setSyncStatus("error");}
   }
 
-  async function updateStatus(id, newStatus) {
-    try {
-      const { error } = await sb.from('tasks').update({ status: newStatus }).eq('id', id);
-      if(error) throw error;
-      loadTasks();
-    } catch(e) { console.error(e); }
-  }
-
-  async function updatePriority(id, newP) {
-    try {
-      const { error } = await sb.from('tasks').update({ priority: newP }).eq('id', id);
-      if(error) throw error;
-      loadTasks();
-    } catch(e) { console.error(e); }
-  }
-
-  async function updateDueDate(id, dateStr) {
-    try {
-      const due = dateStr ? new Date(dateStr).toISOString() : null;
-      const { error } = await sb.from('tasks').update({ due_date: due }).eq('id', id);
-      if(error) throw error;
-      loadTasks();
-    } catch(e) { console.error(e); }
-  }
-
-  async function addComment(id, text) {
-    try {
-      const task = tasks.find(t => t.id === id);
-      const comments = [...(task.comments || []), { text, date: new Date().toISOString() }];
-      const { error } = await sb.from('tasks').update({ comments }).eq('id', id);
-      if(error) throw error;
-      loadTasks();
-    } catch(e) { console.error(e); }
-  }
-
-  async function deleteTask(id) {
-    try {
-      const { error } = await sb.from('tasks').update({ status: 'excluido' }).eq('id', id);
-      if(error) throw error;
-      loadTasks();
-    } catch(e) { console.error(e); }
-  }
-
-  async function permanentDelete(id) {
-    try {
-      const { error } = await sb.from('tasks').delete().eq('id', id);
-      if(error) throw error;
-      loadTasks();
-    } catch(e) { console.error(e); }
-  }
-
-  async function restoreTask(id) {
-    try {
-      const { error } = await sb.from('tasks').update({ status: 'pendente' }).eq('id', id);
-      if(error) throw error;
-      loadTasks();
-    } catch(e) { console.error(e); }
-  }
+  async function updateStatus(id,newStatus){try{const {error}=await sb.from('tasks').update({status:newStatus}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
+  async function updatePriority(id,newP){try{const {error}=await sb.from('tasks').update({priority:newP}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
+  async function updateDueDate(id,dateStr){try{const due=dateStr?new Date(dateStr).toISOString():null;const {error}=await sb.from('tasks').update({due_date:due}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
+  async function addComment(id,text){try{const task=tasks.find(t=>t.id===id);const comments=[...(task.comments||[]),{text,date:new Date().toISOString()}];const {error}=await sb.from('tasks').update({comments}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
+  async function deleteTask(id){try{const {error}=await sb.from('tasks').update({status:'excluido'}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
+  async function permanentDelete(id){try{const {error}=await sb.from('tasks').delete().eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
+  async function restoreTask(id){try{const {error}=await sb.from('tasks').update({status:'pendente'}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
 
   async function saveManualOrder(orderedList) {
     try {
-      const updates = orderedList.map((t, idx) => ({ id: t.id, manual_order: idx + 1 }));
-      const changed = updates.filter(u => {
-        const existing = tasks.find(t => t.id === u.id);
-        return !existing || existing.manual_order !== u.manual_order;
-      });
-      if(!changed.length) return;
-      await Promise.all(changed.map(({ id, manual_order }) =>
-        sb.from('tasks').update({ manual_order }).eq('id', id)
-      ));
-      setTasks(prev => prev.map(t => {
-        const upd = updates.find(u => u.id === t.id);
-        return upd ? { ...t, manual_order: upd.manual_order } : t;
-      }));
+      const updates=orderedList.map((t,idx)=>({id:t.id,manual_order:idx+1}));
+      const changed=updates.filter(u=>{const existing=tasks.find(t=>t.id===u.id);return!existing||existing.manual_order!==u.manual_order;});
+      if(!changed.length)return;
+      await Promise.all(changed.map(({id,manual_order})=>sb.from('tasks').update({manual_order}).eq('id',id)));
+      setTasks(prev=>prev.map(t=>{const upd=updates.find(u=>u.id===t.id);return upd?{...t,manual_order:upd.manual_order}:t;}));
       setSyncStatus("synced");
-    } catch(e) {
-      console.error(e);
-      setSyncStatus("error");
-    }
+    } catch(e){console.error(e);setSyncStatus("error");}
   }
 
   // ─── DERIVED DATA ───────────────────────────
-  const activeTasks = useMemo(() => tasks.filter(t => t.status !== 'excluido'), [tasks]);
-  const nonCompletedTasks = useMemo(() => activeTasks.filter(t => t.status !== 'concluido'), [activeTasks]);
-  const completedTasks = useMemo(() => tasks.filter(t => t.status === 'concluido'), [tasks]);
-  const trashedTasks = useMemo(() => tasks.filter(t => t.status === 'excluido'), [tasks]);
+  const activeTasks=useMemo(()=>tasks.filter(t=>t.status!=='excluido'),[tasks]);
+  const nonCompletedTasks=useMemo(()=>activeTasks.filter(t=>t.status!=='concluido'),[activeTasks]);
+  const completedTasks=useMemo(()=>tasks.filter(t=>t.status==='concluido'),[tasks]);
+  const trashedTasks=useMemo(()=>tasks.filter(t=>t.status==='excluido'),[tasks]);
 
-  const stats = useMemo(() => ({
-    todas: nonCompletedTasks.length,
-    pendentes: activeTasks.filter(t => t.status === 'pendente').length,
-    aguardando: activeTasks.filter(t => t.status === 'aguardando').length,
-    concluidas: completedTasks.length,
-  }), [activeTasks, nonCompletedTasks, completedTasks]);
+  const stats=useMemo(()=>({
+    todas:nonCompletedTasks.length,
+    pendentes:activeTasks.filter(t=>t.status==='pendente').length,
+    aguardando:activeTasks.filter(t=>t.status==='aguardando').length,
+    concluidas:completedTasks.length,
+  }),[activeTasks,nonCompletedTasks,completedTasks]);
 
-  // ─── FILTERED TASKS ─────────────────────────
-  const getFilteredTasks = useCallback(() => {
+  const getFilteredTasks=useCallback(()=>{
     let pool;
-
-    // Base pool depends on view
-    if(currentView === "concluidos") {
-      pool = completedTasks;
-    } else if(currentView === "lixeira") {
-      pool = trashedTasks;
-    } else if(currentView === "setor" && currentSector) {
-      pool = nonCompletedTasks.filter(t => t.sector === currentSector);
-    } else {
-      // geral view
-      pool = nonCompletedTasks;
+    if(currentView==="concluidos")pool=completedTasks;
+    else if(currentView==="lixeira")pool=trashedTasks;
+    else if(currentView==="setor"&&currentSector)pool=nonCompletedTasks.filter(t=>t.sector===currentSector);
+    else pool=nonCompletedTasks;
+    if(currentView==="geral"&&statusFilter){
+      if(statusFilter==="pendentes")pool=pool.filter(t=>t.status==="pendente");
+      else if(statusFilter==="aguardando")pool=pool.filter(t=>t.status==="aguardando");
+      else if(statusFilter==="concluidas")pool=completedTasks;
+      // "todas" — sem filtro adicional
     }
+    if(sectorFilter!=="todos"&&currentView!=="setor")pool=pool.filter(t=>t.sector===sectorFilter);
+    if(search.trim()){const q=search.toLowerCase();pool=pool.filter(t=>t.title.toLowerCase().includes(q)||(t.description||'').toLowerCase().includes(q));}
+    return pool.sort((a,b)=>a.priority-b.priority);
+  },[tasks,currentView,currentSector,statusFilter,sectorFilter,search,nonCompletedTasks,completedTasks,trashedTasks]);
 
-    // Status filter from stat cards (only in geral)
-    if(currentView === "geral" && statusFilter) {
-      if(statusFilter === "urgentes") {
-        pool = pool.filter(t => t.priority <= 2);
-      } else if(statusFilter === "pendentes") {
-        pool = pool.filter(t => t.status === "pendente");
-      } else if(statusFilter === "aguardando") {
-        pool = pool.filter(t => t.status === "aguardando");
-      } else if(statusFilter === "concluidas") {
-        pool = completedTasks;
-      }
-    }
-
-    // Sector filter
-    if(sectorFilter !== "todos" && currentView !== "setor") {
-      pool = pool.filter(t => t.sector === sectorFilter);
-    }
-
-    // Search
-    if(search.trim()) {
-      const q = search.toLowerCase();
-      pool = pool.filter(t => t.title.toLowerCase().includes(q) || (t.description||'').toLowerCase().includes(q));
-    }
-
-    return pool.sort((a,b) => a.priority - b.priority);
-  }, [tasks, currentView, currentSector, statusFilter, sectorFilter, search, nonCompletedTasks, completedTasks, trashedTasks]);
-
-  const filteredTasks = useMemo(() => getFilteredTasks(), [getFilteredTasks]);
-
-  // Calendar tasks (only those with due_date)
-  const calendarTasks = useMemo(() => {
-    return nonCompletedTasks.filter(t => t.due_date);
-  }, [nonCompletedTasks]);
+  const filteredTasks=useMemo(()=>getFilteredTasks(),[getFilteredTasks]);
+  const calendarTasks=useMemo(()=>nonCompletedTasks.filter(t=>t.due_date),[nonCompletedTasks]);
 
   // ─── NAVIGATION ──────────────────────────────
-  function navigate(view, sector=null, tab=null) {
-    setCurrentView(view);
-    setCurrentSector(sector);
-    setStatusFilter(null);
-    setGeralTab(tab || (view === "geral" ? "urgente" : geralTab));
+  function navigate(view,sector=null,tab=null){
+    setCurrentView(view);setCurrentSector(sector);setStatusFilter(null);
+    setGeralTab(tab||(view==="geral"?"urgente":geralTab));
     setSidebarOpen(false);
   }
 
-  function toggleStatFilter(filter) {
-    setGeralTab("urgente");
-    setStatusFilter(prev => prev === filter ? null : filter);
+  // FIX: toggleStatFilter não muda mais o geralTab — evita conflito com tabs que não existem
+  function toggleStatFilter(filter){
+    setStatusFilter(prev=>prev===filter?null:filter);
   }
 
-  // ─── RENDER ──────────────────────────────────
+  const isProgTab = currentView==="geral" && geralTab==="programacao";
+  const isGeralActive = currentView==="geral" && geralTab!=="programacao";
+
   return (
     <div className="app">
-      {/* Mobile Header */}
       <div className="mobile-header">
-        <button className="hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
+        <button className="hamburger" onClick={()=>setSidebarOpen(true)}>☰</button>
         <span className="font-display" style={{fontWeight:700,fontSize:16,letterSpacing:2}}>HUB</span>
-        <button className="hamburger" onClick={() => setTheme(t => t==='light'?'dark':'light')}>
+        <button className="hamburger" onClick={()=>setTheme(t=>t==='light'?'dark':'light')}>
           {theme==='light'?'🌙':'☀️'}
         </button>
       </div>
-      <div className={`mobile-overlay ${sidebarOpen?'show':''}`} onClick={() => setSidebarOpen(false)}/>
+      <div className={`mobile-overlay ${sidebarOpen?'show':''}`} onClick={()=>setSidebarOpen(false)}/>
 
-      {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen?'open':''}`}>
         <div className="logo">
           <h1 style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:28,fontWeight:700,letterSpacing:3}}>HUB</h1>
-          <div className="logo-sub">GRUPO MALORY</div>
+          <div className="logo-sub">Grupo Malory</div>
         </div>
 
         <nav className="nav">
-          <button className={`nav-btn ${currentView==='geral'&&geralTab==='programacao'?'active':''}`} onClick={() => navigate('geral', null, 'programacao')}>
+          {/* FIX: Programação e Visão Geral não ficam ativos ao mesmo tempo */}
+          <button className={`nav-btn ${isProgTab?'active':''}`} onClick={()=>navigate('geral',null,'programacao')}>
             <span className="nav-icon">🗓️</span> Programação
           </button>
-          <button className={`nav-btn ${currentView==='geral'?'active':''}`} onClick={() => navigate('geral')}>
+          <button className={`nav-btn ${isGeralActive?'active':''}`} onClick={()=>navigate('geral')}>
             <span className="nav-icon">📊</span> Visão Geral
           </button>
 
           <div className="nav-sep"/>
           <div className="nav-label">Setores</div>
 
-          {Object.entries(sectors).map(([key, s]) => (
-            <button key={key} className={`nav-btn ${currentView==='setor'&&currentSector===key?'active':''}`} onClick={() => navigate('setor', key)}>
+          {Object.entries(sectors).map(([key,s])=>(
+            <button key={key} className={`nav-btn ${currentView==='setor'&&currentSector===key?'active':''}`} onClick={()=>navigate('setor',key)}>
               <span className="nav-icon">{s.icon}</span> {s.label}
             </button>
           ))}
 
           <div className="nav-sep"/>
-          <button className={`nav-btn ${currentView==='concluidos'?'active':''}`} onClick={() => navigate('concluidos')}>
+          <button className={`nav-btn ${currentView==='concluidos'?'active':''}`} onClick={()=>navigate('concluidos')}>
             <span className="nav-icon">✅</span> Concluídos
             <span style={{marginLeft:'auto',fontSize:11,opacity:.6}}>{completedTasks.length}</span>
           </button>
-          <button className={`nav-btn ${currentView==='lixeira'?'active':''}`} onClick={() => navigate('lixeira')}>
+          <button className={`nav-btn ${currentView==='lixeira'?'active':''}`} onClick={()=>navigate('lixeira')}>
             <span className="nav-icon">🗑</span> Lixeira
             <span style={{marginLeft:'auto',fontSize:11,opacity:.6}}>{trashedTasks.length}</span>
           </button>
-
         </nav>
 
         <div className="sidebar-footer">
-          <button className="theme-toggle" onClick={() => setTheme(t => t==='light'?'dark':'light')}>
+          <button className="theme-toggle" onClick={()=>setTheme(t=>t==='light'?'dark':'light')}>
             {theme==='light'?'🌙':'☀️'} {theme==='light'?'Modo Escuro':'Modo Claro'}
           </button>
           <div className={`sync-badge ${syncStatus==='synced'?'':syncStatus==='error'?'error':'offline'}`}>
@@ -826,11 +469,10 @@ function App() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="main">
-        {loading ? (
+        {loading?(
           <div className="empty-state"><div className="empty-icon">⏳</div><p>Carregando tarefas...</p></div>
-        ) : currentView === "geral" ? (
+        ):currentView==="geral"?(
           <GeralView
             tasks={filteredTasks} allTasks={nonCompletedTasks} calendarTasks={calendarTasks}
             stats={stats} search={search} setSearch={setSearch}
@@ -839,37 +481,40 @@ function App() {
             geralTab={geralTab} setGeralTab={setGeralTab}
             sectors={sectors} onStatusChange={updateStatus} onPriorityChange={updatePriority}
             onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
-            onNewTask={() => { setEditTask(null); setShowModal(true); }}
-            onEditTask={(t) => { setEditTask(t); setShowModal(true); }}
+            onNewTask={()=>{setEditTask(null);setShowModal(true);}}
+            onEditTask={(t)=>{setEditTask(t);setShowModal(true);}}
             calMonth={calMonth} setCalMonth={setCalMonth}
             calYear={calYear} setCalYear={setCalYear}
             hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
             completedTasks={completedTasks} onSaveOrder={saveManualOrder}
           />
-        ) : currentView === "setor" ? (
+        ):currentView==="setor"?(
           <SectorView
             sector={currentSector} sectorInfo={sectors[currentSector]}
             tasks={filteredTasks} search={search} setSearch={setSearch}
             onStatusChange={updateStatus} onPriorityChange={updatePriority}
             onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
-            onNewTask={() => { setEditTask({ sector: currentSector }); setShowModal(true); }}
-            onEditTask={(t) => { setEditTask(t); setShowModal(true); }}
+            onNewTask={()=>{setEditTask({sector:currentSector});setShowModal(true);}}
+            onEditTask={(t)=>{setEditTask(t);setShowModal(true);}}
             sectors={sectors}
           />
-        ) : currentView === "concluidos" ? (
-          <ConcluView tasks={completedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
-        ) : currentView === "lixeira" ? (
+        ):currentView==="concluidos"?(
+          <ConcluView
+            tasks={completedTasks} sectors={sectors}
+            onRestore={restoreTask} onDelete={permanentDelete}
+            onStatusChange={updateStatus}
+            onEditTask={(t)=>{setEditTask(t);setShowModal(true);}}
+            search={search} setSearch={setSearch}
+          />
+        ):currentView==="lixeira"?(
           <TrashView tasks={trashedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
-        ) : null}
+        ):null}
       </main>
 
-      {/* Create/Edit Modal */}
-      {showModal && (
-        <TaskModal
-          task={editTask} sectors={sectors}
-          onSave={(data) => { saveTask(data); setShowModal(false); }}
-          onClose={() => setShowModal(false)}
-        />
+      {showModal&&(
+        <TaskModal task={editTask} sectors={sectors}
+          onSave={(data)=>{saveTask(data);setShowModal(false);}}
+          onClose={()=>setShowModal(false)}/>
       )}
     </div>
   );
@@ -877,117 +522,107 @@ function App() {
 
 // ─── GERAL VIEW ────────────────────────────────
 function GeralView({
-  tasks, allTasks, calendarTasks, stats, search, setSearch,
-  sectorFilter, setSectorFilter, statusFilter, toggleStatFilter,
-  geralTab, setGeralTab, sectors, onStatusChange, onPriorityChange,
-  onDelete, onAddComment, onDueDateChange, onNewTask, onEditTask,
-  calMonth, setCalMonth, calYear, setCalYear, hoveredDay, setHoveredDay,
-  completedTasks, onSaveOrder
-}) {
-  const isProgramacao = geralTab === 'programacao';
+  tasks,allTasks,calendarTasks,stats,search,setSearch,
+  sectorFilter,setSectorFilter,statusFilter,toggleStatFilter,
+  geralTab,setGeralTab,sectors,onStatusChange,onPriorityChange,
+  onDelete,onAddComment,onDueDateChange,onNewTask,onEditTask,
+  calMonth,setCalMonth,calYear,setCalYear,hoveredDay,setHoveredDay,
+  completedTasks,onSaveOrder
+}){
+  const isProgramacao=geralTab==='programacao';
 
-  const displayTasks = geralTab === "urgente"
-    ? allTasks.filter(t => {
-        if(sectorFilter !== "todos" && t.sector !== sectorFilter) return false;
-        if(search.trim() && !t.title.toLowerCase().includes(search.toLowerCase())) return false;
+  const displayTasks=geralTab==="urgente"
+    ?allTasks.filter(t=>{
+        if(sectorFilter!=="todos"&&t.sector!==sectorFilter)return false;
+        if(search.trim()&&!t.title.toLowerCase().includes(search.toLowerCase()))return false;
         return true;
-      }).sort((a,b) => a.priority - b.priority)
-    : tasks;
+      }).sort((a,b)=>a.priority-b.priority)
+    :tasks;
 
-  const urgentTasks = displayTasks.filter(t => t.priority <= 2);
-  const otherTasks = displayTasks.filter(t => t.priority > 2);
-  const finalTasks = statusFilter === "concluidas" ? completedTasks : (statusFilter ? tasks : null);
+  const urgentTasks=displayTasks.filter(t=>t.priority<=2);
+  const otherTasks=displayTasks.filter(t=>t.priority>2);
+  const finalTasks=statusFilter==="concluidas"?completedTasks:(statusFilter?tasks:null);
 
   return (
     <>
       <div className="page-header">
-        <h2 className="page-title">{isProgramacao ? '🗓️ Programação' : 'Visão Geral'}</h2>
+        <h2 className="page-title font-display">{isProgramacao?'🗓️ Programação':'Visão Geral'}</h2>
         <div className="page-subtitle">
           {isProgramacao
-            ? 'Arraste para reordenar · prioridade inteligente'
-            : `${stats.todas} tarefas ativas · ${allTasks.filter(t => t.priority <= 2).length} urgentes`}
+            ?'Arraste para reordenar · prioridade inteligente'
+            :`${stats.todas} tarefas ativas · ${allTasks.filter(t=>t.priority<=2).length} urgentes`}
         </div>
       </div>
 
-      {/* View Tabs */}
       <div className="view-tabs">
         <button className={`view-tab ${geralTab==='urgente'&&!statusFilter?'active':''}`}
-          onClick={() => { setGeralTab('urgente'); toggleStatFilter(null); }}>
+          onClick={()=>{setGeralTab('urgente');setStatusFilter&&toggleStatFilter(null);}}>
           🔥 Urgente
         </button>
         <button className={`view-tab ${geralTab==='calendario'&&!statusFilter?'active':''}`}
-          onClick={() => { setGeralTab('calendario'); toggleStatFilter(null); }}>
+          onClick={()=>{setGeralTab('calendario');toggleStatFilter(null);}}>
           📅 Calendário
         </button>
       </div>
 
-      {/* Stat Cards + Search — hidden on Programação tab */}
-      {!isProgramacao && (
+      {!isProgramacao&&(
         <>
           <div className="stat-row">
-            <div className={`stat-card ${statusFilter==='todas'?'active-filter':''}`} onClick={() => toggleStatFilter('todas')}>
+            <div className={`stat-card ${statusFilter==='todas'?'active-filter':''}`} onClick={()=>toggleStatFilter('todas')}>
               <div className="stat-dot" style={{background:"var(--accent)"}}/>
               <div className="stat-label">Todas</div>
               <div className="stat-num" style={{color:"var(--accent)"}}>{stats.todas}</div>
             </div>
-            <div className={`stat-card ${statusFilter==='pendentes'?'active-filter':''}`} onClick={() => { toggleStatFilter('pendentes'); setGeralTab('todas'); }}>
+            <div className={`stat-card ${statusFilter==='pendentes'?'active-filter':''}`} onClick={()=>toggleStatFilter('pendentes')}>
               <div className="stat-dot" style={{background:"var(--yellow)"}}/>
               <div className="stat-label">Pendentes</div>
               <div className="stat-num" style={{color:"var(--yellow)"}}>{stats.pendentes}</div>
             </div>
-            <div className={`stat-card ${statusFilter==='aguardando'?'active-filter':''}`} onClick={() => { toggleStatFilter('aguardando'); setGeralTab('todas'); }}>
+            <div className={`stat-card ${statusFilter==='aguardando'?'active-filter':''}`} onClick={()=>toggleStatFilter('aguardando')}>
               <div className="stat-dot" style={{background:"var(--blue)"}}/>
               <div className="stat-label">Aguardando</div>
               <div className="stat-num" style={{color:"var(--blue)"}}>{stats.aguardando}</div>
             </div>
-            <div className={`stat-card ${statusFilter==='concluidas'?'active-filter':''}`} onClick={() => { toggleStatFilter('concluidas'); setGeralTab('todas'); }}>
+            <div className={`stat-card ${statusFilter==='concluidas'?'active-filter':''}`} onClick={()=>toggleStatFilter('concluidas')}>
               <div className="stat-dot" style={{background:"var(--green)"}}/>
               <div className="stat-label">Concluídas</div>
               <div className="stat-num" style={{color:"var(--green)"}}>{stats.concluidas}</div>
             </div>
           </div>
           <div className="search-row">
-            <input className="search-input" placeholder="🔍 Buscar tarefas..." value={search} onChange={e => setSearch(e.target.value)}/>
-            <select className="filter-select" value={sectorFilter} onChange={e => setSectorFilter(e.target.value)}>
+            <input className="search-input" placeholder="🔍 Buscar tarefas..." value={search} onChange={e=>setSearch(e.target.value)}/>
+            <select className="filter-select" value={sectorFilter} onChange={e=>setSectorFilter(e.target.value)}>
               <option value="todos">Todos os setores</option>
-              {Object.entries(sectors).map(([k,v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
+              {Object.entries(sectors).map(([k,v])=><option key={k} value={k}>{v.icon} {v.label}</option>)}
             </select>
             <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
           </div>
         </>
       )}
 
-      {/* Content based on tab */}
-      {isProgramacao ? (
+      {isProgramacao?(
         <ProgrTab
-          tasks={allTasks}
-          sectors={sectors}
-          onSaveOrder={onSaveOrder}
-          onStatusChange={onStatusChange}
-          onPriorityChange={onPriorityChange}
-          onDelete={onDelete}
-          onAddComment={onAddComment}
-          onDueDateChange={onDueDateChange}
-          onEditTask={onEditTask}
-          onNewTask={onNewTask}
+          tasks={allTasks} sectors={sectors} onSaveOrder={onSaveOrder}
+          onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+          onDelete={onDelete} onAddComment={onAddComment}
+          onDueDateChange={onDueDateChange} onEditTask={onEditTask} onNewTask={onNewTask}
         />
-      ) : geralTab === "calendario" && !statusFilter ? (
+      ):geralTab==="calendario"&&!statusFilter?(
         <CalendarWidget
           tasks={calendarTasks} sectors={sectors}
-          month={calMonth} year={calYear}
-          setMonth={setCalMonth} setYear={setCalYear}
+          month={calMonth} year={calYear} setMonth={setCalMonth} setYear={setCalYear}
           hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
           onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
           onDelete={onDelete} onAddComment={onAddComment}
           onDueDateChange={onDueDateChange} onEdit={onEditTask}
         />
-      ) : geralTab === "urgente" && !statusFilter ? (
+      ):geralTab==="urgente"&&!statusFilter?(
         <>
-          {urgentTasks.length > 0 ? (
+          {urgentTasks.length>0&&(
             <>
               <div className="section-divider">🔴 Urgentes ({urgentTasks.length})</div>
               <div className="task-list">
-                {urgentTasks.map(t => (
+                {urgentTasks.map(t=>(
                   <TaskCard key={t.id} task={t} sectors={sectors}
                     onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
                     onDelete={onDelete} onAddComment={onAddComment}
@@ -995,12 +630,12 @@ function GeralView({
                 ))}
               </div>
             </>
-          ) : null}
-          {otherTasks.length > 0 ? (
+          )}
+          {otherTasks.length>0&&(
             <>
-              <div className="section-divider">Demais tarefas por prioridade ({otherTasks.length})</div>
+              <div className="section-divider">Demais tarefas ({otherTasks.length})</div>
               <div className="task-list">
-                {otherTasks.map(t => (
+                {otherTasks.map(t=>(
                   <TaskCard key={t.id} task={t} sectors={sectors}
                     onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
                     onDelete={onDelete} onAddComment={onAddComment}
@@ -1008,20 +643,20 @@ function GeralView({
                 ))}
               </div>
             </>
-          ) : null}
-          {urgentTasks.length === 0 && otherTasks.length === 0 && (
+          )}
+          {urgentTasks.length===0&&otherTasks.length===0&&(
             <div className="empty-state"><div className="empty-icon">🎉</div><p>Nenhuma tarefa encontrada</p></div>
           )}
         </>
-      ) : (
+      ):(
         <div className="task-list">
-          {(finalTasks || tasks).length > 0 ? (finalTasks || tasks).map(t => (
+          {(finalTasks||tasks).length>0?(finalTasks||tasks).map(t=>(
             <TaskCard key={t.id} task={t} sectors={sectors}
               onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
               onDelete={onDelete} onAddComment={onAddComment}
               onDueDateChange={onDueDateChange} onEdit={onEditTask}
               isCompleted={t.status==='concluido'}/>
-          )) : (
+          )):(
             <div className="empty-state"><div className="empty-icon">📭</div><p>Nenhuma tarefa encontrada</p></div>
           )}
         </div>
@@ -1031,8 +666,8 @@ function GeralView({
 }
 
 // ─── SECTOR VIEW ───────────────────────────────
-function SectorView({ sector, sectorInfo, tasks, search, setSearch, onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onNewTask, onEditTask, sectors }) {
-  if(!sectorInfo) return <div className="empty-state"><p>Setor não encontrado</p></div>;
+function SectorView({sector,sectorInfo,tasks,search,setSearch,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onNewTask,onEditTask,sectors}){
+  if(!sectorInfo)return <div className="empty-state"><p>Setor não encontrado</p></div>;
   return (
     <>
       <div className="page-header">
@@ -1040,16 +675,16 @@ function SectorView({ sector, sectorInfo, tasks, search, setSearch, onStatusChan
         <div className="page-subtitle">{tasks.length} tarefas ativas</div>
       </div>
       <div className="search-row">
-        <input className="search-input" placeholder="🔍 Buscar neste setor..." value={search} onChange={e => setSearch(e.target.value)}/>
+        <input className="search-input" placeholder="🔍 Buscar neste setor..." value={search} onChange={e=>setSearch(e.target.value)}/>
         <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
       </div>
       <div className="task-list">
-        {tasks.length > 0 ? tasks.map(t => (
+        {tasks.length>0?tasks.map(t=>(
           <TaskCard key={t.id} task={t} sectors={sectors}
             onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
             onDelete={onDelete} onAddComment={onAddComment}
             onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
-        )) : (
+        )):(
           <div className="empty-state"><div className="empty-icon">✨</div><p>Nenhuma tarefa neste setor</p></div>
         )}
       </div>
@@ -1057,50 +692,43 @@ function SectorView({ sector, sectorInfo, tasks, search, setSearch, onStatusChan
   );
 }
 
-// ─── CONCLUIDOS VIEW ───────────────────────────
-function ConcluView({ tasks, sectors, onRestore, onDelete, search, setSearch }) {
-  const filtered = search.trim()
-    ? tasks.filter(t => t.title.toLowerCase().includes(search.toLowerCase()))
-    : tasks;
+// ─── CONCLUIDOS VIEW — FIX: usa TaskCard com status picker bidirecional ──
+function ConcluView({tasks,sectors,onRestore,onDelete,onStatusChange,onEditTask,search,setSearch}){
+  const filtered=search.trim()?tasks.filter(t=>t.title.toLowerCase().includes(search.toLowerCase())):tasks;
   return (
     <>
       <div className="page-header">
         <h2 className="page-title">✅ Tarefas Concluídas</h2>
-        <div className="page-subtitle">{tasks.length} tarefas concluídas</div>
+        <div className="page-subtitle">{tasks.length} concluídas · clique no status para reativar</div>
       </div>
       <div className="search-row">
-        <input className="search-input" placeholder="🔍 Buscar concluídas..." value={search} onChange={e => setSearch(e.target.value)}/>
+        <input className="search-input" placeholder="🔍 Buscar concluídas..." value={search} onChange={e=>setSearch(e.target.value)}/>
       </div>
       <div className="task-list">
-        {filtered.map(t => (
-          <div key={t.id} className="task-card" style={{opacity:.8}}>
-            <div className="task-card-inner">
-              <div className="task-priority-bar" style={{background:priorityColor(t.priority),opacity:.4}}/>
-              <div className="task-body">
-                <div className="task-title" style={{textDecoration:'line-through'}}>{t.title}</div>
-                <div className="task-meta">
-                  <span className="sector-tag">{(sectors[t.sector]||{}).icon} {(sectors[t.sector]||{}).label||t.sector}</span>
-                  <span style={{fontSize:11,color:"var(--muted)"}}>Prioridade {t.priority}</span>
-                </div>
-              </div>
-              <div className="task-actions">
-                <button title="Restaurar" onClick={() => onRestore(t.id)}>↩️</button>
-                <button title="Excluir permanente" onClick={() => onDelete(t.id)} style={{color:"var(--red)"}}>🗑</button>
-              </div>
-            </div>
+        {filtered.map(t=>(
+          <div key={t.id} style={{position:'relative'}}>
+            <TaskCard task={t} sectors={sectors}
+              onStatusChange={onStatusChange}
+              onPriorityChange={()=>{}}
+              onDelete={()=>{}}
+              onAddComment={()=>{}}
+              onDueDateChange={()=>{}}
+              onEdit={onEditTask||(() =>{})}
+              showRestoreActions
+              onRestore={onRestore}
+              onPermDelete={onDelete}
+            />
           </div>
         ))}
-        {filtered.length === 0 && <div className="empty-state"><div className="empty-icon">📭</div><p>Nenhuma tarefa concluída</p></div>}
+        {filtered.length===0&&<div className="empty-state"><div className="empty-icon">📭</div><p>Nenhuma tarefa concluída</p></div>}
       </div>
     </>
   );
 }
 
 // ─── TRASH VIEW ────────────────────────────────
-function TrashView({ tasks, sectors, onRestore, onDelete, search, setSearch }) {
-  const filtered = search.trim()
-    ? tasks.filter(t => t.title.toLowerCase().includes(search.toLowerCase()))
-    : tasks;
+function TrashView({tasks,sectors,onRestore,onDelete,search,setSearch}){
+  const filtered=search.trim()?tasks.filter(t=>t.title.toLowerCase().includes(search.toLowerCase())):tasks;
   return (
     <>
       <div className="page-header">
@@ -1108,117 +736,96 @@ function TrashView({ tasks, sectors, onRestore, onDelete, search, setSearch }) {
         <div className="page-subtitle">{tasks.length} itens na lixeira</div>
       </div>
       <div className="search-row">
-        <input className="search-input" placeholder="🔍 Buscar na lixeira..." value={search} onChange={e => setSearch(e.target.value)}/>
+        <input className="search-input" placeholder="🔍 Buscar na lixeira..." value={search} onChange={e=>setSearch(e.target.value)}/>
       </div>
       <div className="task-list">
-        {filtered.map(t => (
+        {filtered.map(t=>(
           <div key={t.id} className="task-card" style={{opacity:.7}}>
             <div className="task-card-inner">
               <div className="task-priority-bar" style={{background:"var(--muted)",opacity:.3}}/>
               <div className="task-body">
-                <div className="task-title" style={{textDecoration:'line-through'}}>{t.title}</div>
+                <div className="task-title" style={{textDecoration:'line-through',cursor:'default'}}>{t.title}</div>
                 <div className="task-meta">
                   <span className="sector-tag">{(sectors[t.sector]||{}).icon} {(sectors[t.sector]||{}).label||t.sector}</span>
                 </div>
               </div>
               <div className="task-actions">
-                <button title="Restaurar" onClick={() => onRestore(t.id)}>↩️ Restaurar</button>
-                <button title="Excluir permanente" onClick={() => { if(confirm('Excluir permanentemente?')) onDelete(t.id); }} style={{color:"var(--red)"}}>❌ Deletar</button>
+                <button title="Restaurar" onClick={()=>onRestore(t.id)}>↩️ Restaurar</button>
+                <button title="Excluir permanente" onClick={()=>{if(confirm('Excluir permanentemente?'))onDelete(t.id);}} style={{color:"var(--red)"}}>❌</button>
               </div>
             </div>
           </div>
         ))}
-        {filtered.length === 0 && <div className="empty-state"><div className="empty-icon">🗑</div><p>Lixeira vazia</p></div>}
+        {filtered.length===0&&<div className="empty-state"><div className="empty-icon">🗑</div><p>Lixeira vazia</p></div>}
       </div>
     </>
   );
 }
 
 // ─── CALENDAR WIDGET ───────────────────────────
-function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hoveredDay, setHoveredDay,
-  onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEdit }) {
-  const [selectedDay, setSelectedDay] = useState(null);
+function CalendarWidget({tasks,sectors,month,year,setMonth,setYear,hoveredDay,setHoveredDay,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onEdit}){
+  const [selectedDay,setSelectedDay]=useState(null);
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const prevDays=new Date(year,month,0).getDate();
+  const today=new Date();
 
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  const prevDays = new Date(year, month, 0).getDate();
-  const today = new Date();
+  useEffect(()=>{setSelectedDay(null);},[month,year]);
 
-  // Reset selectedDay when month/year changes
-  useEffect(() => { setSelectedDay(null); }, [month, year]);
-
-  // Group tasks by day
-  const tasksByDay = {};
-  tasks.forEach(t => {
-    if(!t.due_date) return;
-    const d = new Date(t.due_date);
-    if(d.getMonth() === month && d.getFullYear() === year) {
-      const day = d.getDate();
-      if(!tasksByDay[day]) tasksByDay[day] = [];
+  const tasksByDay={};
+  tasks.forEach(t=>{
+    if(!t.due_date)return;
+    const d=new Date(t.due_date);
+    if(d.getMonth()===month&&d.getFullYear()===year){
+      const day=d.getDate();
+      if(!tasksByDay[day])tasksByDay[day]=[];
       tasksByDay[day].push(t);
     }
   });
 
-  function prevMonth() {
-    if(month === 0) { setMonth(11); setYear(year-1); }
-    else setMonth(month-1);
-  }
-  function nextMonth() {
-    if(month === 11) { setMonth(0); setYear(year+1); }
-    else setMonth(month+1);
-  }
+  function prevMonth(){if(month===0){setMonth(11);setYear(year-1);}else setMonth(month-1);}
+  function nextMonth(){if(month===11){setMonth(0);setYear(year+1);}else setMonth(month+1);}
 
-  const cells = [];
-  for(let i = firstDay - 1; i >= 0; i--) {
-    cells.push({ day: prevDays - i, isOther: true });
-  }
-  for(let d = 1; d <= daysInMonth; d++) {
-    cells.push({ day: d, isOther: false, isToday: d === today.getDate() && month === today.getMonth() && year === today.getFullYear() });
-  }
-  const remaining = 42 - cells.length;
-  for(let d = 1; d <= remaining; d++) {
-    cells.push({ day: d, isOther: true });
-  }
+  const cells=[];
+  for(let i=firstDay-1;i>=0;i--)cells.push({day:prevDays-i,isOther:true});
+  for(let d=1;d<=daysInMonth;d++)cells.push({day:d,isOther:false,isToday:d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear()});
+  const remaining=42-cells.length;
+  for(let d=1;d<=remaining;d++)cells.push({day:d,isOther:true});
 
-  const selectedDayTasks = selectedDay ? (tasksByDay[selectedDay] || []) : [];
+  const selectedDayTasks=selectedDay?(tasksByDay[selectedDay]||[]):[];
 
   return (
     <div>
       <div className="calendar-wrap">
         <div className="calendar-header">
-          <div className="calendar-nav">
-            <button onClick={prevMonth}>◀</button>
-          </div>
+          <div className="calendar-nav"><button onClick={prevMonth}>◀</button></div>
           <h3>{MONTHS_PT[month]} {year}</h3>
-          <div className="calendar-nav">
-            <button onClick={nextMonth}>▶</button>
-          </div>
+          <div className="calendar-nav"><button onClick={nextMonth}>▶</button></div>
         </div>
         <div className="calendar-grid">
-          {DAYS_PT.map(d => <div key={d} className="calendar-day-label">{d}</div>)}
-          {cells.map((cell, i) => {
-            const dayTasks = !cell.isOther ? (tasksByDay[cell.day] || []) : [];
-            const hasTasks = dayTasks.length > 0;
-            const isSelected = !cell.isOther && selectedDay === cell.day;
+          {DAYS_PT.map(d=><div key={d} className="calendar-day-label">{d}</div>)}
+          {cells.map((cell,i)=>{
+            const dayTasks=!cell.isOther?(tasksByDay[cell.day]||[]):[];
+            const hasTasks=dayTasks.length>0;
+            const isSelected=!cell.isOther&&selectedDay===cell.day;
             return (
               <div key={i}
-                className={`calendar-cell ${cell.isOther?'other-month':''} ${cell.isToday?'today':''} ${hasTasks?'has-tasks':''}`}
-                onMouseEnter={() => hasTasks && setHoveredDay(`${year}-${month}-${cell.day}`)}
-                onMouseLeave={() => setHoveredDay(null)}
-                onClick={() => !cell.isOther && hasTasks && setSelectedDay(isSelected ? null : cell.day)}
-                style={{position:'relative', outline: isSelected ? '2px solid var(--accent)' : 'none', borderRadius: isSelected ? 10 : undefined}}
+                className={`calendar-cell ${cell.isOther?'other-month':''} ${cell.isToday?'today':''} ${hasTasks?'has-tasks':''} ${isSelected?'selected-day':''}`}
+                onMouseEnter={()=>hasTasks&&setHoveredDay(`${year}-${month}-${cell.day}`)}
+                onMouseLeave={()=>setHoveredDay(null)}
+                onClick={()=>!cell.isOther&&hasTasks&&setSelectedDay(isSelected?null:cell.day)}
               >
                 <span>{cell.day}</span>
-                {hasTasks && (
+                {hasTasks&&(
                   <div className="calendar-dots">
-                    {dayTasks.slice(0,4).map((t,j) => (
+                    {dayTasks.slice(0,4).map((t,j)=>(
                       <div key={j} className="calendar-dot" style={{background:priorityColor(t.priority)}}/>
                     ))}
                   </div>
                 )}
-                {hoveredDay === `${year}-${month}-${cell.day}` && hasTasks && !isSelected && (
+                {hoveredDay===`${year}-${month}-${cell.day}`&&hasTasks&&!isSelected&&(
                   <div className="calendar-cell-tooltip">
-                    {dayTasks.map((t,j) => (
+                    {dayTasks.map((t,j)=>(
                       <div key={j} style={{marginBottom:j<dayTasks.length-1?4:0}}>
                         <span style={{color:priorityColor(t.priority),fontWeight:700}}>●</span> {t.title.substring(0,50)}{t.title.length>50?'...':''}
                       </div>
@@ -1229,25 +836,23 @@ function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hovere
             );
           })}
         </div>
-        {tasks.length === 0 && (
+        {tasks.length===0&&(
           <div className="empty-state" style={{padding:'20px 0'}}>
             <div className="empty-icon">📅</div>
             <p>Nenhuma tarefa com data definida</p>
           </div>
         )}
       </div>
-
-      {/* Lista de tasks do dia selecionado */}
-      {selectedDay && (
+      {selectedDay&&(
         <div style={{marginTop:16}}>
           <div className="section-divider">
-            📅 Tarefas de {selectedDay} de {MONTHS_PT[month]}
+            📅 {selectedDay} de {MONTHS_PT[month]}
             <span style={{fontSize:11,opacity:.7,marginLeft:6,fontWeight:400,textTransform:'none'}}>
               ({selectedDayTasks.length} {selectedDayTasks.length===1?'tarefa':'tarefas'})
             </span>
           </div>
           <div className="task-list">
-            {selectedDayTasks.map(t => (
+            {selectedDayTasks.map(t=>(
               <TaskCard key={t.id} task={t} sectors={sectors}
                 onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
                 onDelete={onDelete} onAddComment={onAddComment}
@@ -1261,96 +866,79 @@ function CalendarWidget({ tasks, sectors, month, year, setMonth, setYear, hovere
 }
 
 // ─── TASK CARD ─────────────────────────────────
-function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEdit, isCompleted,
-  dragSlot, wrapperClassName, dragEvents }) {
-  const [openComment, setOpenComment] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const [showPicker, setShowPicker] = useState(false);
-  const [showStatusPicker, setShowStatusPicker] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [dateVal, setDateVal] = useState(task.due_date ? task.due_date.substring(0,16) : "");
-  const pickerRef = useRef(null);
-  const statusPickerRef = useRef(null);
+function TaskCard({task,sectors,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onEdit,isCompleted,dragSlot,wrapperClassName,dragEvents,showRestoreActions,onRestore,onPermDelete}){
+  const [openComment,setOpenComment]=useState(false);
+  const [commentText,setCommentText]=useState("");
+  const [showPicker,setShowPicker]=useState(false);
+  const [showStatusPicker,setShowStatusPicker]=useState(false);
+  const [showDatePicker,setShowDatePicker]=useState(false);
+  const [dateVal,setDateVal]=useState(task.due_date?task.due_date.substring(0,16):"");
+  const pickerRef=useRef(null);
+  const statusPickerRef=useRef(null);
+  const sectorInfo=sectors[task.sector]||{icon:"📌",label:task.sector,color:"#888"};
+  const commentCount=(task.comments||[]).length;
 
-  const sectorInfo = sectors[task.sector] || { icon:"📌", label:task.sector, color:"#888" };
-  const commentCount = (task.comments||[]).length;
+  function handleAddComment(){if(!commentText.trim())return;onAddComment(task.id,commentText.trim());setCommentText("");}
+  function handleDateSave(){onDueDateChange(task.id,dateVal||null);setShowDatePicker(false);}
 
-  function handleAddComment() {
-    if(!commentText.trim()) return;
-    onAddComment(task.id, commentText.trim());
-    setCommentText("");
-  }
+  useEffect(()=>{
+    function h(e){if(pickerRef.current&&!pickerRef.current.contains(e.target))setShowPicker(false);}
+    if(showPicker)document.addEventListener('mousedown',h);
+    return()=>document.removeEventListener('mousedown',h);
+  },[showPicker]);
 
-  function handleDateSave() {
-    onDueDateChange(task.id, dateVal || null);
-    setShowDatePicker(false);
-  }
+  useEffect(()=>{
+    function h(e){if(statusPickerRef.current&&!statusPickerRef.current.contains(e.target))setShowStatusPicker(false);}
+    if(showStatusPicker)document.addEventListener('mousedown',h);
+    return()=>document.removeEventListener('mousedown',h);
+  },[showStatusPicker]);
 
-  // Close priority picker on outside click
-  useEffect(() => {
-    function handleClick(e) {
-      if(pickerRef.current && !pickerRef.current.contains(e.target)) setShowPicker(false);
-    }
-    if(showPicker) document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [showPicker]);
-
-  // Close status picker on outside click
-  useEffect(() => {
-    function handleClick(e) {
-      if(statusPickerRef.current && !statusPickerRef.current.contains(e.target)) setShowStatusPicker(false);
-    }
-    if(showStatusPicker) document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [showStatusPicker]);
-
-  const statusBg = task.status==='pendente' ? 'var(--yellow-bg)' : task.status==='aguardando' ? 'var(--blue-bg)' : 'var(--green-bg)';
-  const statusColor = task.status==='pendente' ? 'var(--yellow)' : task.status==='aguardando' ? 'var(--blue)' : 'var(--green)';
+  const statusBg=task.status==='pendente'?'var(--yellow-bg)':task.status==='aguardando'?'var(--blue-bg)':'var(--green-bg)';
+  const statusColor=task.status==='pendente'?'var(--yellow)':task.status==='aguardando'?'var(--blue)':'var(--green)';
 
   return (
-    <div className={`task-card${wrapperClassName ? ' '+wrapperClassName : ''}`} {...(dragEvents||{})}>
+    <div className={`task-card${wrapperClassName?' '+wrapperClassName:''}`} {...(dragEvents||{})}>
       <div className="task-card-inner">
         {dragSlot}
-        <div className="task-priority-bar" style={{background: priorityColor(task.priority)}}/>
+        <div className="task-priority-bar" style={{background:priorityColor(task.priority)}}/>
         <div className="task-body">
           <div className="task-header">
             <span className="task-title"
-              onClick={() => onEdit && onEdit(task)}
+              onClick={()=>onEdit&&onEdit(task)}
               style={isCompleted?{textDecoration:'line-through',opacity:.7}:{}}>
               {task.title}
             </span>
           </div>
           <div className="task-meta">
-            {/* 1. Status badge — clicável, com popover */}
+            {/* 1. Status badge clicável — bidirecional incluindo concluido→aguardando/pendente */}
             <span style={{position:'relative'}} ref={statusPickerRef}>
               <span className="badge"
                 style={{background:statusBg,color:statusColor,padding:'5px 12px',fontSize:'12.5px',cursor:'pointer'}}
-                onClick={() => setShowStatusPicker(!showStatusPicker)}
+                onClick={()=>setShowStatusPicker(!showStatusPicker)}
                 title="Clique para alterar status">
                 {statusIcon(task.status)} {statusLabel(task.status)}
               </span>
-              {showStatusPicker && (
+              {showStatusPicker&&(
                 <div className="status-picker">
-                  <button onClick={() => { onStatusChange(task.id,'pendente'); setShowStatusPicker(false); }}>⏳ Pendente</button>
-                  <button onClick={() => { onStatusChange(task.id,'aguardando'); setShowStatusPicker(false); }}>⏸ Aguardando</button>
-                  <button onClick={() => { onStatusChange(task.id,'concluido'); setShowStatusPicker(false); }}>✅ Concluído</button>
+                  <button onClick={()=>{onStatusChange(task.id,'pendente');setShowStatusPicker(false);}}>⏳ Pendente</button>
+                  <button onClick={()=>{onStatusChange(task.id,'aguardando');setShowStatusPicker(false);}}>⏸ Aguardando</button>
+                  <button onClick={()=>{onStatusChange(task.id,'concluido');setShowStatusPicker(false);}}>✅ Concluído</button>
                 </div>
               )}
             </span>
 
-            {/* 2. Priority badge — clicável */}
+            {/* 2. Prioridade clicável */}
             <span style={{position:'relative'}} ref={pickerRef}>
               <span className={`badge ${task.priority<=2?'badge-red':task.priority<=4?'badge-yellow':task.priority<=7?'badge-blue':'badge-green'}`}
-                onClick={() => setShowPicker(!showPicker)} title="Clique para alterar prioridade">
+                onClick={()=>setShowPicker(!showPicker)} title="Clique para alterar prioridade">
                 {priorityLabel(task.priority)} · {task.priority}
               </span>
-              {showPicker && (
+              {showPicker&&(
                 <div className="priority-picker">
-                  {[1,2,3,4,5,6,7,8,9,10].map(p => (
-                    <button key={p}
-                      className={task.priority===p?'selected':''}
-                      style={{background: priorityBg(p), color: priorityColor(p)}}
-                      onClick={() => { onPriorityChange(task.id, p); setShowPicker(false); }}>
+                  {[1,2,3,4,5,6,7,8,9,10].map(p=>(
+                    <button key={p} className={task.priority===p?'selected':''}
+                      style={{background:priorityBg(p),color:priorityColor(p)}}
+                      onClick={()=>{onPriorityChange(task.id,p);setShowPicker(false);}}>
                       {p}
                     </button>
                   ))}
@@ -1358,76 +946,72 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
               )}
             </span>
 
-            {/* 3. Data — clicável se existe; botão discreto se não existe */}
-            {task.due_date ? (
+            {/* 3. Data — clicável se existe; botão definir se não existe */}
+            {task.due_date?(
               <span className={`task-date-tag ${isOverdue(task.due_date)&&task.status!=='concluido'?'overdue':''}`}
-                onClick={() => setShowDatePicker(!showDatePicker)} style={{cursor:'pointer'}}>
+                onClick={()=>setShowDatePicker(!showDatePicker)}>
                 📅 {fmtShort(task.due_date)}
               </span>
-            ) : (
-              !isCompleted && (
-                <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
-                  onClick={() => setShowDatePicker(!showDatePicker)}>
-                  📅 Definir data
-                </button>
-              )
+            ):(
+              <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
+                onClick={()=>setShowDatePicker(!showDatePicker)}>
+                📅 Definir data
+              </button>
             )}
 
-            {/* 4. Botão de comentários com badge de contagem */}
-            {!isCompleted && (
-              <span style={{position:'relative',display:'inline-flex'}}>
-                <button
-                  style={{fontSize:12,color:"var(--accent)",background:"var(--accent-soft)",border:"none",borderRadius:8,padding:"4px 10px",cursor:"pointer",display:'flex',alignItems:'center',gap:4}}
-                  onClick={() => setOpenComment(!openComment)}
-                  title="Comentários">
-                  💬
-                </button>
-                {commentCount > 0 && (
-                  <span className="comment-badge-count">{commentCount}</span>
-                )}
-              </span>
-            )}
-
-            {/* 5. Badge de setor — menor, por último, opacidade 0.7 */}
-            <span className="sector-tag" style={{fontSize:'10px',opacity:0.7,padding:'2px 6px'}}>
-              {sectorInfo.icon} {sectorInfo.label}
+            {/* 4. Comentários com badge de notificação */}
+            <span style={{position:'relative',display:'inline-flex'}}>
+              <button
+                style={{fontSize:12,color:"var(--accent)",background:"var(--accent-soft)",border:"none",borderRadius:8,padding:"4px 10px",cursor:"pointer",display:'flex',alignItems:'center',gap:4}}
+                onClick={()=>setOpenComment(!openComment)}
+                title="Comentários">
+                💬
+              </button>
+              {commentCount>0&&<span className="comment-badge-count">{commentCount}</span>}
             </span>
+
+            {/* 5. Setor — menor, por último */}
+            <span className="sector-tag">{sectorInfo.icon} {sectorInfo.label}</span>
           </div>
 
-          {/* Date picker */}
-          {showDatePicker && (
+          {showDatePicker&&(
             <div className="date-picker-inline">
-              <input type="datetime-local" value={dateVal} onChange={e => setDateVal(e.target.value)}/>
+              <input type="datetime-local" value={dateVal} onChange={e=>setDateVal(e.target.value)}/>
               <button style={{background:"var(--accent)",color:"#fff"}} onClick={handleDateSave}>Salvar</button>
-              <button style={{background:"var(--red-bg)",color:"var(--red)"}} onClick={() => { setDateVal(""); onDueDateChange(task.id, null); setShowDatePicker(false); }}>Remover</button>
-              <button style={{background:"var(--input-bg)",color:"var(--muted)"}} onClick={() => setShowDatePicker(false)}>Cancelar</button>
+              <button style={{background:"var(--red-bg)",color:"var(--red)"}} onClick={()=>{setDateVal("");onDueDateChange(task.id,null);setShowDatePicker(false);}}>Remover</button>
+              <button style={{background:"var(--input-bg)",color:"var(--muted)"}} onClick={()=>setShowDatePicker(false)}>Cancelar</button>
             </div>
           )}
 
-          {/* Comments area */}
-          {openComment && !isCompleted && (
+          {openComment&&(
             <div className="comments-area">
-              {(task.comments||[]).map((c,i) => (
+              {(task.comments||[]).map((c,i)=>(
                 <div key={i} className="comment-item">
                   <small>{fmt(c.date)}</small>{c.text}
                 </div>
               ))}
               <div className="comment-input-row">
                 <input className="comment-input" value={commentText}
-                  onChange={e => setCommentText(e.target.value)}
+                  onChange={e=>setCommentText(e.target.value)}
                   placeholder="Adicionar comentário..."
-                  onKeyDown={e => e.key==='Enter' && handleAddComment()}/>
+                  onKeyDown={e=>e.key==='Enter'&&handleAddComment()}/>
                 <button className="comment-send" onClick={handleAddComment}>→</button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Actions */}
-        {!isCompleted && (
+        {/* Ações: restore (Concluídos) ou editar/excluir (normal) */}
+        {showRestoreActions?(
           <div className="task-actions">
-            <button title="Editar" onClick={() => onEdit(task)}>✏️</button>
-            <button title="Excluir" onClick={() => onDelete(task.id)} style={{color:"var(--red)"}}>🗑</button>
+            <button title="Restaurar para Pendente" onClick={()=>onRestore&&onRestore(task.id)}
+              style={{color:"var(--accent)",borderColor:"var(--accent)"}}>↩️</button>
+            <button title="Excluir permanente" onClick={()=>onPermDelete&&onPermDelete(task.id)} style={{color:"var(--red)"}}>🗑</button>
+          </div>
+        ):(
+          <div className="task-actions">
+            <button title="Editar" onClick={()=>onEdit&&onEdit(task)}>✏️</button>
+            <button title="Excluir" onClick={()=>onDelete(task.id)} style={{color:"var(--red)"}}>🗑</button>
           </div>
         )}
       </div>
@@ -1436,359 +1020,208 @@ function TaskCard({ task, sectors, onStatusChange, onPriorityChange, onDelete, o
 }
 
 // ─── DRAGGABLE TASK CARD ───────────────────────
-// Wraps the existing TaskCard with drag-and-drop behaviour.
-// Injects the drag handle to the left of the priority bar via dragSlot;
-// all drag event props are spread onto TaskCard's outer div so no extra
-// DOM wrapper is added — layout is identical to a regular TaskCard.
-function DraggableTaskCard({ task, draggingId, position, handlers, ...taskProps }) {
-  const dragSlot = (
-    <div className="drag-handle" title={`#${position} — arrastar para reordenar`}
-      onTouchStart={e => handlers.onTouchStart(e, task.id)}
-      onTouchEnd={handlers.onTouchEnd}
-    >
+function DraggableTaskCard({task,draggingId,position,handlers,...taskProps}){
+  const dragSlot=(
+    <div className="drag-handle" title={`#${position} — arrastar`}
+      onTouchStart={e=>handlers.onTouchStart(e,task.id)}
+      onTouchEnd={handlers.onTouchEnd}>
       <span className="drag-dots">⠿</span>
       <span className="minha-ordem-pos">#{position}</span>
     </div>
   );
-  const dragEvents = {
-    'data-task-id': task.id,
-    draggable: true,
-    onDragStart:  e => handlers.onDragStart(e, task.id),
-    onDragEnter:  e => handlers.onDragEnter(e, task.id),
-    onDragOver:   handlers.onDragOver,
-    onDrop:       handlers.onDrop,
-    onDragEnd:    handlers.onDragEnd,
+  const dragEvents={
+    'data-task-id':task.id,draggable:true,
+    onDragStart:e=>handlers.onDragStart(e,task.id),
+    onDragEnter:e=>handlers.onDragEnter(e,task.id),
+    onDragOver:handlers.onDragOver,
+    onDrop:handlers.onDrop,
+    onDragEnd:handlers.onDragEnd,
   };
   return (
-    <TaskCard
-      task={task}
-      {...taskProps}
+    <TaskCard task={task} {...taskProps}
       dragSlot={dragSlot}
-      wrapperClassName={`minha-ordem-card${draggingId === task.id ? ' is-dragging' : ''}`}
-      dragEvents={dragEvents}
-    />
+      wrapperClassName={`minha-ordem-card${draggingId===task.id?' is-dragging':''}`}
+      dragEvents={dragEvents}/>
   );
 }
 
 // ─── PROGR TAB ─────────────────────────────────
-function ProgrTab({ tasks, sectors, onSaveOrder,
-  onStatusChange, onPriorityChange, onDelete, onAddComment, onDueDateChange, onEditTask, onNewTask }) {
-  const [fullList, setFullList] = useState([]);
-  const [filter, setFilter] = useState('todas');
-  const [search, setSearch] = useState('');
-  const [draggingId, setDraggingId] = useState(null);
-  const [prioDlg, setPrioDlg] = useState(null); // { task, suggested, pendingList }
+function ProgrTab({tasks,sectors,onSaveOrder,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onEditTask,onNewTask}){
+  const [fullList,setFullList]=useState([]);
+  const [filter,setFilter]=useState('todas');
+  const [search,setSearch]=useState('');
+  const [draggingId,setDraggingId]=useState(null);
+  const [prioDlg,setPrioDlg]=useState(null);
 
-  const fullListRef = useRef([]);
-  const prevListRef = useRef([]);
-  const draggingIdRef = useRef(null);
-  const dropSucceededRef = useRef(false);
-  const lastEnterRef = useRef(null);
-  const saveTimerRef = useRef(null);
-  const listRef = useRef(null);
-  const filterRef = useRef('todas');
-  const searchRef = useRef('');
+  const fullListRef=useRef([]);
+  const prevListRef=useRef([]);
+  const draggingIdRef=useRef(null);
+  const dropSucceededRef=useRef(false);
+  const lastEnterRef=useRef(null);
+  const saveTimerRef=useRef(null);
+  const listRef=useRef(null);
+  const filterRef=useRef('todas');
+  const searchRef=useRef('');
 
-  useEffect(() => { filterRef.current = filter; }, [filter]);
-  useEffect(() => { searchRef.current = search; }, [search]);
-  useEffect(() => { fullListRef.current = fullList; }, [fullList]);
+  useEffect(()=>{filterRef.current=filter;},[filter]);
+  useEffect(()=>{searchRef.current=search;},[search]);
+  useEffect(()=>{fullListRef.current=fullList;},[fullList]);
 
-  // Sync tasks prop → ordered list (skip during active drag)
-  useEffect(() => {
-    if(draggingIdRef.current) return;
-    const sorted = [...tasks].sort((a, b) => {
-      if(a.manual_order == null && b.manual_order == null) return a.priority - b.priority;
-      if(a.manual_order == null) return 1;
-      if(b.manual_order == null) return -1;
-      return a.manual_order - b.manual_order;
+  useEffect(()=>{
+    if(draggingIdRef.current)return;
+    const sorted=[...tasks].sort((a,b)=>{
+      if(a.manual_order==null&&b.manual_order==null)return a.priority-b.priority;
+      if(a.manual_order==null)return 1;if(b.manual_order==null)return -1;
+      return a.manual_order-b.manual_order;
     });
-    setFullList(sorted);
-    fullListRef.current = sorted;
-  }, [tasks]);
+    setFullList(sorted);fullListRef.current=sorted;
+  },[tasks]);
 
-  function applyFilters(list, f, s) {
-    let pool = list;
-    if(f === 'urgentes') pool = pool.filter(t => t.priority <= 2);
-    else if(f === 'pendentes') pool = pool.filter(t => t.status === 'pendente');
-    else if(f === 'aguardando') pool = pool.filter(t => t.status === 'aguardando');
-    if(s && s.trim()) {
-      const q = s.toLowerCase();
-      pool = pool.filter(t => t.title.toLowerCase().includes(q));
-    }
+  function applyFilters(list,f,s){
+    let pool=list;
+    if(f==='urgentes')pool=pool.filter(t=>t.priority<=2);
+    else if(f==='pendentes')pool=pool.filter(t=>t.status==='pendente');
+    else if(f==='aguardando')pool=pool.filter(t=>t.status==='aguardando');
+    if(s&&s.trim()){const q=s.toLowerCase();pool=pool.filter(t=>t.title.toLowerCase().includes(q));}
     return pool;
   }
 
-  const displayList = useMemo(
-    () => applyFilters(fullList, filter, search),
-    [fullList, filter, search]
-  );
+  const displayList=useMemo(()=>applyFilters(fullList,filter,search),[fullList,filter,search]);
+  const tabStats=useMemo(()=>({
+    urgentes:fullList.filter(t=>t.priority<=2).length,
+    pendentes:fullList.filter(t=>t.status==='pendente').length,
+    aguardando:fullList.filter(t=>t.status==='aguardando').length,
+  }),[fullList]);
 
-  const tabStats = useMemo(() => ({
-    urgentes:  fullList.filter(t => t.priority <= 2).length,
-    pendentes: fullList.filter(t => t.status === 'pendente').length,
-    aguardando:fullList.filter(t => t.status === 'aguardando').length,
-  }), [fullList]);
-
-  // Reorder using slot algorithm — works correctly even when filtered
-  function reorderById(fromId, toId) {
-    setFullList(prev => {
-      const currentDisplay = applyFilters(prev, filterRef.current, searchRef.current);
-      const fromIdx = currentDisplay.findIndex(t => t.id === fromId);
-      const toIdx = currentDisplay.findIndex(t => t.id === toId);
-      if(fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return prev;
-      const newDisplay = [...currentDisplay];
-      const [moved] = newDisplay.splice(fromIdx, 1);
-      newDisplay.splice(toIdx, 0, moved);
-      const filteredIds = new Set(currentDisplay.map(t => t.id));
-      const slots = [];
-      prev.forEach((t, idx) => { if(filteredIds.has(t.id)) slots.push(idx); });
-      const result = [...prev];
-      slots.forEach((slotIdx, i) => { result[slotIdx] = newDisplay[i]; });
+  function reorderById(fromId,toId){
+    setFullList(prev=>{
+      const currentDisplay=applyFilters(prev,filterRef.current,searchRef.current);
+      const fromIdx=currentDisplay.findIndex(t=>t.id===fromId);
+      const toIdx=currentDisplay.findIndex(t=>t.id===toId);
+      if(fromIdx===-1||toIdx===-1||fromIdx===toIdx)return prev;
+      const newDisplay=[...currentDisplay];
+      const [moved]=newDisplay.splice(fromIdx,1);newDisplay.splice(toIdx,0,moved);
+      const filteredIds=new Set(currentDisplay.map(t=>t.id));
+      const slots=[];prev.forEach((t,idx)=>{if(filteredIds.has(t.id))slots.push(idx);});
+      const result=[...prev];slots.forEach((slotIdx,i)=>{result[slotIdx]=newDisplay[i];});
       return result;
     });
   }
 
-  function scheduleSave() {
-    if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => { onSaveOrder(fullListRef.current); }, 500);
+  function scheduleSave(){
+    if(saveTimerRef.current)clearTimeout(saveTimerRef.current);
+    saveTimerRef.current=setTimeout(()=>{onSaveOrder(fullListRef.current);},500);
   }
 
-  // Smart priority: check if dragged task crossed a priority band boundary
-  function getSuggestedPriority(taskId, orderedList) {
-    const displayed = applyFilters(orderedList, filterRef.current, searchRef.current);
-    const idx = displayed.findIndex(t => t.id === taskId);
-    if(idx === -1) return null;
-    const task = displayed[idx];
-    const prev = displayed[idx - 1];
-    const next = displayed[idx + 1];
+  function getSuggestedPriority(taskId,orderedList){
+    const displayed=applyFilters(orderedList,filterRef.current,searchRef.current);
+    const idx=displayed.findIndex(t=>t.id===taskId);
+    if(idx===-1)return null;
+    const task=displayed[idx];const prev=displayed[idx-1];const next=displayed[idx+1];
     let suggested;
-    if(prev && next) {
-      suggested = Math.round((prev.priority + next.priority) / 2);
-    } else if(prev) {
-      suggested = Math.min(10, prev.priority + 1);
-    } else if(next) {
-      suggested = Math.max(1, next.priority - 1);
-    } else {
-      return null;
-    }
-    suggested = Math.max(1, Math.min(10, suggested));
-    function band(p) { return p <= 2 ? 0 : p <= 4 ? 1 : p <= 7 ? 2 : 3; }
-    if(band(suggested) !== band(task.priority)) return { task, suggested };
+    if(prev&&next)suggested=Math.round((prev.priority+next.priority)/2);
+    else if(prev)suggested=Math.min(10,prev.priority+1);
+    else if(next)suggested=Math.max(1,next.priority-1);
+    else return null;
+    suggested=Math.max(1,Math.min(10,suggested));
+    function band(p){return p<=2?0:p<=4?1:p<=7?2:3;}
+    if(band(suggested)!==band(task.priority))return{task,suggested};
     return null;
   }
 
-  // ── HTML5 DnD (desktop)
-  function handleDragStart(e, id) {
-    prevListRef.current = [...fullListRef.current];
-    dropSucceededRef.current = false;
-    lastEnterRef.current = null;
-    draggingIdRef.current = id;
-    setDraggingId(id);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', String(id));
+  function handleDragStart(e,id){prevListRef.current=[...fullListRef.current];dropSucceededRef.current=false;lastEnterRef.current=null;draggingIdRef.current=id;setDraggingId(id);e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(id));}
+  function handleDragEnter(e,id){if(lastEnterRef.current===id)return;lastEnterRef.current=id;const fromId=draggingIdRef.current;if(fromId&&id!==fromId)reorderById(fromId,id);}
+  function handleDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+  function handleDrop(e){
+    e.preventDefault();dropSucceededRef.current=true;
+    const fromId=draggingIdRef.current;const currentList=[...fullListRef.current];
+    const dlg=getSuggestedPriority(fromId,currentList);
+    if(dlg)setPrioDlg({...dlg,pendingList:currentList});else scheduleSave();
+  }
+  function handleDragEnd(){
+    if(!dropSucceededRef.current){if(saveTimerRef.current)clearTimeout(saveTimerRef.current);setFullList(prevListRef.current);fullListRef.current=prevListRef.current;}
+    setDraggingId(null);draggingIdRef.current=null;dropSucceededRef.current=false;lastEnterRef.current=null;
+  }
+  function handleTouchStart(e,id){prevListRef.current=[...fullListRef.current];draggingIdRef.current=id;setDraggingId(id);}
+  function handleTouchEnd(){
+    if(draggingIdRef.current){const fromId=draggingIdRef.current;const currentList=[...fullListRef.current];const dlg=getSuggestedPriority(fromId,currentList);if(dlg)setPrioDlg({...dlg,pendingList:currentList});else scheduleSave();}
+    setDraggingId(null);draggingIdRef.current=null;lastEnterRef.current=null;
   }
 
-  function handleDragEnter(e, id) {
-    if(lastEnterRef.current === id) return;
-    lastEnterRef.current = id;
-    const fromId = draggingIdRef.current;
-    if(fromId && id !== fromId) reorderById(fromId, id);
-  }
+  const dragHandlers={onDragStart:handleDragStart,onDragEnter:handleDragEnter,onDragOver:handleDragOver,onDrop:handleDrop,onDragEnd:handleDragEnd,onTouchStart:handleTouchStart,onTouchEnd:handleTouchEnd};
 
-  function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  }
-
-  function handleDrop(e) {
-    e.preventDefault();
-    dropSucceededRef.current = true;
-    const fromId = draggingIdRef.current;
-    const currentList = [...fullListRef.current];
-    const dlg = getSuggestedPriority(fromId, currentList);
-    if(dlg) {
-      setPrioDlg({ ...dlg, pendingList: currentList });
-    } else {
-      scheduleSave();
-    }
-  }
-
-  function handleDragEnd() {
-    if(!dropSucceededRef.current) {
-      if(saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      setFullList(prevListRef.current);
-      fullListRef.current = prevListRef.current;
-    }
-    setDraggingId(null);
-    draggingIdRef.current = null;
-    dropSucceededRef.current = false;
-    lastEnterRef.current = null;
-  }
-
-  // ── Touch (mobile)
-  function handleTouchStart(e, id) {
-    prevListRef.current = [...fullListRef.current];
-    draggingIdRef.current = id;
-    setDraggingId(id);
-  }
-
-  function handleTouchEnd() {
-    if(draggingIdRef.current) {
-      const fromId = draggingIdRef.current;
-      const currentList = [...fullListRef.current];
-      const dlg = getSuggestedPriority(fromId, currentList);
-      if(dlg) {
-        setPrioDlg({ ...dlg, pendingList: currentList });
-      } else {
-        scheduleSave();
-      }
-    }
-    setDraggingId(null);
-    draggingIdRef.current = null;
-    lastEnterRef.current = null;
-  }
-
-  const dragHandlers = {
-    onDragStart: handleDragStart, onDragEnter: handleDragEnter,
-    onDragOver: handleDragOver, onDrop: handleDrop, onDragEnd: handleDragEnd,
-    onTouchStart: handleTouchStart, onTouchEnd: handleTouchEnd,
-  };
-
-  // Non-passive touchmove to prevent page scroll during drag
-  useEffect(() => {
-    const el = listRef.current;
-    if(!el) return;
-    function onTouchMove(e) {
-      if(!draggingIdRef.current) return;
-      e.preventDefault();
-      const touch = e.touches[0];
-      const target = document.elementFromPoint(touch.clientX, touch.clientY);
-      const card = target && target.closest('[data-task-id]');
-      if(card) {
-        const targetId = Number(card.dataset.taskId);
-        const fromId = draggingIdRef.current;
-        if(fromId && targetId && targetId !== fromId && lastEnterRef.current !== targetId) {
-          lastEnterRef.current = targetId;
-          const list = [...fullListRef.current];
-          const fi = list.findIndex(t => t.id === fromId);
-          const ti = list.findIndex(t => t.id === targetId);
-          if(fi !== -1 && ti !== -1) {
-            const [item] = list.splice(fi, 1);
-            list.splice(ti, 0, item);
-            fullListRef.current = list;
-            setFullList(list);
-          }
+  useEffect(()=>{
+    const el=listRef.current;if(!el)return;
+    function onTouchMove(e){
+      if(!draggingIdRef.current)return;e.preventDefault();
+      const touch=e.touches[0];
+      const target=document.elementFromPoint(touch.clientX,touch.clientY);
+      const card=target&&target.closest('[data-task-id]');
+      if(card){
+        const targetId=Number(card.dataset.taskId);const fromId=draggingIdRef.current;
+        if(fromId&&targetId&&targetId!==fromId&&lastEnterRef.current!==targetId){
+          lastEnterRef.current=targetId;
+          const list=[...fullListRef.current];
+          const fi=list.findIndex(t=>t.id===fromId);const ti=list.findIndex(t=>t.id===targetId);
+          if(fi!==-1&&ti!==-1){const [item]=list.splice(fi,1);list.splice(ti,0,item);fullListRef.current=list;setFullList(list);}
         }
       }
     }
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    return () => el.removeEventListener('touchmove', onTouchMove);
-  }, []);
+    el.addEventListener('touchmove',onTouchMove,{passive:false});
+    return()=>el.removeEventListener('touchmove',onTouchMove);
+  },[]);
 
-  function confirmPrioUpdate() {
-    const { task, suggested, pendingList } = prioDlg;
-    setPrioDlg(null);
-    onPriorityChange(task.id, suggested);
-    onSaveOrder(pendingList);
-  }
-
-  function declinePrioUpdate() {
-    const { pendingList } = prioDlg;
-    setPrioDlg(null);
-    onSaveOrder(pendingList);
-  }
-
-  const hasFilter = filter !== 'todas' || search.trim();
+  function confirmPrioUpdate(){const{task,suggested,pendingList}=prioDlg;setPrioDlg(null);onPriorityChange(task.id,suggested);onSaveOrder(pendingList);}
+  function declinePrioUpdate(){const{pendingList}=prioDlg;setPrioDlg(null);onSaveOrder(pendingList);}
 
   return (
     <>
-      {/* Filter tabs */}
       <div className="view-tabs" style={{marginBottom:14}}>
-        <button className={`view-tab ${filter==='todas'?'active':''}`} onClick={() => setFilter('todas')}>
-          📋 Todas <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({fullList.length})</span>
-        </button>
-        <button className={`view-tab ${filter==='urgentes'?'active':''}`} onClick={() => setFilter('urgentes')}>
-          🔴 Urgentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.urgentes})</span>
-        </button>
-        <button className={`view-tab ${filter==='pendentes'?'active':''}`} onClick={() => setFilter('pendentes')}>
-          ⏳ Pendentes <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.pendentes})</span>
-        </button>
-        <button className={`view-tab ${filter==='aguardando'?'active':''}`} onClick={() => setFilter('aguardando')}>
-          ⏸ Aguardando <span style={{fontSize:11,opacity:.7,marginLeft:2}}>({tabStats.aguardando})</span>
-        </button>
+        <button className={`view-tab ${filter==='todas'?'active':''}`} onClick={()=>setFilter('todas')}>📋 Todas ({fullList.length})</button>
+        <button className={`view-tab ${filter==='urgentes'?'active':''}`} onClick={()=>setFilter('urgentes')}>🔴 Urgentes ({tabStats.urgentes})</button>
+        <button className={`view-tab ${filter==='pendentes'?'active':''}`} onClick={()=>setFilter('pendentes')}>⏳ Pendentes ({tabStats.pendentes})</button>
+        <button className={`view-tab ${filter==='aguardando'?'active':''}`} onClick={()=>setFilter('aguardando')}>⏸ Aguardando ({tabStats.aguardando})</button>
       </div>
-
-      {/* Search row */}
       <div className="search-row" style={{marginBottom:14}}>
-        <input
-          className="search-input"
-          placeholder="🔍 Buscar para filtrar..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        {hasFilter && (
-          <button className="btn-secondary" onClick={() => { setFilter('todas'); setSearch(''); }}
-            style={{whiteSpace:'nowrap'}}>
-            ✕ Limpar
-          </button>
+        <input className="search-input" placeholder="🔍 Buscar para filtrar..." value={search} onChange={e=>setSearch(e.target.value)}/>
+        {(filter!=='todas'||search.trim())&&(
+          <button className="btn-secondary" onClick={()=>{setFilter('todas');setSearch('');}} style={{whiteSpace:'nowrap'}}>✕ Limpar</button>
         )}
         <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
       </div>
 
-      {/* List */}
-      {displayList.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">↕️</div>
-          <p>{fullList.length === 0 ? 'Nenhuma tarefa ativa' : 'Nenhuma tarefa para este filtro'}</p>
-        </div>
-      ) : (
-        <div
-          ref={listRef}
-          className="minha-ordem-list"
-          style={draggingId ? {touchAction:'none',userSelect:'none'} : {}}
-        >
-          {displayList.map(task => (
-            <DraggableTaskCard
-              key={task.id}
-              task={task}
-              sectors={sectors}
+      {displayList.length===0?(
+        <div className="empty-state"><div className="empty-icon">↕️</div><p>{fullList.length===0?'Nenhuma tarefa ativa':'Nenhuma tarefa para este filtro'}</p></div>
+      ):(
+        <div ref={listRef} className="minha-ordem-list" style={draggingId?{touchAction:'none',userSelect:'none'}:{}}>
+          {displayList.map(task=>(
+            <DraggableTaskCard key={task.id} task={task} sectors={sectors}
               draggingId={draggingId}
-              position={fullList.findIndex(t => t.id === task.id) + 1}
+              position={fullList.findIndex(t=>t.id===task.id)+1}
               handlers={dragHandlers}
-              onStatusChange={onStatusChange}
-              onPriorityChange={onPriorityChange}
-              onDelete={onDelete}
-              onAddComment={onAddComment}
-              onDueDateChange={onDueDateChange}
-              onEdit={onEditTask}
-            />
+              onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
+              onDelete={onDelete} onAddComment={onAddComment}
+              onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
           ))}
         </div>
       )}
 
-      {/* Smart priority dialog */}
-      {prioDlg && (
+      {prioDlg&&(
         <div className="modal-overlay" onClick={declinePrioUpdate}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{maxWidth:380}}>
+          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:380}}>
             <h2>Atualizar Prioridade?</h2>
             <p style={{margin:'12px 0',fontSize:13,color:'var(--muted)'}}>
-              Você moveu <strong style={{color:'var(--text)'}}>{prioDlg.task.title}</strong> para uma nova posição na lista.
+              Você moveu <strong style={{color:'var(--text)'}}>{prioDlg.task.title}</strong> para uma nova posição.
             </p>
             <p style={{fontSize:13}}>
               Deseja atualizar a prioridade de{' '}
-              <span style={{color:priorityColor(prioDlg.task.priority),fontWeight:600}}>
-                {priorityLabel(prioDlg.task.priority)} ({prioDlg.task.priority})
-              </span>{' '}
-              para{' '}
-              <span style={{color:priorityColor(prioDlg.suggested),fontWeight:600}}>
-                {priorityLabel(prioDlg.suggested)} ({prioDlg.suggested})
-              </span>?
+              <span style={{color:priorityColor(prioDlg.task.priority),fontWeight:600}}>{priorityLabel(prioDlg.task.priority)} ({prioDlg.task.priority})</span>
+              {' '}para{' '}
+              <span style={{color:priorityColor(prioDlg.suggested),fontWeight:600}}>{priorityLabel(prioDlg.suggested)} ({prioDlg.suggested})</span>?
             </p>
             <div className="modal-actions">
               <button className="btn-secondary" onClick={declinePrioUpdate}>Manter prioridade</button>
-              <button className="btn-primary" onClick={confirmPrioUpdate}>
-                Atualizar para {prioDlg.suggested}
-              </button>
+              <button className="btn-primary" onClick={confirmPrioUpdate}>Atualizar para {prioDlg.suggested}</button>
             </div>
           </div>
         </div>
@@ -1798,76 +1231,48 @@ function ProgrTab({ tasks, sectors, onSaveOrder,
 }
 
 // ─── TASK MODAL ────────────────────────────────
-function TaskModal({ task, sectors, onSave, onClose }) {
-  const isEdit = task && task.id;
-  const [title, setTitle] = useState(task?.title || "");
-  const [sector, setSector] = useState(task?.sector || Object.keys(sectors)[0]);
-  const [priority, setPriority] = useState(task?.priority || 5);
-  const [status, setStatus] = useState(task?.status || "pendente");
-  const [description, setDescription] = useState(task?.description || "");
-  const [dueDate, setDueDate] = useState(task?.due_date ? task.due_date.substring(0,16) : "");
+function TaskModal({task,sectors,onSave,onClose}){
+  const isEdit=task&&task.id;
+  const [title,setTitle]=useState(task?.title||"");
+  const [sector,setSector]=useState(task?.sector||Object.keys(sectors)[0]);
+  const [priority,setPriority]=useState(task?.priority||5);
+  const [status,setStatus]=useState(task?.status||"pendente");
+  const [description,setDescription]=useState(task?.description||"");
+  const [dueDate,setDueDate]=useState(task?.due_date?task.due_date.substring(0,16):"");
 
-  function handleSave() {
-    if(!title.trim()) return;
-    onSave({
-      id: task?.id || null,
-      title: title.trim(),
-      sector,
-      priority,
-      status,
-      description,
-      due_date: dueDate || null,
-    });
+  function handleSave(){
+    if(!title.trim())return;
+    onSave({id:task?.id||null,title:title.trim(),sector,priority,status,description,due_date:dueDate||null});
   }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
-        <h2>{isEdit ? '✏️ Editar Tarefa' : '➕ Nova Tarefa'}</h2>
-
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <h2>{isEdit?'✏️ Editar Tarefa':'➕ Nova Tarefa'}</h2>
         <label>Título *</label>
-        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="O que precisa ser feito?"
-          autoFocus onKeyDown={e => e.key==='Enter' && handleSave()}/>
-
+        <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="O que precisa ser feito?" autoFocus onKeyDown={e=>e.key==='Enter'&&handleSave()}/>
         <label>Setor</label>
-        <select value={sector} onChange={e => setSector(e.target.value)}>
-          {Object.entries(sectors).map(([k,v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
+        <select value={sector} onChange={e=>setSector(e.target.value)}>
+          {Object.entries(sectors).map(([k,v])=><option key={k} value={k}>{v.icon} {v.label}</option>)}
         </select>
-
         <label>Prioridade (1 = mais urgente)</label>
         <div style={{display:'flex',gap:4,marginTop:4}}>
-          {[1,2,3,4,5,6,7,8,9,10].map(p => (
+          {[1,2,3,4,5,6,7,8,9,10].map(p=>(
             <button key={p}
-              style={{
-                width:36,height:36,borderRadius:8,
-                border: priority===p ? '2px solid var(--text)' : '2px solid transparent',
-                background: priorityBg(p), color: priorityColor(p),
-                fontWeight:700,fontSize:13,cursor:'pointer',transition:'.15s',
-                transform: priority===p ? 'scale(1.15)' : 'scale(1)'
-              }}
-              onClick={() => setPriority(p)}>
-              {p}
-            </button>
+              style={{width:36,height:36,borderRadius:8,border:priority===p?'2px solid var(--text)':'2px solid transparent',background:priorityBg(p),color:priorityColor(p),fontWeight:700,fontSize:13,cursor:'pointer',transition:'.15s',transform:priority===p?'scale(1.15)':'scale(1)'}}
+              onClick={()=>setPriority(p)}>{p}</button>
           ))}
         </div>
-
-        {isEdit && (
-          <>
-            <label>Status</label>
-            <select value={status} onChange={e => setStatus(e.target.value)}>
-              <option value="pendente">⏳ Pendente</option>
-              <option value="aguardando">⏸ Aguardando</option>
-              <option value="concluido">✅ Concluído</option>
-            </select>
-          </>
-        )}
-
+        <label>Status</label>
+        <select value={status} onChange={e=>setStatus(e.target.value)}>
+          <option value="pendente">⏳ Pendente</option>
+          <option value="aguardando">⏸ Aguardando</option>
+          <option value="concluido">✅ Concluído</option>
+        </select>
         <label>Data / Prazo (opcional)</label>
-        <input type="datetime-local" value={dueDate} onChange={e => setDueDate(e.target.value)}/>
-
+        <input type="datetime-local" value={dueDate} onChange={e=>setDueDate(e.target.value)}/>
         <label>Descrição (opcional)</label>
-        <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Detalhes adicionais..."/>
-
+        <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Detalhes adicionais..."/>
         <div className="modal-actions">
           <button className="btn-secondary" onClick={onClose}>Cancelar</button>
           <button className="btn-primary" onClick={handleSave}>{isEdit?'Salvar':'Criar Tarefa'}</button>
