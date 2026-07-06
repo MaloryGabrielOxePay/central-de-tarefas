@@ -98,10 +98,10 @@ O conector Supabase global (`~/.mcp.json`, server `supabase`) está **pinado no 
 `id` (uuid) · `key` (text, unique) · `label` (text) · `emoji` (text, def 🏢) · `color` (text, def #7c6af7) · `created_at`.
 Setores customizados aparecem **depois** dos fixos na sidebar. Hoje contém só `suplente`.
 
-### Tabela `public.deployments` — ⚠️ existe mas está **VAZIA**
+### Tabela `public.deployments` — histórico (3 linhas em 06/jul/2026)
 
 Schema: `id` (bigint identity), `html_content`, `commit_message`, `status`, `commit_sha`, `created_at`.
-O `fetch-source` **não está gravando snapshots**. Não confie nela para "puxar o HTML atual" — use o GitHub raw.
+`deploy_dashboard()` grava aqui a cada deploy remoto. Mesmo assim, para **"puxar o HTML atual"** use o **GitHub raw** (`raw.githubusercontent.com/.../main/index.html`) — é a fonte da verdade; a tabela pode ficar atrás.
 
 ### Tabela `public.dashboard_data` — **legada/morta** (0 linhas)
 
