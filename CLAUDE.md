@@ -27,6 +27,7 @@
 | **Pasta local (canônica)** | `C:\Users\artau\.claude\projects\HUB Dashboard Malory` — clone git único, **trabalhar SEMPRE aqui**. `C:\MaloryHub` descontinuado (consolidado nesta pasta em 06/jul/2026). |
 | Deploy (atual) | Push no `main` → Netlify republica em ~30s |
 | **Host preferido (alvo)** | **Coolify ou Vercel** (preferência do dono, 06/jul/2026). Netlify segue live até migrar. Migração de host = tarefa **gated** (DNS/produção) — não flipar sem confirmar. |
+| **Vercel (paralelo, live)** | `https://hub-central-tarefas.vercel.app` — deploy paralelo do `index.html` (06/jul/2026), Netlify **intacto**. Projeto `malorygabrieloxepays-projects/hub-central-tarefas`, `ssoProtection` desligado (público, paridade c/ Netlify). Deploy manual do scratchpad hoje; **cutover** (ligar Git→Vercel = push vira deploy) pendente. Descartar: `vercel remove hub-central-tarefas --yes --token $VERCEL_TOKEN --scope malorygabrieloxepays-projects`. |
 | Título da página | `HUB · Grupo Malory` |
 
 ---
@@ -57,6 +58,23 @@ Editar o HTML = editar o app. Não há `package.json` nem `node_modules`.
 | Plano | Free tier — **pausa após inatividade** (causa dashboard em branco; reativar é não-destrutivo) |
 
 ⚠️ **Anon key:** a chave anon legacy está embutida no `index.html` (válida até ~2036). **Antes de gerar HTML, confirme a key atual** via `Supabase:get_publishable_keys`. Existe também uma publishable moderna (`sb_publishable_...`) recomendada para o futuro. Nunca hardcode sem confirmar.
+
+### ⚙️ MCP dedicado do HUB — `supabase-hub` (isolado do wowlog)
+
+O conector Supabase global (`~/.mcp.json`, server `supabase`) está **pinado no projeto wowlog** (`pyvcjpngdyirnykzfnzw`) e é OAuth/claude.ai — **não usar pro HUB** (risco de mexer no wowlog + o ref wowlog estava dando 504 em 06/jul). Em vez disso, o HUB tem um MCP **próprio, local (stdio), isolado**, versionado em **`.mcp.json` na raiz deste repo**:
+
+```json
+{ "mcpServers": { "supabase-hub": {
+  "command": "npx",
+  "args": ["-y","@supabase/mcp-server-supabase@latest","--project-ref=pyoabyuqbjivqgidrtpi"],
+  "env": { "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN_HUB}" } } } }
+```
+
+- **Sem OAuth** — autentica por **Personal Access Token** (`sbp_...`) do Supabase, lido da env var Windows **`SUPABASE_ACCESS_TOKEN_HUB`** (nunca no git; o `.mcp.json` só referencia).
+- **Escopado ao ref do HUB** (`--project-ref=pyoabyuqbjivqgidrtpi`) → blast radius = só o HUB. Não toca o server `supabase`/wowlog.
+- **Setup (1×):** gerar PAT em supabase.com/dashboard/account/tokens → `setx SUPABASE_ACCESS_TOKEN_HUB "sbp_..."` (reabrir o terminal/Claude Code) → o server `supabase-hub` aparece nas tools ao rodar o Claude Code **nesta pasta**.
+- **Fallback Windows:** se `npx` não subir direto, trocar `command` por `cmd` e prefixar `["/c","npx",...]`.
+- **Sem MCP:** operações de **dados** (backup/leitura de `tasks`/`custom_sectors`) funcionam via REST + anon key direto (RLS aberta) — foi como o backup de 06/jul foi feito. Só operações de **management** (edge functions, migrations) exigem o `supabase-hub` autenticado.
 
 ### Tabela `public.tasks` (principal)
 
