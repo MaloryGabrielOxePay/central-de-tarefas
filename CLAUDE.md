@@ -111,7 +111,7 @@ Resquício de arquitetura antiga (blob jsonb). O app atual **não usa**. Candida
 
 | Slug | Papel |
 |---|---|
-| `push-to-github` | Recebe `{content, message}`, commita **`index.html`** no `main`. ⚠️ token GitHub hardcoded como fallback — **rotacionar**. |
+| `push-to-github` | Recebe `{content, message}`, commita **`index.html`** no `main`. ✅ **v4 (06/jul/2026)**: só `Deno.env.get("GITHUB_TOKEN")` + guard, fallback hardcoded removido. |
 | `fetch-source` | Deveria snapshotar o HTML em `deployments` — **não grava hoje**. |
 | `bidding-pricer` | Precificação bidding uShip (WIP). |
 | `bidding-agent` | Agente bidding uShip (WIP). |
@@ -234,7 +234,7 @@ UPDATE public.tasks SET status = 'excluido' WHERE id = '<uuid>';
 
 ## Segurança (pendências)
 
-- 🔴 **Token GitHub hardcoded** em `push-to-github` (fallback no corpo). Rotacionar e deixar só no secret `GITHUB_TOKEN`.
+- ✅ **Token GitHub hardcoded — RESOLVIDO (06/jul/2026).** `push-to-github` **v4** usa só `Deno.env.get("GITHUB_TOKEN")` + guard (throw se ausente); fallback `ghp_` removido; secret `GITHUB_TOKEN` criado. Deploy feito via **Management API** (editor do dashboard estava fora por incidente). Pendente só: revogar o `ghp_` antigo (começa `ghp_tZTs`) no GitHub + rotacionar o github_pat interino (passou pelo chat).
 - 🟠 Edge Functions com `verify_jwt: false` — invocáveis sem auth.
 - 🟠 RLS aberta — anon lê/escreve tudo (ok p/ app pessoal, mas qualquer um com a URL acessa).
 
