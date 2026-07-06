@@ -4,3 +4,4 @@ backups/
 .mcp.json
 .playwright-mcp/
 .gitignore
+_redirects
