@@ -91,7 +91,8 @@ O conector Supabase global (`~/.mcp.json`, server `supabase`) está **pinado no 
 | due_date | timestamptz | null | prazo |
 | created_at | timestamptz | now() | |
 | updated_at | timestamptz | now() | sempre `new Date().toISOString()` |
-| **manual_order** | integer | 0 | **ordem do drag & drop** (aba Programação) |
+| **manual_order** | integer | 0 | **ordem do drag & drop** (toggle "Reordenar" na Visão Geral) |
+| **subtasks** | jsonb | '[]' | checklist de sub-itens `{id,text,done}` + barra de progresso (HUB v2, 06/jul/2026) |
 
 ### Tabela `public.custom_sectors`
 
