@@ -1,0 +1,6 @@
+# Vercel serve so o app; nao publicar dados/docs
+backups/
+*.md
+.mcp.json
+.playwright-mcp/
+.gitignore
