@@ -56,6 +56,7 @@ Editar o HTML = editar o app. Não há `package.json` nem `node_modules`.
 | URL | `https://pyoabyuqbjivqgidrtpi.supabase.co` |
 | Status | `ACTIVE_HEALTHY` |
 | Plano | Free tier — **pausa após inatividade** (causa dashboard em branco; reativar é não-destrutivo) |
+| **Conta dona** ⚠️ | Supabase **logado via GitHub** (MaloryGabrielOxePay / oxepaybr@gmail.com). O projeto aparece como **"Claude"** na **MaloryGabrielOxePay's Org** (free). **NÃO** está nas contas Google `artaudgabriel@gmail.com` nem `gabriel@grupomalory.com` (essas = orgs MaloryV2 / Solution Pay). Pra dashboard/management (editar Edge Functions, secrets, PAT): no Supabase, **Continue with GitHub**. Descoberto 06/jul/2026. |
 
 ⚠️ **Anon key:** a chave anon legacy está embutida no `index.html` (válida até ~2036). **Antes de gerar HTML, confirme a key atual** via `Supabase:get_publishable_keys`. Existe também uma publishable moderna (`sb_publishable_...`) recomendada para o futuro. Nunca hardcode sem confirmar.
 
