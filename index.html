@@ -2,241 +2,305 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="theme-color" content="#0c0b12"/>
 <title>HUB · Grupo Malory</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{height:100%}
-body{font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;transition:background .3s,color .3s;height:100%}
-h1,h2,h3,.font-display{font-family:'Space Grotesk',sans-serif}
-#root{min-height:100vh}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-input,select,textarea,button{font-family:inherit}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;min-height:100%;transition:background .25s,color .25s}
+h1,h2,h3,.font-display{font-family:'Space Grotesk','Inter',sans-serif;letter-spacing:-.01em}
+#root{min-height:100vh;min-height:100dvh}
+button,input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
 
-/* ─── LIGHT THEME ─── */
-body, body.light {
-  --bg:#f4f3f8;--surface:#ffffff;--card:#ffffff;--border:#e4e2ee;
-  --accent:#6c5ce7;--accent-soft:#ede9fe;--text:#1e1b2e;--muted:#7b7794;
-  --green:#16a34a;--green-bg:#dcfce7;--yellow:#d97706;--yellow-bg:#fef3c7;
-  --red:#dc2626;--red-bg:#fee2e2;--blue:#2563eb;--blue-bg:#dbeafe;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-lg:0 4px 12px rgba(0,0,0,.08);--input-bg:#f8f7fc;
+/* ─── THEME ─── */
+body,body.light{
+  --bg:#f5f4f9;--surface:#ffffff;--surface-2:#faf9fd;--card:#ffffff;--border:#e7e5f0;--border-soft:#f0eff6;
+  --accent:#6c5ce7;--accent-2:#8b7cf7;--accent-soft:#efeaff;--accent-ring:rgba(108,92,231,.18);
+  --text:#1c1a2e;--text-2:#4a4763;--muted:#8b87a3;
+  --green:#0f9d58;--green-bg:#e3f6ec;--yellow:#c77b0a;--yellow-bg:#fdf0d9;
+  --red:#dc2626;--red-bg:#fdeaea;--blue:#2563eb;--blue-bg:#e6efff;
+  --shadow:0 1px 2px rgba(20,18,40,.05),0 1px 3px rgba(20,18,40,.04);
+  --shadow-md:0 4px 16px rgba(20,18,40,.09);--shadow-lg:0 12px 34px rgba(20,18,40,.16);
+  --input-bg:#f6f5fb;
   background:var(--bg);color:var(--text)
 }
-/* ─── DARK THEME ─── */
-body.dark {
-  --bg:#0c0b12;--surface:#141320;--card:#1a1929;--border:#262438;
-  --accent:#8b7cf7;--accent-soft:#1e1a3a;--text:#e4e2f0;--muted:#6b6780;
-  --green:#4ade80;--green-bg:#052e16;--yellow:#fbbf24;--yellow-bg:#422006;
-  --red:#f87171;--red-bg:#450a0a;--blue:#60a5fa;--blue-bg:#172554;
-  --shadow:0 1px 3px rgba(0,0,0,.3);--shadow-lg:0 4px 12px rgba(0,0,0,.4);
-  --input-bg:#111020;background:var(--bg);color:var(--text)
+body.dark{
+  --bg:#0b0a11;--surface:#141320;--surface-2:#181726;--card:#1a1927;--border:#2a2840;--border-soft:#221f34;
+  --accent:#8b7cf7;--accent-2:#a394ff;--accent-soft:#211d3d;--accent-ring:rgba(139,124,247,.24);
+  --text:#eceaf6;--text-2:#b6b2cc;--muted:#726e88;
+  --green:#4ade80;--green-bg:#0c2f1c;--yellow:#fbbf24;--yellow-bg:#3a2a08;
+  --red:#f87171;--red-bg:#3a1414;--blue:#60a5fa;--blue-bg:#122845;
+  --shadow:0 1px 2px rgba(0,0,0,.4);--shadow-md:0 6px 20px rgba(0,0,0,.5);--shadow-lg:0 16px 40px rgba(0,0,0,.6);
+  --input-bg:#100f1b;
+  background:var(--bg);color:var(--text)
 }
 
 /* ─── LAYOUT ─── */
-.app{display:flex;min-height:100vh}
-.sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;transition:transform .3s}
-.main{flex:1;padding:24px 28px;overflow-y:auto;min-width:0}
+.app{display:flex;min-height:100vh;min-height:100dvh}
+.sidebar{width:250px;min-width:250px;background:var(--surface);border-right:1px solid var(--border);
+  padding:18px 0 12px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;height:100dvh;
+  overflow-y:auto;z-index:120;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.main{flex:1;padding:26px 30px 60px;overflow-y:auto;min-width:0;max-width:1100px;margin:0 auto;width:100%}
 
-/* Logo */
-.logo{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
-.logo-sub{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:1.5px}
+.brand{padding:0 22px 16px;border-bottom:1px solid var(--border-soft);margin-bottom:14px;display:flex;align-items:center;gap:11px}
+.brand-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:18px;box-shadow:0 4px 12px var(--accent-ring)}
+.brand h1{font-size:18px;font-weight:700;line-height:1}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:3px}
 
-/* Nav */
-.nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px}
-.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;text-align:left;width:100%;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nav-btn:hover{background:var(--accent-soft);color:var(--accent)}
+.nav{flex:1;padding:0 12px;display:flex;flex-direction:column;gap:2px}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);padding:14px 14px 5px;font-weight:700}
+.nav-btn{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:11px;border:none;background:transparent;
+  color:var(--text-2);cursor:pointer;font-size:13.5px;font-weight:500;text-align:left;width:100%;transition:.14s;white-space:nowrap;overflow:hidden}
+.nav-btn:hover{background:var(--surface-2);color:var(--text)}
 .nav-btn.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
-.nav-btn .nav-icon{font-size:16px;min-width:20px;text-align:center}
-.nav-sep{height:1px;background:var(--border);margin:10px 14px}
-.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:8px 14px 4px;font-weight:600}
+.nav-icon{font-size:16px;min-width:22px;text-align:center}
+.nav-count{margin-left:auto;font-size:11px;font-weight:700;color:var(--muted);background:var(--input-bg);padding:1px 8px;border-radius:20px}
+.nav-btn.active .nav-count{background:#fff2;color:var(--accent)}
+.sector-dot{width:9px;height:9px;border-radius:50%;min-width:9px}
 
-/* Sidebar footer */
-.sidebar-footer{border-top:1px solid var(--border);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
-.theme-toggle{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--text);font-size:12px;transition:.15s;width:100%}
-.theme-toggle:hover{border-color:var(--accent)}
-.sync-badge{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;padding:4px 0}
-.sync-badge.offline{color:var(--yellow)}
-.sync-badge.error{color:var(--red)}
+.sidebar-foot{border-top:1px solid var(--border-soft);padding:12px 16px 4px;display:flex;flex-direction:column;gap:9px}
+.theme-toggle{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;border-radius:11px;
+  border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--text-2);font-size:12.5px;font-weight:500;transition:.14s;width:100%}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.sync{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;padding:2px 4px}
+.sync .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.sync.err .dot{background:var(--red)}.sync.off .dot{background:var(--yellow)}
+.sync.err{color:var(--red)}.sync.off{color:var(--yellow)}
 
 /* ─── HEADER ─── */
-.page-header{margin-bottom:24px}
-.page-title{font-size:22px;font-weight:800;letter-spacing:-.5px}
-.page-subtitle{font-size:13px;color:var(--muted);margin-top:2px}
+.page-head{margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-title{font-size:26px;font-weight:700}
+.page-sub{font-size:13px;color:var(--muted);margin-top:3px}
 
-/* ─── STAT CARDS ─── */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.stat-card.active-filter{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
-.stat-card .stat-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-.stat-card .stat-num{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;margin-top:4px}
-.stat-card .stat-dot{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%}
+/* ─── QUICK ADD ─── */
+.quick-add{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:6px 8px 6px 16px;box-shadow:var(--shadow);margin-bottom:16px;transition:.16s}
+.quick-add:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-ring)}
+.quick-add .plus{color:var(--accent);font-size:18px;font-weight:700;line-height:1}
+.quick-add input{flex:1;border:none;background:none;outline:none;color:var(--text);font-size:14.5px;padding:9px 0}
+.quick-add input::placeholder{color:var(--muted)}
+.quick-add .qa-hint{font-size:11px;color:var(--muted);white-space:nowrap;display:none}
+@media(min-width:640px){.quick-add .qa-hint{display:block}}
+.quick-add button.qa-go{border:none;background:var(--accent);color:#fff;font-weight:600;font-size:13px;padding:9px 16px;border-radius:10px;cursor:pointer;transition:.14s}
+.quick-add button.qa-go:hover{background:var(--accent-2)}
+.quick-add button.qa-go:disabled{opacity:.4;cursor:default}
 
-/* ─── VIEW TABS ─── */
-.view-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px}
-.view-tab{padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px}
-.view-tab:hover{color:var(--text)}
-.view-tab.active{background:var(--accent);color:#fff;font-weight:600}
+/* ─── TABS + STATS ─── */
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:4px;margin-bottom:16px;overflow-x:auto}
+.tab{padding:8px 15px;border-radius:9px;border:none;background:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;
+  transition:.14s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-ring)}
 
-/* ─── SEARCH BAR ─── */
-.search-row{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
-.search-input{flex:1;min-width:200px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;outline:none;transition:.2s}
-.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.filter-select{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;outline:none;cursor:pointer}
-.btn-primary{padding:10px 18px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:600;font-size:13px;cursor:pointer;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);
+  cursor:pointer;transition:.18s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-card.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-ring)}
+.stat-card .lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.stat-card .num{font-family:'Space Grotesk';font-size:27px;font-weight:700;margin-top:5px;line-height:1}
+.stat-card .sdot{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%}
 
-/* ─── TASK CARDS ─── */
-.task-list{display:flex;flex-direction:column;gap:8px}
-.section-divider{display:flex;align-items:center;gap:10px;margin:16px 0 10px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+/* ─── CONTROL BAR ─── */
+.ctl-row{display:flex;gap:9px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:180px;position:relative}
+.search-wrap .si{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.search-input{width:100%;padding:10px 14px 10px 36px;border-radius:11px;border:1px solid var(--border);background:var(--input-bg);
+  color:var(--text);font-size:13.5px;outline:none;transition:.16s}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-ring);background:var(--card)}
+.sel{padding:10px 12px;border-radius:11px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);
+  font-size:13px;outline:none;cursor:pointer;transition:.16s}
+.sel:focus{border-color:var(--accent)}
+.iconbtn{padding:10px 13px;border-radius:11px;border:1px solid var(--border);background:var(--card);color:var(--text-2);
+  font-size:13px;font-weight:600;cursor:pointer;transition:.14s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+.iconbtn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 
-.task-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);transition:all .2s;position:relative;overflow:hidden}
-.task-card:hover{box-shadow:var(--shadow-lg)}
-.task-card-inner{display:flex;align-items:flex-start;gap:12px}
-.task-priority-bar{width:4px;min-height:40px;border-radius:4px;flex-shrink:0;margin-top:2px;align-self:stretch}
-.task-body{flex:1;min-width:0}
-.task-header{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
-.task-title{font-size:15px;font-weight:600;line-height:1.4;word-break:break-word;flex:1;min-width:0;cursor:pointer;transition:color .15s}
-.task-title:hover{color:var(--accent)}
-.task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+.group-seg{display:inline-flex;background:var(--input-bg);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px}
+.group-seg button{border:none;background:none;color:var(--muted);font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:8px;cursor:pointer;transition:.14s}
+.group-seg button:hover{color:var(--text)}
+.group-seg button.on{background:var(--card);color:var(--accent);box-shadow:var(--shadow)}
 
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid transparent;white-space:nowrap}
-.badge:hover{opacity:.85}
-.badge-red{background:var(--red-bg);color:var(--red)}
-.badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
-.badge-blue{background:var(--blue-bg);color:var(--blue)}
-.badge-green{background:var(--green-bg);color:var(--green)}
+/* ─── TASK LIST ─── */
+.group-head{display:flex;align-items:center;gap:9px;margin:20px 0 9px;font-size:12px;font-weight:700;color:var(--text-2);
+  text-transform:uppercase;letter-spacing:.04em}
+.group-head .g-count{font-size:11px;color:var(--muted);background:var(--input-bg);padding:1px 8px;border-radius:20px}
+.group-head::after{content:'';flex:1;height:1px;background:var(--border-soft)}
+.task-list{display:flex;flex-direction:column;gap:9px}
 
-.sector-tag{font-size:10px;color:var(--muted);background:var(--input-bg);padding:2px 6px;border-radius:5px;white-space:nowrap;opacity:.7}
-.task-date-tag{font-size:11px;display:inline-flex;align-items:center;gap:3px;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:5px;white-space:nowrap;cursor:pointer}
-.task-date-tag.overdue{color:var(--red);background:var(--red-bg)}
+.task-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px 15px;box-shadow:var(--shadow);
+  transition:box-shadow .16s,transform .12s,border-color .16s;position:relative;cursor:pointer}
+.task-card:hover{box-shadow:var(--shadow-md)}
+.task-card:active{transform:scale(.995)}
+.task-card.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-ring)}
+.tc-inner{display:flex;align-items:flex-start;gap:12px}
+.pbar{width:4px;border-radius:4px;flex-shrink:0;align-self:stretch;min-height:34px}
+.tc-body{flex:1;min-width:0}
+.tc-title{font-size:15px;font-weight:600;line-height:1.35;word-break:break-word;color:var(--text)}
+.tc-title.done{text-decoration:line-through;opacity:.55}
+.tc-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:9px}
 
-.task-actions{display:flex;gap:4px;flex-shrink:0;margin-left:auto;align-items:flex-start}
-.task-actions button{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--muted);font-size:12px;transition:.15s}
-.task-actions button:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.chk{width:21px;height:21px;border-radius:7px;border:2px solid var(--border);background:var(--card);cursor:pointer;flex-shrink:0;
+  display:grid;place-items:center;color:#fff;font-size:12px;transition:.13s;margin-top:1px}
+.chk:hover{border-color:var(--accent)}
+.chk.on{background:var(--accent);border-color:var(--accent)}
 
-/* ─── PRIORITY PICKER ─── */
-.priority-picker{position:absolute;top:100%;left:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;box-shadow:var(--shadow-lg);display:flex;gap:4px;flex-wrap:wrap;width:200px}
-.priority-picker button{width:32px;height:32px;border-radius:8px;border:2px solid transparent;font-weight:700;font-size:12px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center}
-.priority-picker button:hover{transform:scale(1.1)}
-.priority-picker button.selected{border-color:var(--text);transform:scale(1.15)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:9px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:.13s;border:1px solid transparent;white-space:nowrap;user-select:none}
+.badge:hover{filter:brightness(.97)}
+.badge-red{background:var(--red-bg);color:var(--red)}.badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-soft{background:var(--input-bg);color:var(--text-2)}
+.sector-tag{font-size:11.5px;color:var(--muted);background:var(--input-bg);padding:4px 9px;border-radius:8px;white-space:nowrap;display:inline-flex;gap:4px;align-items:center}
+.date-tag{font-size:11.5px;display:inline-flex;align-items:center;gap:4px;color:var(--accent);background:var(--accent-soft);padding:4px 9px;border-radius:8px;white-space:nowrap;cursor:pointer}
+.date-tag.over{color:var(--red);background:var(--red-bg)}
+.mini-btn{font-size:11.5px;color:var(--muted);background:var(--input-bg);border:none;border-radius:8px;padding:4px 9px;cursor:pointer;transition:.13s;display:inline-flex;align-items:center;gap:4px}
+.mini-btn:hover{color:var(--accent);background:var(--accent-soft)}
 
-/* ─── STATUS PICKER ─── */
-.status-picker{position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;gap:3px;min-width:155px}
-.status-picker button{padding:7px 12px;border-radius:8px;border:none;background:transparent;color:var(--text);cursor:pointer;font-size:12px;text-align:left;transition:.15s;font-weight:500}
-.status-picker button:hover{background:var(--input-bg)}
+.tc-actions{display:flex;gap:4px;flex-shrink:0}
+.act{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--muted);
+  font-size:13px;transition:.13s;display:grid;place-items:center}
+.act:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.act.del:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
 
-/* ─── COMMENT BADGE ─── */
-.comment-badge-count{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1}
+.prog{margin-top:9px;display:flex;align-items:center;gap:8px}
+.prog-bar{flex:1;height:6px;border-radius:6px;background:var(--input-bg);overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px;transition:width .3s}
+.prog-txt{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap}
 
-/* ─── DATE PICKER inline ─── */
-.date-picker-inline{margin-top:8px;padding:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.date-picker-inline input{padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px;outline:none}
-.date-picker-inline input:focus{border-color:var(--accent)}
-.date-picker-inline button{padding:5px 12px;border-radius:8px;border:none;font-size:12px;cursor:pointer;font-weight:600;transition:.15s}
+.pop{position:absolute;top:calc(100% + 6px);left:0;z-index:60;background:var(--card);border:1px solid var(--border);
+  border-radius:13px;padding:8px;box-shadow:var(--shadow-lg);animation:pop .13s ease}
+@keyframes pop{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
+.pri-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:60;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:8px;box-shadow:var(--shadow-lg);
+  display:grid;grid-template-columns:repeat(5,1fr);gap:5px;width:210px;animation:pop .13s ease}
+.pri-pop button{width:34px;height:34px;border-radius:9px;border:2px solid transparent;font-weight:700;font-size:13px;cursor:pointer;transition:.12s;display:grid;place-items:center}
+.pri-pop button:hover{transform:scale(1.08)}
+.pri-pop button.on{border-color:var(--text);transform:scale(1.12)}
+.status-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:60;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:6px;box-shadow:var(--shadow-lg);
+  display:flex;flex-direction:column;gap:2px;min-width:170px;animation:pop .13s ease}
+.status-pop button{text-align:left;border:none;background:none;color:var(--text);font-size:13px;padding:9px 11px;border-radius:9px;cursor:pointer;transition:.12s;display:flex;gap:8px;align-items:center}
+.status-pop button:hover{background:var(--surface-2)}
 
-/* ─── COMMENTS ─── */
-.comments-area{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.comment-item{padding:6px 0;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
-.comment-item small{display:block;font-size:10px;color:var(--muted);opacity:.7;margin-bottom:2px}
-.comment-input-row{display:flex;gap:6px;margin-top:8px}
-.comment-input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:12px;outline:none}
-.comment-input:focus{border-color:var(--accent)}
-.comment-send{padding:6px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600;font-size:13px}
+.date-inline{margin-top:10px;padding:11px;background:var(--input-bg);border:1px solid var(--border);border-radius:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.date-inline input{padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12.5px;outline:none}
+.date-inline button{padding:6px 12px;border-radius:9px;border:none;font-size:12.5px;cursor:pointer;font-weight:600}
+
+.expand{margin-top:11px;padding-top:11px;border-top:1px solid var(--border-soft)}
+.sub-row{display:flex;align-items:center;gap:9px;padding:5px 0}
+.sub-check{width:18px;height:18px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:grid;place-items:center;color:#fff;font-size:10px;transition:.12s}
+.sub-check.on{background:var(--green);border-color:var(--green)}
+.sub-text{flex:1;font-size:13px;color:var(--text)}
+.sub-text.done{text-decoration:line-through;color:var(--muted)}
+.sub-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;opacity:.6}
+.sub-del:hover{color:var(--red);opacity:1}
+.row-input{display:flex;gap:7px;margin-top:8px}
+.row-input input{flex:1;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:12.5px;outline:none}
+.row-input input:focus{border-color:var(--accent)}
+.row-input button{padding:7px 13px;border-radius:9px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600;font-size:13px}
+.comment{padding:7px 0;font-size:12.5px;color:var(--text-2);border-bottom:1px solid var(--border-soft)}
+.comment small{display:block;font-size:10px;color:var(--muted);margin-bottom:2px}
+
+/* ─── BULK BAR ─── */
+.bulk-bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:150;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;box-shadow:var(--shadow-lg);padding:9px 10px 9px 18px;display:flex;align-items:center;gap:10px;
+  animation:bulkin .2s cubic-bezier(.34,1.56,.64,1);max-width:calc(100vw - 24px);flex-wrap:wrap}
+@keyframes bulkin{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+.bulk-count{font-weight:700;font-size:13px;color:var(--text);white-space:nowrap}
+.bulk-bar .bb{border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);font-size:12.5px;font-weight:600;
+  padding:8px 12px;border-radius:10px;cursor:pointer;transition:.13s;white-space:nowrap}
+.bulk-bar .bb:hover{border-color:var(--accent);color:var(--accent)}
+.bulk-bar .bb.del:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+.bulk-bar .bb.x{padding:8px 11px}
+.bulk-sel{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:12.5px;cursor:pointer;font-weight:600}
 
 /* ─── MODAL ─── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto}
-.modal h2{font-size:18px;font-weight:700;margin-bottom:16px}
-.modal label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px;margin-top:12px}
-.modal input,.modal select,.modal textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px;outline:none}
-.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--accent)}
-.modal textarea{min-height:60px;resize:vertical}
-.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
-.btn-secondary{padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-weight:500;font-size:13px;cursor:pointer}
-.btn-secondary:hover{background:var(--input-bg)}
+.overlay{position:fixed;inset:0;background:rgba(12,11,18,.55);z-index:200;display:flex;align-items:center;justify-content:center;
+  padding:16px;backdrop-filter:blur(5px);animation:fade .15s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px;width:100%;max-width:520px;
+  box-shadow:var(--shadow-lg);max-height:92vh;max-height:92dvh;overflow-y:auto;animation:modin .2s cubic-bezier(.34,1.3,.64,1)}
+@keyframes modin{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.modal h2{font-size:19px;font-weight:700;margin-bottom:18px}
+.modal label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.03em}
+.modal input,.modal select,.modal textarea{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--border);
+  background:var(--input-bg);color:var(--text);font-size:14px;outline:none;transition:.14s}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-ring);background:var(--card)}
+.modal textarea{min-height:64px;resize:vertical}
+.pri-grid{display:flex;gap:5px;flex-wrap:wrap}
+.pri-grid button{width:38px;height:38px;border-radius:10px;border:2px solid transparent;font-weight:700;font-size:13px;cursor:pointer;transition:.12s}
+.pri-grid button:hover{transform:scale(1.06)}
+.modal-actions{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+.btn{padding:11px 20px;border-radius:12px;border:none;font-weight:600;font-size:14px;cursor:pointer;transition:.14s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-2)}
+.btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--input-bg)}
 
 /* ─── CALENDAR ─── */
-.calendar-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
-.calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.calendar-header h3{font-size:16px;font-weight:700}
-.calendar-nav{display:flex;gap:6px}
-.calendar-nav button{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);cursor:pointer;font-size:13px}
-.calendar-nav button:hover{border-color:var(--accent)}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.calendar-day-label{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:6px 0;text-transform:uppercase}
-.calendar-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:13px;position:relative;cursor:default;transition:.15s;min-height:40px;gap:2px}
-.calendar-cell.today{background:var(--accent-soft);font-weight:700;color:var(--accent)}
-.calendar-cell.other-month{opacity:.3}
-.calendar-cell.has-tasks{cursor:pointer}
-.calendar-cell.has-tasks:hover{background:var(--input-bg)}
-.calendar-cell.selected-day{outline:2px solid var(--accent);border-radius:10px}
-.calendar-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:28px}
-.calendar-dot{width:5px;height:5px;border-radius:50%}
-.calendar-cell-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;z-index:50;box-shadow:var(--shadow-lg);pointer-events:none;max-width:220px;white-space:normal;line-height:1.3}
+.cal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-head h3{font-size:16px;font-weight:700}
+.cal-nav{padding:7px 13px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);cursor:pointer}
+.cal-nav:hover{border-color:var(--accent)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dl{text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:7px 0;text-transform:uppercase}
+.cal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:11px;font-size:13px;
+  position:relative;transition:.13s;min-height:40px;gap:3px}
+.cal-cell.today{background:var(--accent-soft);font-weight:700;color:var(--accent)}
+.cal-cell.other{opacity:.32}.cal-cell.has{cursor:pointer}.cal-cell.has:hover{background:var(--input-bg)}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:30px}
+.cal-dot{width:5px;height:5px;border-radius:50%}
+.cal-tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:9px 11px;font-size:11.5px;z-index:70;box-shadow:var(--shadow-lg);pointer-events:none;max-width:230px;line-height:1.35;text-align:left}
 
-/* ─── DRAG & DROP ─── */
-.minha-ordem-list{display:flex;flex-direction:column;gap:8px}
-.minha-ordem-card{transition:transform 150ms ease,box-shadow 150ms ease,opacity 150ms ease;cursor:default}
-.minha-ordem-card.is-dragging{opacity:.55;box-shadow:0 8px 24px rgba(0,0,0,.18);transform:scale(1.02) rotate(.5deg);z-index:10;cursor:grabbing}
-.drag-handle{width:28px;min-width:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:grab;color:var(--muted);opacity:.35;transition:opacity .15s;user-select:none;flex-shrink:0;touch-action:none}
-.drag-dots{font-size:18px;line-height:1;letter-spacing:-2px}
-.minha-ordem-card:hover .drag-handle{opacity:.75}
+/* ─── REORDER ─── */
+.reorder-hint{font-size:12.5px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.drag-handle{cursor:grab;color:var(--muted);font-size:17px;padding:0 3px;align-self:center;touch-action:none}
 .drag-handle:active{cursor:grabbing}
-.minha-ordem-pos{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;line-height:1}
+.task-card.dragging{opacity:.4}
+.task-card.dragover{border-color:var(--accent);box-shadow:0 -3px 0 var(--accent)}
+.ord-num{font-family:'Space Grotesk';font-size:11px;font-weight:700;color:var(--muted);min-width:22px;text-align:center;align-self:center}
 
-/* ─── EMPTY STATE ─── */
-.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
-.empty-state .empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
-.empty-state p{font-size:14px}
+/* ─── EMPTY ─── */
+.empty{text-align:center;padding:56px 20px;color:var(--muted)}
+.empty .ei{font-size:44px;margin-bottom:12px;opacity:.55}
+.empty p{font-size:14.5px}
 
 /* ─── MOBILE ─── */
-.mobile-header{display:none;position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;align-items:center;justify-content:space-between}
-.hamburger{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px}
-.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;backdrop-filter:blur(2px)}
-
-@media(max-width:768px){
-  .app{flex-direction:column}
-  html,body{height:100%;overflow:hidden}
-  #root{height:100%;display:flex;flex-direction:column}
-  .mobile-header{display:flex;width:100%;flex-shrink:0}
-  .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);z-index:200;height:100%;box-shadow:var(--shadow-lg);width:260px;min-width:260px}
+.m-head{display:none;position:sticky;top:0;z-index:110;background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 14px;align-items:center;justify-content:space-between;gap:10px}
+.hamb{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;line-height:1}
+.m-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:115;backdrop-filter:blur(2px)}
+@media(max-width:820px){
+  .main{max-width:none;padding:16px}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .app{display:block}
+  .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);height:100vh;height:100dvh;box-shadow:var(--shadow-lg);width:82vw;max-width:300px}
   .sidebar.open{transform:translateX(0)}
-  .mobile-overlay.show{display:block}
-  .main{flex:1;min-height:0;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
-  .stat-row{grid-template-columns:repeat(2,1fr);gap:8px}
-  .stat-card .stat-num{font-size:22px}
-  .view-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
-  .view-tabs::-webkit-scrollbar{display:none}
-  .view-tab{flex-shrink:0;padding:8px 12px;font-size:12px}
-  .search-row{flex-direction:column;gap:8px}
-  .search-input{min-width:0;width:100%}
-  .filter-select{width:100%}
-  .btn-primary{width:100%;justify-content:center;padding:12px 18px}
-  .task-card{padding:12px 14px}
-  .task-card-inner{flex-direction:row;gap:10px;flex-wrap:nowrap}
-  .task-priority-bar{align-self:stretch}
-  .task-body{min-width:0;flex:1}
-  .task-actions{flex-shrink:0;margin-left:auto;width:auto}
-  .task-actions button{padding:8px 10px;min-width:36px;min-height:36px}
-  .nav-btn{min-height:44px;padding:10px 14px}
-  .hamburger{min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
-  .modal-overlay{align-items:flex-end;padding:0}
-  .modal{border-radius:16px 16px 0 0;padding:20px;max-height:92vh}
-  .modal-actions{flex-direction:column-reverse;gap:8px}
-  .modal-actions .btn-primary,.modal-actions .btn-secondary{width:100%;justify-content:center}
-  .calendar-cell{min-height:32px;font-size:11px}
-  .calendar-wrap{padding:14px}
-  .drag-handle{min-width:44px;min-height:44px;font-size:22px}
+  .m-head{display:flex}.m-overlay.show{display:block}
+  .main{padding:14px 14px 90px}
+  .page-title{font-size:22px}
+  .search-wrap{min-width:100%;order:-1}
+  .ctl-row{gap:8px}
+  .group-seg{overflow-x:auto}
+  .tc-actions .act{width:34px;height:34px}
+  .badge,.mini-btn,.sector-tag,.date-tag{font-size:12px;padding:6px 11px}
+  .modal{padding:20px;border-radius:18px}
+  .bulk-bar{left:12px;right:12px;transform:none;bottom:14px;max-width:none}
+  @keyframes bulkin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 }
 </style>
 </head>
@@ -244,775 +308,582 @@ body.dark {
 <div id="root"></div>
 
 <script type="text/babel">
-const { useState, useEffect, useRef, useCallback, useMemo } = React;
+const {useState,useEffect,useRef,useCallback,useMemo}=React;
 
-// ─── SUPABASE ──────────────────────────────────────────────
-const SB_URL = "https://pyoabyuqbjivqgidrtpi.supabase.co";
-const SB_KEY = "sb_publishable_vTM3Ipu4HLM7xxmlwV7yPw_65IxvzqP";
-const sb = window.supabase.createClient(SB_URL, SB_KEY);
+// ─── SUPABASE ───
+const SB_URL="https://pyoabyuqbjivqgidrtpi.supabase.co";
+const SB_KEY="sb_publishable_vTM3Ipu4HLM7xxmlwV7yPw_65IxvzqP";
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
 
-// ─── SECTORS ───────────────────────────────────────────────
-const DEFAULT_SECTORS = {
-  maloryconnect:  { label:"Malory Connect",        icon:"🔗", color:"#14b8a6" },
-  wowlog:         { label:"Wowlog",               icon:"📦", color:"#38bdf8" },
-  iai:            { label:"Agência IAI",           icon:"💡", color:"#eab308" },
-  entretenimento: { label:"Malory Entretenimento", icon:"🎪", color:"#ec4899" },
-  oxepay:         { label:"Oxepay",                icon:"💳", color:"#34d399" },
-  pessoal:        { label:"Pessoal / Malory",      icon:"👤", color:"#a78bfa" },
-  escritorio:     { label:"Escritório Geral",      icon:"🏢", color:"#fb923c" },
+// ─── SECTORS ───
+const DEFAULT_SECTORS={
+  maloryconnect:{label:"Malory Connect",icon:"🔗",color:"#14b8a6"},
+  wowlog:{label:"Wowlog",icon:"📦",color:"#38bdf8"},
+  iai:{label:"Agência IAI",icon:"💡",color:"#eab308"},
+  entretenimento:{label:"Malory Entretenimento",icon:"🎪",color:"#ec4899"},
+  oxepay:{label:"Oxepay",icon:"💳",color:"#34d399"},
+  pessoal:{label:"Pessoal / Malory",icon:"👤",color:"#a78bfa"},
+  escritorio:{label:"Escritório Geral",icon:"🏢",color:"#fb923c"},
 };
 
-// ─── HELPERS ───────────────────────────────────────────────
+// ─── HELPERS ───
 function priorityColor(p){if(p<=2)return"var(--red)";if(p<=4)return"var(--yellow)";if(p<=7)return"var(--blue)";return"var(--green)";}
 function priorityBg(p){if(p<=2)return"var(--red-bg)";if(p<=4)return"var(--yellow-bg)";if(p<=7)return"var(--blue-bg)";return"var(--green-bg)";}
 function priorityLabel(p){if(p<=2)return"Urgente";if(p<=4)return"Alta";if(p<=7)return"Média";return"Baixa";}
-function statusLabel(s){if(s==="pendente")return"Pendente";if(s==="aguardando")return"Aguardando";if(s==="concluido")return"Concluído";if(s==="excluido")return"Excluído";return s;}
-function statusIcon(s){if(s==="pendente")return"⏳";if(s==="aguardando")return"⏸";if(s==="concluido")return"✅";if(s==="excluido")return"🗑";return"•";}
+function priorityBadge(p){return p<=2?'badge-red':p<=4?'badge-yellow':p<=7?'badge-blue':'badge-green';}
+function statusLabel(s){return{pendente:"Pendente",aguardando:"Aguardando",concluido:"Concluído",excluido:"Excluído"}[s]||s;}
+function statusIcon(s){return{pendente:"⏳",aguardando:"⏸",concluido:"✅",excluido:"🗑"}[s]||"•";}
 function fmt(d){if(!d)return"";try{return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return"";}}
 function fmtShort(d){if(!d)return"";try{return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});}catch(e){return"";}}
 function isOverdue(d){if(!d)return false;return new Date(d)<new Date();}
+function subProgress(t){const s=t.subtasks||[];if(!s.length)return null;const done=s.filter(x=>x.done).length;return{done,total:s.length,pct:Math.round(done/s.length*100)};}
+const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
-const MONTHS_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const DAYS_PT=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+function dueBucket(d){
+  if(!d)return{key:'nodate',label:'📭 Sem data',order:5};
+  const now=new Date();const due=new Date(d);
+  const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const startDue=new Date(due.getFullYear(),due.getMonth(),due.getDate());
+  const diff=Math.round((startDue-startToday)/86400000);
+  if(diff<0)return{key:'overdue',label:'🔴 Atrasado',order:0};
+  if(diff===0)return{key:'today',label:'📌 Hoje',order:1};
+  if(diff<=7)return{key:'week',label:'🗓️ Esta semana',order:2};
+  return{key:'later',label:'📅 Depois',order:3};
+}
+function priBucket(p){if(p<=2)return{key:'u',label:'🔴 Urgente',order:0};if(p<=4)return{key:'a',label:'🟡 Alta',order:1};if(p<=7)return{key:'m',label:'🔵 Média',order:2};return{key:'b',label:'🟢 Baixa',order:3};}
 
-// ─── APP ───────────────────────────────────────────────────
-function App() {
-  const [tasks, setTasks] = useState([]);
-  const [sectors, setSectors] = useState(DEFAULT_SECTORS);
-  const [loading, setLoading] = useState(true);
-  const [syncStatus, setSyncStatus] = useState("loading");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentView, setCurrentView] = useState("geral");
-  const [currentSector, setCurrentSector] = useState(null);
-  const [geralTab, setGeralTab] = useState("urgente");
-  const [search, setSearch] = useState("");
-  const [sectorFilter, setSectorFilter] = useState("todos");
-  const [statusFilter, setStatusFilter] = useState(null);
-  const [theme, setTheme] = useState("light");
-  const [showModal, setShowModal] = useState(false);
-  const [editTask, setEditTask] = useState(null);
-  const [calMonth, setCalMonth] = useState(new Date().getMonth());
-  const [calYear, setCalYear] = useState(new Date().getFullYear());
-  const [hoveredDay, setHoveredDay] = useState(null);
+// ─── APP ───
+function App(){
+  const [tasks,setTasks]=useState([]);
+  const [sectors,setSectors]=useState(DEFAULT_SECTORS);
+  const [loading,setLoading]=useState(true);
+  const [sync,setSync]=useState("loading");
+  const [sbOpen,setSbOpen]=useState(false);
+  const [view,setView]=useState("geral");
+  const [curSector,setCurSector]=useState(null);
+  const [tab,setTab]=useState("todas");
+  const [search,setSearch]=useState("");
+  const [sectorFilter,setSectorFilter]=useState("todos");
+  const [groupBy,setGroupBy]=useState("none");
+  const [reorder,setReorder]=useState(false);
+  const [selected,setSelected]=useState(()=>new Set());
+  const [selecting,setSelecting]=useState(false);
+  const [statFilter,setStatFilter]=useState(null);
+  const [theme,setTheme]=useState(()=>localStorage.getItem('hub_theme')||'light');
+  const [showModal,setShowModal]=useState(false);
+  const [editTask,setEditTask]=useState(null);
+  const [quick,setQuick]=useState("");
+  const [calMonth,setCalMonth]=useState(new Date().getMonth());
+  const [calYear,setCalYear]=useState(new Date().getFullYear());
+  const [hoverDay,setHoverDay]=useState(null);
 
-  useEffect(() => {
-    loadTasks();
-    loadCustomSectors();
-    const channel = sb.channel('tasks-changes')
-      .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks())
-      .subscribe();
-    return () => sb.removeChannel(channel);
-  }, []);
+  useEffect(()=>{loadTasks();loadSectors();
+    const ch=sb.channel('tasks-changes').on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks()).subscribe();
+    return()=>sb.removeChannel(ch);
+  },[]);
+  useEffect(()=>{document.body.className=theme;localStorage.setItem('hub_theme',theme);},[theme]);
+  useEffect(()=>{if(tasks.length)localStorage.setItem('tasks_cache',JSON.stringify(tasks));},[tasks]);
 
-  async function loadTasks() {
-    try {
-      const {data,error} = await sb.from('tasks').select('*').order('priority',{ascending:true});
-      if(error) throw error;
-      setTasks(data||[]);
-      setSyncStatus("synced");
-    } catch(e) {
-      console.error(e);
-      setSyncStatus("error");
-      const cached = localStorage.getItem('tasks_cache');
-      if(cached) setTasks(JSON.parse(cached));
-    }
+  async function loadTasks(){
+    try{const{data,error}=await sb.from('tasks').select('*').order('priority',{ascending:true});
+      if(error)throw error;setTasks(data||[]);setSync("synced");
+    }catch(e){console.error(e);setSync("error");const c=localStorage.getItem('tasks_cache');if(c)setTasks(JSON.parse(c));}
     setLoading(false);
   }
-
-  async function loadCustomSectors() {
-    try {
-      const {data} = await sb.from('custom_sectors').select('*');
-      if(data&&data.length){
-        const merged={...DEFAULT_SECTORS};
-        data.forEach(s=>{merged[s.key]={label:s.label,icon:s.emoji,color:s.color};});
-        setSectors(merged);
-      }
-    } catch(e){}
+  async function loadSectors(){
+    try{const{data}=await sb.from('custom_sectors').select('*');
+      if(data&&data.length){const m={...DEFAULT_SECTORS};data.forEach(s=>{m[s.key]={label:s.label,icon:s.emoji,color:s.color};});setSectors(m);}
+    }catch(e){}
   }
 
-  useEffect(()=>{if(tasks.length>0)localStorage.setItem('tasks_cache',JSON.stringify(tasks));},[tasks]);
-  useEffect(()=>{document.body.className=theme;},[theme]);
+  async function saveTask(d){
+    try{
+      if(d.id){const{error}=await sb.from('tasks').update({title:d.title,sector:d.sector,priority:d.priority,status:d.status,description:d.description||'',due_date:d.due_date||null,subtasks:d.subtasks||[]}).eq('id',d.id);if(error)throw error;}
+      else{const{error}=await sb.from('tasks').insert({title:d.title,sector:d.sector,priority:d.priority,status:d.status||'pendente',description:d.description||'',due_date:d.due_date||null,comments:[],subtasks:d.subtasks||[]});if(error)throw error;}
+      setSync("synced");loadTasks();
+    }catch(e){console.error(e);setSync("error");}
+  }
+  const patch=useCallback(async(id,fields)=>{try{const{error}=await sb.from('tasks').update(fields).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}},[]);
+  const updateStatus=(id,s)=>patch(id,{status:s});
+  const updatePriority=(id,p)=>patch(id,{priority:p});
+  const updateDueDate=(id,ds)=>patch(id,{due_date:ds?new Date(ds).toISOString():null});
+  const updateSubtasks=(id,st)=>patch(id,{subtasks:st});
+  async function addComment(id,text){const t=tasks.find(x=>x.id===id);const c=[...((t&&t.comments)||[]),{text,date:new Date().toISOString()}];patch(id,{comments:c});}
+  const deleteTask=id=>patch(id,{status:'excluido'});
+  const restoreTask=id=>patch(id,{status:'pendente'});
+  async function permDelete(id){try{const{error}=await sb.from('tasks').delete().eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
 
-  // ─── CRUD ────────────────────────────────────
-  async function saveTask(taskData) {
-    try {
-      if(taskData.id){
-        const {error}=await sb.from('tasks').update({title:taskData.title,sector:taskData.sector,priority:taskData.priority,status:taskData.status,description:taskData.description||'',due_date:taskData.due_date||null}).eq('id',taskData.id);
-        if(error) throw error;
-      } else {
-        const {error}=await sb.from('tasks').insert({title:taskData.title,sector:taskData.sector,priority:taskData.priority,status:taskData.status||'pendente',description:taskData.description||'',due_date:taskData.due_date||null,comments:[]});
-        if(error) throw error;
-      }
-      setSyncStatus("synced");loadTasks();
-    } catch(e){console.error(e);setSyncStatus("error");}
+  async function quickAdd(){
+    const raw=quick.trim();if(!raw)return;
+    let title=raw,sector=(sectorFilter!=="todos"?sectorFilter:(view==="setor"?curSector:'escritorio')),priority=5;
+    const mSec=raw.match(/#(\w+)/);if(mSec){const k=mSec[1].toLowerCase();if(sectors[k]){sector=k;title=title.replace(mSec[0],'').trim();}}
+    const mPri=raw.match(/!([1-9]|10)\b/);if(mPri){priority=parseInt(mPri[1]);title=title.replace(mPri[0],'').trim();}
+    if(!title)return;
+    setQuick("");
+    await saveTask({title,sector,priority,status:'pendente'});
   }
 
-  async function updateStatus(id,newStatus){try{const {error}=await sb.from('tasks').update({status:newStatus}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
-  async function updatePriority(id,newP){try{const {error}=await sb.from('tasks').update({priority:newP}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
-  async function updateDueDate(id,dateStr){try{const due=dateStr?new Date(dateStr).toISOString():null;const {error}=await sb.from('tasks').update({due_date:due}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
-  async function addComment(id,text){try{const task=tasks.find(t=>t.id===id);const comments=[...(task.comments||[]),{text,date:new Date().toISOString()}];const {error}=await sb.from('tasks').update({comments}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
-  async function deleteTask(id){try{const {error}=await sb.from('tasks').update({status:'excluido'}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
-  async function permanentDelete(id){try{const {error}=await sb.from('tasks').delete().eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
-  async function restoreTask(id){try{const {error}=await sb.from('tasks').update({status:'pendente'}).eq('id',id);if(error)throw error;loadTasks();}catch(e){console.error(e);}}
-
-  async function saveManualOrder(orderedList) {
-    try {
-      const updates=orderedList.map((t,idx)=>({id:t.id,manual_order:idx+1}));
-      const changed=updates.filter(u=>{const existing=tasks.find(t=>t.id===u.id);return!existing||existing.manual_order!==u.manual_order;});
-      if(!changed.length)return;
-      await Promise.all(changed.map(({id,manual_order})=>sb.from('tasks').update({manual_order}).eq('id',id)));
-      setTasks(prev=>prev.map(t=>{const upd=updates.find(u=>u.id===t.id);return upd?{...t,manual_order:upd.manual_order}:t;}));
-      setSyncStatus("synced");
-    } catch(e){console.error(e);setSyncStatus("error");}
+  async function saveOrder(ordered){
+    try{const ids=ordered.map(t=>t.id);const orders=ordered.map((_,i)=>i);
+      const{error}=await sb.rpc('reorder_tasks',{task_ids:ids,new_orders:orders});
+      if(error){for(let i=0;i<ordered.length;i++){await sb.from('tasks').update({manual_order:i}).eq('id',ordered[i].id);}}
+      loadTasks();
+    }catch(e){console.error(e);loadTasks();}
   }
 
-  // ─── DERIVED DATA ───────────────────────────
-  const activeTasks=useMemo(()=>tasks.filter(t=>t.status!=='excluido'),[tasks]);
-  const nonCompletedTasks=useMemo(()=>activeTasks.filter(t=>t.status!=='concluido'),[activeTasks]);
-  const completedTasks=useMemo(()=>tasks.filter(t=>t.status==='concluido'),[tasks]);
-  const trashedTasks=useMemo(()=>tasks.filter(t=>t.status==='excluido'),[tasks]);
+  const toggleSel=useCallback((id)=>{setSelected(prev=>{const n=new Set(prev);n.has(id)?n.delete(id):n.add(id);return n;});},[]);
+  const clearSel=()=>setSelected(new Set());
+  async function bulkStatus(s){for(const id of selected)await sb.from('tasks').update({status:s}).eq('id',id);clearSel();loadTasks();}
+  async function bulkPriority(p){for(const id of selected)await sb.from('tasks').update({priority:p}).eq('id',id);clearSel();loadTasks();}
+  async function bulkSector(sec){for(const id of selected)await sb.from('tasks').update({sector:sec}).eq('id',id);clearSel();loadTasks();}
+  async function bulkDelete(){for(const id of selected)await sb.from('tasks').update({status:'excluido'}).eq('id',id);clearSel();loadTasks();}
 
-  const stats=useMemo(()=>({
-    todas:nonCompletedTasks.length,
-    pendentes:activeTasks.filter(t=>t.status==='pendente').length,
-    aguardando:activeTasks.filter(t=>t.status==='aguardando').length,
-    concluidas:completedTasks.length,
-  }),[activeTasks,nonCompletedTasks,completedTasks]);
+  const active=useMemo(()=>tasks.filter(t=>t.status!=='excluido'),[tasks]);
+  const nonDone=useMemo(()=>active.filter(t=>t.status!=='concluido'),[active]);
+  const done=useMemo(()=>tasks.filter(t=>t.status==='concluido'),[tasks]);
+  const trashed=useMemo(()=>tasks.filter(t=>t.status==='excluido'),[tasks]);
+  const stats=useMemo(()=>({todas:nonDone.length,urgentes:nonDone.filter(t=>t.priority<=2).length,pendentes:active.filter(t=>t.status==='pendente').length,aguardando:active.filter(t=>t.status==='aguardando').length,concluidas:done.length}),[active,nonDone,done]);
 
-  const getFilteredTasks=useCallback(()=>{
+  function navigate(v,sec){setView(v);setCurSector(sec||null);setStatFilter(null);setReorder(false);setSelecting(false);clearSel();setSbOpen(false);if(v==="geral")setTab("todas");}
+  const exitSelect=()=>{setSelecting(false);clearSel();};
+
+  function poolFor(){
     let pool;
-    if(currentView==="concluidos")pool=completedTasks;
-    else if(currentView==="lixeira")pool=trashedTasks;
-    else if(currentView==="setor"&&currentSector)pool=nonCompletedTasks.filter(t=>t.sector===currentSector);
-    else pool=nonCompletedTasks;
-    if(currentView==="geral"&&statusFilter){
-      if(statusFilter==="pendentes")pool=pool.filter(t=>t.status==="pendente");
-      else if(statusFilter==="aguardando")pool=pool.filter(t=>t.status==="aguardando");
-      else if(statusFilter==="concluidas")pool=completedTasks;
-      // "todas" — sem filtro adicional
+    if(view==="setor"&&curSector)pool=nonDone.filter(t=>t.sector===curSector);
+    else pool=nonDone;
+    if(view==="geral"&&statFilter){
+      if(statFilter==='urgentes')pool=pool.filter(t=>t.priority<=2);
+      else if(statFilter==='pendentes')pool=pool.filter(t=>t.status==='pendente');
+      else if(statFilter==='aguardando')pool=pool.filter(t=>t.status==='aguardando');
+      else if(statFilter==='concluidas')pool=done;
     }
-    if(sectorFilter!=="todos"&&currentView!=="setor")pool=pool.filter(t=>t.sector===sectorFilter);
+    if(sectorFilter!=="todos"&&view!=="setor")pool=pool.filter(t=>t.sector===sectorFilter);
     if(search.trim()){const q=search.toLowerCase();pool=pool.filter(t=>t.title.toLowerCase().includes(q)||(t.description||'').toLowerCase().includes(q));}
-    return pool.sort((a,b)=>a.priority-b.priority);
-  },[tasks,currentView,currentSector,statusFilter,sectorFilter,search,nonCompletedTasks,completedTasks,trashedTasks]);
-
-  const filteredTasks=useMemo(()=>getFilteredTasks(),[getFilteredTasks]);
-  const calendarTasks=useMemo(()=>nonCompletedTasks.filter(t=>t.due_date),[nonCompletedTasks]);
-
-  // ─── NAVIGATION ──────────────────────────────
-  function navigate(view,sector=null,tab=null){
-    setCurrentView(view);setCurrentSector(sector);setStatusFilter(null);
-    setGeralTab(tab||(view==="geral"?"urgente":geralTab));
-    setSidebarOpen(false);
+    return pool;
   }
 
-  // FIX: toggleStatFilter não muda mais o geralTab — evita conflito com tabs que não existem
-  function toggleStatFilter(filter){
-    setStatusFilter(prev=>prev===filter?null:filter);
-  }
-
-  const isProgTab = currentView==="geral" && geralTab==="programacao";
-  const isGeralActive = currentView==="geral" && geralTab!=="programacao";
+  const taskProps={sectors,onStatusChange:updateStatus,onPriorityChange:updatePriority,onDelete:deleteTask,onAddComment:addComment,onDueDateChange:updateDueDate,onSubtasks:updateSubtasks,onEdit:t=>{setEditTask(t);setShowModal(true);},selected,onToggleSel:toggleSel,selMode:selecting||selected.size>0};
 
   return (
     <div className="app">
-      <div className="mobile-header">
-        <button className="hamburger" onClick={()=>setSidebarOpen(true)}>☰</button>
-        <span className="font-display" style={{fontWeight:700,fontSize:16,letterSpacing:2}}>HUB</span>
-        <button className="hamburger" onClick={()=>setTheme(t=>t==='light'?'dark':'light')}>
-          {theme==='light'?'🌙':'☀️'}
-        </button>
+      <div className="m-head">
+        <button className="hamb" onClick={()=>setSbOpen(true)}>☰</button>
+        <span className="font-display" style={{fontWeight:700,fontSize:16}}>HUB</span>
+        <button className="hamb" onClick={()=>setTheme(t=>t==='light'?'dark':'light')}>{theme==='light'?'🌙':'☀️'}</button>
       </div>
-      <div className={`mobile-overlay ${sidebarOpen?'show':''}`} onClick={()=>setSidebarOpen(false)}/>
+      <div className={`m-overlay ${sbOpen?'show':''}`} onClick={()=>setSbOpen(false)}/>
 
-      <aside className={`sidebar ${sidebarOpen?'open':''}`}>
-        <div className="logo">
-          <h1 style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:28,fontWeight:700,letterSpacing:3}}>HUB</h1>
-          <div className="logo-sub">Grupo Malory</div>
+      <aside className={`sidebar ${sbOpen?'open':''}`}>
+        <div className="brand">
+          <div className="brand-mark">H</div>
+          <div><h1 className="font-display">HUB</h1><div className="brand-sub">Grupo Malory</div></div>
         </div>
-
         <nav className="nav">
-          {/* FIX: Programação e Visão Geral não ficam ativos ao mesmo tempo */}
-          <button className={`nav-btn ${isProgTab?'active':''}`} onClick={()=>navigate('geral',null,'programacao')}>
-            <span className="nav-icon">🗓️</span> Programação
-          </button>
-          <button className={`nav-btn ${isGeralActive?'active':''}`} onClick={()=>navigate('geral')}>
+          <button className={`nav-btn ${view==='geral'?'active':''}`} onClick={()=>navigate('geral')}>
             <span className="nav-icon">📊</span> Visão Geral
           </button>
-
-          <div className="nav-sep"/>
           <div className="nav-label">Setores</div>
-
-          {Object.entries(sectors).map(([key,s])=>(
-            <button key={key} className={`nav-btn ${currentView==='setor'&&currentSector===key?'active':''}`} onClick={()=>navigate('setor',key)}>
-              <span className="nav-icon">{s.icon}</span> {s.label}
-            </button>
-          ))}
-
-          <div className="nav-sep"/>
-          <button className={`nav-btn ${currentView==='concluidos'?'active':''}`} onClick={()=>navigate('concluidos')}>
-            <span className="nav-icon">✅</span> Concluídos
-            <span style={{marginLeft:'auto',fontSize:11,opacity:.6}}>{completedTasks.length}</span>
+          {Object.entries(sectors).map(([k,s])=>{
+            const c=active.filter(t=>t.sector===k&&t.status!=='concluido').length;
+            return (
+              <button key={k} className={`nav-btn ${view==='setor'&&curSector===k?'active':''}`} onClick={()=>navigate('setor',k)}>
+                <span className="sector-dot" style={{background:s.color}}/> {s.icon} {s.label}
+                {c>0&&<span className="nav-count">{c}</span>}
+              </button>
+            );
+          })}
+          <div className="nav-label">Arquivo</div>
+          <button className={`nav-btn ${view==='concluidos'?'active':''}`} onClick={()=>navigate('concluidos')}>
+            <span className="nav-icon">✅</span> Concluídos <span className="nav-count">{done.length}</span>
           </button>
-          <button className={`nav-btn ${currentView==='lixeira'?'active':''}`} onClick={()=>navigate('lixeira')}>
-            <span className="nav-icon">🗑</span> Lixeira
-            <span style={{marginLeft:'auto',fontSize:11,opacity:.6}}>{trashedTasks.length}</span>
+          <button className={`nav-btn ${view==='lixeira'?'active':''}`} onClick={()=>navigate('lixeira')}>
+            <span className="nav-icon">🗑</span> Lixeira <span className="nav-count">{trashed.length}</span>
           </button>
         </nav>
-
-        <div className="sidebar-footer">
+        <div className="sidebar-foot">
           <button className="theme-toggle" onClick={()=>setTheme(t=>t==='light'?'dark':'light')}>
-            {theme==='light'?'🌙':'☀️'} {theme==='light'?'Modo Escuro':'Modo Claro'}
+            {theme==='light'?'🌙 Modo Escuro':'☀️ Modo Claro'}
           </button>
-          <div className={`sync-badge ${syncStatus==='synced'?'':syncStatus==='error'?'error':'offline'}`}>
-            {syncStatus==='synced'?'● Sincronizado':syncStatus==='error'?'● Erro de conexão':'● Carregando...'}
+          <div className={`sync ${sync==='synced'?'':sync==='error'?'err':'off'}`}>
+            <span className="dot"/>{sync==='synced'?'Sincronizado':sync==='error'?'Erro de conexão':'Carregando…'}
           </div>
         </div>
       </aside>
 
       <main className="main">
         {loading?(
-          <div className="empty-state"><div className="empty-icon">⏳</div><p>Carregando tarefas...</p></div>
-        ):currentView==="geral"?(
+          <div className="empty"><div className="ei">⏳</div><p>Carregando tarefas…</p></div>
+        ):view==='geral'?(
           <GeralView
-            tasks={filteredTasks} allTasks={nonCompletedTasks} calendarTasks={calendarTasks}
-            stats={stats} search={search} setSearch={setSearch}
-            sectorFilter={sectorFilter} setSectorFilter={setSectorFilter}
-            statusFilter={statusFilter} toggleStatFilter={toggleStatFilter}
-            geralTab={geralTab} setGeralTab={setGeralTab}
-            sectors={sectors} onStatusChange={updateStatus} onPriorityChange={updatePriority}
-            onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
+            pool={poolFor()} nonDone={nonDone} done={done} stats={stats}
+            search={search} setSearch={setSearch} sectorFilter={sectorFilter} setSectorFilter={setSectorFilter}
+            statFilter={statFilter} setStatFilter={setStatFilter} tab={tab} setTab={setTab}
+            groupBy={groupBy} setGroupBy={setGroupBy} reorder={reorder} setReorder={setReorder}
+            selecting={selecting} setSelecting={setSelecting}
+            quick={quick} setQuick={setQuick} onQuickAdd={quickAdd} onSaveOrder={saveOrder}
             onNewTask={()=>{setEditTask(null);setShowModal(true);}}
-            onEditTask={(t)=>{setEditTask(t);setShowModal(true);}}
-            calMonth={calMonth} setCalMonth={setCalMonth}
-            calYear={calYear} setCalYear={setCalYear}
-            hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
-            completedTasks={completedTasks} onSaveOrder={saveManualOrder}
+            calMonth={calMonth} setCalMonth={setCalMonth} calYear={calYear} setCalYear={setCalYear}
+            hoverDay={hoverDay} setHoverDay={setHoverDay} taskProps={taskProps}
           />
-        ):currentView==="setor"?(
-          <SectorView
-            sector={currentSector} sectorInfo={sectors[currentSector]}
-            tasks={filteredTasks} search={search} setSearch={setSearch}
-            onStatusChange={updateStatus} onPriorityChange={updatePriority}
-            onDelete={deleteTask} onAddComment={addComment} onDueDateChange={updateDueDate}
-            onNewTask={()=>{setEditTask({sector:currentSector});setShowModal(true);}}
-            onEditTask={(t)=>{setEditTask(t);setShowModal(true);}}
-            sectors={sectors}
-          />
-        ):currentView==="concluidos"?(
-          <ConcluView
-            tasks={completedTasks} sectors={sectors}
-            onRestore={restoreTask} onDelete={permanentDelete}
-            onStatusChange={updateStatus}
-            onEditTask={(t)=>{setEditTask(t);setShowModal(true);}}
-            search={search} setSearch={setSearch}
-          />
-        ):currentView==="lixeira"?(
-          <TrashView tasks={trashedTasks} sectors={sectors} onRestore={restoreTask} onDelete={permanentDelete} search={search} setSearch={setSearch}/>
-        ):null}
+        ):view==='setor'?(
+          <SectorView sector={curSector} info={sectors[curSector]} pool={poolFor()}
+            search={search} setSearch={setSearch} groupBy={groupBy} setGroupBy={setGroupBy}
+            reorder={reorder} setReorder={setReorder} onSaveOrder={saveOrder}
+            selecting={selecting} setSelecting={setSelecting}
+            quick={quick} setQuick={setQuick} onQuickAdd={quickAdd}
+            onNewTask={()=>{setEditTask({sector:curSector});setShowModal(true);}} taskProps={taskProps}/>
+        ):view==='concluidos'?(
+          <ArchiveView title="✅ Concluídos" tasks={done} sectors={sectors} search={search} setSearch={setSearch}
+            onRestore={restoreTask} onPermDelete={permDelete}/>
+        ):(
+          <ArchiveView title="🗑 Lixeira" tasks={trashed} sectors={sectors} search={search} setSearch={setSearch}
+            onRestore={restoreTask} onPermDelete={permDelete} trash/>
+        )}
       </main>
+
+      {selected.size>0&&(
+        <BulkBar count={selected.size} sectors={sectors} onClear={exitSelect}
+          onStatus={bulkStatus} onPriority={bulkPriority} onSector={bulkSector} onDelete={bulkDelete}/>
+      )}
 
       {showModal&&(
         <TaskModal task={editTask} sectors={sectors}
-          onSave={(data)=>{saveTask(data);setShowModal(false);}}
-          onClose={()=>setShowModal(false)}/>
+          onSave={d=>{saveTask(d);setShowModal(false);}} onClose={()=>setShowModal(false)}/>
       )}
     </div>
   );
 }
 
-// ─── GERAL VIEW ────────────────────────────────
-function GeralView({
-  tasks,allTasks,calendarTasks,stats,search,setSearch,
-  sectorFilter,setSectorFilter,statusFilter,toggleStatFilter,
-  geralTab,setGeralTab,sectors,onStatusChange,onPriorityChange,
-  onDelete,onAddComment,onDueDateChange,onNewTask,onEditTask,
-  calMonth,setCalMonth,calYear,setCalYear,hoveredDay,setHoveredDay,
-  completedTasks,onSaveOrder
-}){
-  const isProgramacao=geralTab==='programacao';
-
-  const displayTasks=geralTab==="urgente"
-    ?allTasks.filter(t=>{
-        if(sectorFilter!=="todos"&&t.sector!==sectorFilter)return false;
-        if(search.trim()&&!t.title.toLowerCase().includes(search.toLowerCase()))return false;
-        return true;
-      }).sort((a,b)=>a.priority-b.priority)
-    :tasks;
-
-  const urgentTasks=displayTasks.filter(t=>t.priority<=2);
-  const otherTasks=displayTasks.filter(t=>t.priority>2);
-  const finalTasks=statusFilter==="concluidas"?completedTasks:(statusFilter?tasks:null);
-
-  return (
-    <>
-      <div className="page-header">
-        <h2 className="page-title font-display">{isProgramacao?'🗓️ Programação':'Visão Geral'}</h2>
-        <div className="page-subtitle">
-          {isProgramacao
-            ?'Arraste para reordenar · prioridade inteligente'
-            :`${stats.todas} tarefas ativas · ${allTasks.filter(t=>t.priority<=2).length} urgentes`}
-        </div>
-      </div>
-
-      <div className="view-tabs">
-        <button className={`view-tab ${geralTab==='urgente'&&!statusFilter?'active':''}`}
-          onClick={()=>{setGeralTab('urgente');setStatusFilter&&toggleStatFilter(null);}}>
-          🔥 Urgente
-        </button>
-        <button className={`view-tab ${geralTab==='calendario'&&!statusFilter?'active':''}`}
-          onClick={()=>{setGeralTab('calendario');toggleStatFilter(null);}}>
-          📅 Calendário
-        </button>
-      </div>
-
-      {!isProgramacao&&(
-        <>
-          <div className="stat-row">
-            <div className={`stat-card ${statusFilter==='todas'?'active-filter':''}`} onClick={()=>toggleStatFilter('todas')}>
-              <div className="stat-dot" style={{background:"var(--accent)"}}/>
-              <div className="stat-label">Todas</div>
-              <div className="stat-num" style={{color:"var(--accent)"}}>{stats.todas}</div>
-            </div>
-            <div className={`stat-card ${statusFilter==='pendentes'?'active-filter':''}`} onClick={()=>toggleStatFilter('pendentes')}>
-              <div className="stat-dot" style={{background:"var(--yellow)"}}/>
-              <div className="stat-label">Pendentes</div>
-              <div className="stat-num" style={{color:"var(--yellow)"}}>{stats.pendentes}</div>
-            </div>
-            <div className={`stat-card ${statusFilter==='aguardando'?'active-filter':''}`} onClick={()=>toggleStatFilter('aguardando')}>
-              <div className="stat-dot" style={{background:"var(--blue)"}}/>
-              <div className="stat-label">Aguardando</div>
-              <div className="stat-num" style={{color:"var(--blue)"}}>{stats.aguardando}</div>
-            </div>
-            <div className={`stat-card ${statusFilter==='concluidas'?'active-filter':''}`} onClick={()=>toggleStatFilter('concluidas')}>
-              <div className="stat-dot" style={{background:"var(--green)"}}/>
-              <div className="stat-label">Concluídas</div>
-              <div className="stat-num" style={{color:"var(--green)"}}>{stats.concluidas}</div>
-            </div>
-          </div>
-          <div className="search-row">
-            <input className="search-input" placeholder="🔍 Buscar tarefas..." value={search} onChange={e=>setSearch(e.target.value)}/>
-            <select className="filter-select" value={sectorFilter} onChange={e=>setSectorFilter(e.target.value)}>
-              <option value="todos">Todos os setores</option>
-              {Object.entries(sectors).map(([k,v])=><option key={k} value={k}>{v.icon} {v.label}</option>)}
-            </select>
-            <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
-          </div>
-        </>
-      )}
-
-      {isProgramacao?(
-        <ProgrTab
-          tasks={allTasks} sectors={sectors} onSaveOrder={onSaveOrder}
-          onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-          onDelete={onDelete} onAddComment={onAddComment}
-          onDueDateChange={onDueDateChange} onEditTask={onEditTask} onNewTask={onNewTask}
-        />
-      ):geralTab==="calendario"&&!statusFilter?(
-        <CalendarWidget
-          tasks={calendarTasks} sectors={sectors}
-          month={calMonth} year={calYear} setMonth={setCalMonth} setYear={setCalYear}
-          hoveredDay={hoveredDay} setHoveredDay={setHoveredDay}
-          onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-          onDelete={onDelete} onAddComment={onAddComment}
-          onDueDateChange={onDueDateChange} onEdit={onEditTask}
-        />
-      ):geralTab==="urgente"&&!statusFilter?(
-        <>
-          {urgentTasks.length>0&&(
-            <>
-              <div className="section-divider">🔴 Urgentes ({urgentTasks.length})</div>
-              <div className="task-list">
-                {urgentTasks.map(t=>(
-                  <TaskCard key={t.id} task={t} sectors={sectors}
-                    onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-                    onDelete={onDelete} onAddComment={onAddComment}
-                    onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
-                ))}
-              </div>
-            </>
-          )}
-          {otherTasks.length>0&&(
-            <>
-              <div className="section-divider">Demais tarefas ({otherTasks.length})</div>
-              <div className="task-list">
-                {otherTasks.map(t=>(
-                  <TaskCard key={t.id} task={t} sectors={sectors}
-                    onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-                    onDelete={onDelete} onAddComment={onAddComment}
-                    onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
-                ))}
-              </div>
-            </>
-          )}
-          {urgentTasks.length===0&&otherTasks.length===0&&(
-            <div className="empty-state"><div className="empty-icon">🎉</div><p>Nenhuma tarefa encontrada</p></div>
-          )}
-        </>
-      ):(
-        <div className="task-list">
-          {(finalTasks||tasks).length>0?(finalTasks||tasks).map(t=>(
-            <TaskCard key={t.id} task={t} sectors={sectors}
-              onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-              onDelete={onDelete} onAddComment={onAddComment}
-              onDueDateChange={onDueDateChange} onEdit={onEditTask}
-              isCompleted={t.status==='concluido'}/>
-          )):(
-            <div className="empty-state"><div className="empty-icon">📭</div><p>Nenhuma tarefa encontrada</p></div>
-          )}
-        </div>
-      )}
-    </>
-  );
-}
-
-// ─── SECTOR VIEW ───────────────────────────────
-function SectorView({sector,sectorInfo,tasks,search,setSearch,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onNewTask,onEditTask,sectors}){
-  if(!sectorInfo)return <div className="empty-state"><p>Setor não encontrado</p></div>;
-  return (
-    <>
-      <div className="page-header">
-        <h2 className="page-title">{sectorInfo.icon} {sectorInfo.label}</h2>
-        <div className="page-subtitle">{tasks.length} tarefas ativas</div>
-      </div>
-      <div className="search-row">
-        <input className="search-input" placeholder="🔍 Buscar neste setor..." value={search} onChange={e=>setSearch(e.target.value)}/>
-        <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
-      </div>
-      <div className="task-list">
-        {tasks.length>0?tasks.map(t=>(
-          <TaskCard key={t.id} task={t} sectors={sectors}
-            onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-            onDelete={onDelete} onAddComment={onAddComment}
-            onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
-        )):(
-          <div className="empty-state"><div className="empty-icon">✨</div><p>Nenhuma tarefa neste setor</p></div>
-        )}
-      </div>
-    </>
-  );
-}
-
-// ─── CONCLUIDOS VIEW — FIX: usa TaskCard com status picker bidirecional ──
-function ConcluView({tasks,sectors,onRestore,onDelete,onStatusChange,onEditTask,search,setSearch}){
-  const filtered=search.trim()?tasks.filter(t=>t.title.toLowerCase().includes(search.toLowerCase())):tasks;
-  return (
-    <>
-      <div className="page-header">
-        <h2 className="page-title">✅ Tarefas Concluídas</h2>
-        <div className="page-subtitle">{tasks.length} concluídas · clique no status para reativar</div>
-      </div>
-      <div className="search-row">
-        <input className="search-input" placeholder="🔍 Buscar concluídas..." value={search} onChange={e=>setSearch(e.target.value)}/>
-      </div>
-      <div className="task-list">
-        {filtered.map(t=>(
-          <div key={t.id} style={{position:'relative'}}>
-            <TaskCard task={t} sectors={sectors}
-              onStatusChange={onStatusChange}
-              onPriorityChange={()=>{}}
-              onDelete={()=>{}}
-              onAddComment={()=>{}}
-              onDueDateChange={()=>{}}
-              onEdit={onEditTask||(() =>{})}
-              showRestoreActions
-              onRestore={onRestore}
-              onPermDelete={onDelete}
-            />
-          </div>
-        ))}
-        {filtered.length===0&&<div className="empty-state"><div className="empty-icon">📭</div><p>Nenhuma tarefa concluída</p></div>}
-      </div>
-    </>
-  );
-}
-
-// ─── TRASH VIEW ────────────────────────────────
-function TrashView({tasks,sectors,onRestore,onDelete,search,setSearch}){
-  const filtered=search.trim()?tasks.filter(t=>t.title.toLowerCase().includes(search.toLowerCase())):tasks;
-  return (
-    <>
-      <div className="page-header">
-        <h2 className="page-title">🗑 Lixeira</h2>
-        <div className="page-subtitle">{tasks.length} itens na lixeira</div>
-      </div>
-      <div className="search-row">
-        <input className="search-input" placeholder="🔍 Buscar na lixeira..." value={search} onChange={e=>setSearch(e.target.value)}/>
-      </div>
-      <div className="task-list">
-        {filtered.map(t=>(
-          <div key={t.id} className="task-card" style={{opacity:.7}}>
-            <div className="task-card-inner">
-              <div className="task-priority-bar" style={{background:"var(--muted)",opacity:.3}}/>
-              <div className="task-body">
-                <div className="task-title" style={{textDecoration:'line-through',cursor:'default'}}>{t.title}</div>
-                <div className="task-meta">
-                  <span className="sector-tag">{(sectors[t.sector]||{}).icon} {(sectors[t.sector]||{}).label||t.sector}</span>
-                </div>
-              </div>
-              <div className="task-actions">
-                <button title="Restaurar" onClick={()=>onRestore(t.id)}>↩️ Restaurar</button>
-                <button title="Excluir permanente" onClick={()=>{if(confirm('Excluir permanentemente?'))onDelete(t.id);}} style={{color:"var(--red)"}}>❌</button>
-              </div>
-            </div>
-          </div>
-        ))}
-        {filtered.length===0&&<div className="empty-state"><div className="empty-icon">🗑</div><p>Lixeira vazia</p></div>}
-      </div>
-    </>
-  );
-}
-
-// ─── CALENDAR WIDGET ───────────────────────────
-function CalendarWidget({tasks,sectors,month,year,setMonth,setYear,hoveredDay,setHoveredDay,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onEdit}){
-  const [selectedDay,setSelectedDay]=useState(null);
-  const firstDay=new Date(year,month,1).getDay();
-  const daysInMonth=new Date(year,month+1,0).getDate();
-  const prevDays=new Date(year,month,0).getDate();
-  const today=new Date();
-
-  useEffect(()=>{setSelectedDay(null);},[month,year]);
-
-  const tasksByDay={};
-  tasks.forEach(t=>{
-    if(!t.due_date)return;
-    const d=new Date(t.due_date);
-    if(d.getMonth()===month&&d.getFullYear()===year){
-      const day=d.getDate();
-      if(!tasksByDay[day])tasksByDay[day]=[];
-      tasksByDay[day].push(t);
-    }
+// ─── GROUPING ───
+function groupTasks(list,groupBy,sectors){
+  if(groupBy==='none')return[{key:'all',label:null,tasks:list}];
+  const map={};
+  list.forEach(t=>{
+    let g;
+    if(groupBy==='sector'){const s=sectors[t.sector]||{label:t.sector,icon:'📌'};g={key:t.sector,label:`${s.icon} ${s.label}`,order:0};}
+    else if(groupBy==='prazo')g=dueBucket(t.due_date);
+    else g=priBucket(t.priority);
+    if(!map[g.key])map[g.key]={key:g.key,label:g.label,order:g.order||0,tasks:[]};
+    map[g.key].tasks.push(t);
   });
+  return Object.values(map).sort((a,b)=>(a.order-b.order)||String(a.label).localeCompare(String(b.label)));
+}
 
-  function prevMonth(){if(month===0){setMonth(11);setYear(year-1);}else setMonth(month-1);}
-  function nextMonth(){if(month===11){setMonth(0);setYear(year+1);}else setMonth(month+1);}
-
-  const cells=[];
-  for(let i=firstDay-1;i>=0;i--)cells.push({day:prevDays-i,isOther:true});
-  for(let d=1;d<=daysInMonth;d++)cells.push({day:d,isOther:false,isToday:d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear()});
-  const remaining=42-cells.length;
-  for(let d=1;d<=remaining;d++)cells.push({day:d,isOther:true});
-
-  const selectedDayTasks=selectedDay?(tasksByDay[selectedDay]||[]):[];
-
+// ─── GERAL VIEW ───
+function GeralView(p){
+  const {pool,nonDone,done,stats,search,setSearch,sectorFilter,setSectorFilter,statFilter,setStatFilter,
+    tab,setTab,groupBy,setGroupBy,reorder,setReorder,selecting,setSelecting,quick,setQuick,onQuickAdd,onSaveOrder,onNewTask,
+    calMonth,setCalMonth,calYear,setCalYear,hoverDay,setHoverDay,taskProps}=p;
+  const sectors=taskProps.sectors;
+  const calendarTasks=useMemo(()=>nonDone.filter(t=>t.due_date),[nonDone]);
+  const sorted=useMemo(()=>[...pool].sort((a,b)=>a.priority-b.priority),[pool]);
+  const showList=tab==='todas'||statFilter;
+  function clickStat(k){setStatFilter(prev=>prev===k?null:k);setTab('todas');}
   return (
-    <div>
-      <div className="calendar-wrap">
-        <div className="calendar-header">
-          <div className="calendar-nav"><button onClick={prevMonth}>◀</button></div>
-          <h3>{MONTHS_PT[month]} {year}</h3>
-          <div className="calendar-nav"><button onClick={nextMonth}>▶</button></div>
+    <>
+      <div className="page-head">
+        <div>
+          <h2 className="page-title font-display">Visão Geral</h2>
+          <div className="page-sub">{stats.todas} tarefas ativas · {stats.urgentes} urgentes</div>
         </div>
-        <div className="calendar-grid">
-          {DAYS_PT.map(d=><div key={d} className="calendar-day-label">{d}</div>)}
-          {cells.map((cell,i)=>{
-            const dayTasks=!cell.isOther?(tasksByDay[cell.day]||[]):[];
-            const hasTasks=dayTasks.length>0;
-            const isSelected=!cell.isOther&&selectedDay===cell.day;
-            return (
-              <div key={i}
-                className={`calendar-cell ${cell.isOther?'other-month':''} ${cell.isToday?'today':''} ${hasTasks?'has-tasks':''} ${isSelected?'selected-day':''}`}
-                onMouseEnter={()=>hasTasks&&setHoveredDay(`${year}-${month}-${cell.day}`)}
-                onMouseLeave={()=>setHoveredDay(null)}
-                onClick={()=>!cell.isOther&&hasTasks&&setSelectedDay(isSelected?null:cell.day)}
-              >
-                <span>{cell.day}</span>
-                {hasTasks&&(
-                  <div className="calendar-dots">
-                    {dayTasks.slice(0,4).map((t,j)=>(
-                      <div key={j} className="calendar-dot" style={{background:priorityColor(t.priority)}}/>
-                    ))}
-                  </div>
-                )}
-                {hoveredDay===`${year}-${month}-${cell.day}`&&hasTasks&&!isSelected&&(
-                  <div className="calendar-cell-tooltip">
-                    {dayTasks.map((t,j)=>(
-                      <div key={j} style={{marginBottom:j<dayTasks.length-1?4:0}}>
-                        <span style={{color:priorityColor(t.priority),fontWeight:700}}>●</span> {t.title.substring(0,50)}{t.title.length>50?'...':''}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        {tasks.length===0&&(
-          <div className="empty-state" style={{padding:'20px 0'}}>
-            <div className="empty-icon">📅</div>
-            <p>Nenhuma tarefa com data definida</p>
-          </div>
-        )}
       </div>
-      {selectedDay&&(
-        <div style={{marginTop:16}}>
-          <div className="section-divider">
-            📅 {selectedDay} de {MONTHS_PT[month]}
-            <span style={{fontSize:11,opacity:.7,marginLeft:6,fontWeight:400,textTransform:'none'}}>
-              ({selectedDayTasks.length} {selectedDayTasks.length===1?'tarefa':'tarefas'})
-            </span>
+      <QuickAdd value={quick} setValue={setQuick} onAdd={onQuickAdd}/>
+      <div className="tabs">
+        <button className={`tab ${tab==='todas'&&!statFilter?'active':''}`} onClick={()=>{setTab('todas');setStatFilter(null);}}>📋 Todas</button>
+        <button className={`tab ${tab==='urgente'&&!statFilter?'active':''}`} onClick={()=>{setTab('urgente');setStatFilter(null);}}>🔥 Urgente</button>
+        <button className={`tab ${tab==='calendario'&&!statFilter?'active':''}`} onClick={()=>{setTab('calendario');setStatFilter(null);}}>📅 Calendário</button>
+      </div>
+      <div className="stat-row">
+        {[['todas','Todas',stats.todas,'var(--accent)'],['pendentes','Pendentes',stats.pendentes,'var(--yellow)'],['aguardando','Aguardando',stats.aguardando,'var(--blue)'],['concluidas','Concluídas',stats.concluidas,'var(--green)']].map(([k,l,n,c])=>(
+          <div key={k} className={`stat-card ${statFilter===k?'on':''}`} onClick={()=>clickStat(k)}>
+            <div className="sdot" style={{background:c}}/><div className="lbl">{l}</div>
+            <div className="num" style={{color:c}}>{n}</div>
           </div>
-          <div className="task-list">
-            {selectedDayTasks.map(t=>(
-              <TaskCard key={t.id} task={t} sectors={sectors}
-                onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-                onDelete={onDelete} onAddComment={onAddComment}
-                onDueDateChange={onDueDateChange} onEdit={onEdit}/>
-            ))}
-          </div>
-        </div>
+        ))}
+      </div>
+      <ControlRow search={search} setSearch={setSearch} sectorFilter={sectorFilter} setSectorFilter={setSectorFilter}
+        sectors={sectors} groupBy={groupBy} setGroupBy={setGroupBy} reorder={reorder} setReorder={setReorder}
+        selecting={selecting} setSelecting={setSelecting}
+        onNewTask={onNewTask} showReorder={tab==='todas'&&!statFilter&&groupBy==='none'}/>
+      {tab==='calendario'&&!statFilter?(
+        <CalendarWidget tasks={calendarTasks} month={calMonth} year={calYear} setMonth={setCalMonth} setYear={setCalYear}
+          hoverDay={hoverDay} setHoverDay={setHoverDay} taskProps={taskProps}/>
+      ):reorder&&showList?(
+        <ReorderList tasks={sorted} onSaveOrder={onSaveOrder} taskProps={taskProps}/>
+      ):tab==='urgente'&&!statFilter?(
+        <UrgentList list={sorted} taskProps={taskProps}/>
+      ):(
+        <GroupedList list={statFilter==='concluidas'?[...done]:sorted} groupBy={groupBy} taskProps={taskProps}/>
       )}
+    </>
+  );
+}
+
+function QuickAdd({value,setValue,onAdd}){
+  return (
+    <div className="quick-add">
+      <span className="plus">+</span>
+      <input placeholder="Adicionar tarefa rápida…  (#setor  !prioridade)" value={value}
+        onChange={e=>setValue(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')onAdd();}}/>
+      <span className="qa-hint">Enter</span>
+      <button className="qa-go" disabled={!value.trim()} onClick={onAdd}>Adicionar</button>
     </div>
   );
 }
 
-// ─── TASK CARD ─────────────────────────────────
-function TaskCard({task,sectors,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onEdit,isCompleted,dragSlot,wrapperClassName,dragEvents,showRestoreActions,onRestore,onPermDelete}){
-  const [openComment,setOpenComment]=useState(false);
+function ControlRow({search,setSearch,sectorFilter,setSectorFilter,sectors,groupBy,setGroupBy,reorder,setReorder,selecting,setSelecting,onNewTask,showReorder,hideSectorFilter}){
+  return (
+    <div className="ctl-row">
+      <div className="search-wrap">
+        <span className="si">🔍</span>
+        <input className="search-input" placeholder="Buscar…" value={search} onChange={e=>setSearch(e.target.value)}/>
+      </div>
+      {!hideSectorFilter&&(
+        <select className="sel" value={sectorFilter} onChange={e=>setSectorFilter(e.target.value)}>
+          <option value="todos">Todos os setores</option>
+          {Object.entries(sectors).map(([k,v])=><option key={k} value={k}>{v.icon} {v.label}</option>)}
+        </select>
+      )}
+      <div className="group-seg" title="Agrupar por">
+        {[['none','—'],['sector','Setor'],['prazo','Prazo'],['prioridade','Prioridade']].map(([k,l])=>(
+          <button key={k} className={groupBy===k?'on':''} onClick={()=>{setGroupBy(k);if(k!=='none'&&setReorder)setReorder(false);}}>{l}</button>
+        ))}
+      </div>
+      {showReorder&&<button className={`iconbtn ${reorder?'on':''}`} onClick={()=>setReorder(r=>!r)}>↕ Reordenar</button>}
+      <button className={`iconbtn ${selecting?'on':''}`} onClick={()=>setSelecting(s=>!s)}>☑ Selecionar</button>
+      <button className="iconbtn" style={{background:'var(--accent)',color:'#fff',borderColor:'var(--accent)'}} onClick={onNewTask}>+ Nova</button>
+    </div>
+  );
+}
+
+function GroupedList({list,groupBy,taskProps}){
+  const sectors=taskProps.sectors;
+  const groups=useMemo(()=>groupTasks(list,groupBy,sectors),[list,groupBy,sectors]);
+  if(!list.length)return <div className="empty"><div className="ei">📭</div><p>Nenhuma tarefa encontrada</p></div>;
+  return (
+    <>
+      {groups.map(g=>(
+        <div key={g.key}>
+          {g.label&&<div className="group-head">{g.label}<span className="g-count">{g.tasks.length}</span></div>}
+          <div className="task-list">
+            {g.tasks.map(t=><TaskCard key={t.id} task={t} {...taskProps} isCompleted={t.status==='concluido'}/>)}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function UrgentList({list,taskProps}){
+  const urg=list.filter(t=>t.priority<=2),oth=list.filter(t=>t.priority>2);
+  if(!list.length)return <div className="empty"><div className="ei">🎉</div><p>Nenhuma tarefa</p></div>;
+  return (
+    <>
+      {urg.length>0&&(<><div className="group-head">🔴 Urgentes<span className="g-count">{urg.length}</span></div>
+        <div className="task-list">{urg.map(t=><TaskCard key={t.id} task={t} {...taskProps}/>)}</div></>)}
+      {oth.length>0&&(<><div className="group-head">Demais por prioridade<span className="g-count">{oth.length}</span></div>
+        <div className="task-list">{oth.map(t=><TaskCard key={t.id} task={t} {...taskProps}/>)}</div></>)}
+    </>
+  );
+}
+
+// ─── REORDER LIST ───
+function ReorderList({tasks,onSaveOrder,taskProps}){
+  const [items,setItems]=useState(tasks);
+  const [dragId,setDragId]=useState(null);
+  const [overId,setOverId]=useState(null);
+  useEffect(()=>{setItems(tasks);},[tasks]);
+  function onDrop(){
+    if(dragId&&overId&&dragId!==overId){
+      const arr=[...items];const from=arr.findIndex(t=>t.id===dragId);const to=arr.findIndex(t=>t.id===overId);
+      const [m]=arr.splice(from,1);arr.splice(to,0,m);setItems(arr);onSaveOrder(arr);
+    }
+    setDragId(null);setOverId(null);
+  }
+  return (
+    <>
+      <div className="reorder-hint">↕ Arraste os cards para reordenar. A ordem manual é salva.</div>
+      <div className="task-list">
+        {items.map((t,i)=>(
+          <div key={t.id} draggable
+            onDragStart={()=>setDragId(t.id)} onDragEnd={onDrop}
+            onDragOver={e=>{e.preventDefault();setOverId(t.id);}}
+            className={`${dragId===t.id?'dragging':''} ${overId===t.id&&dragId!==t.id?'dragover':''}`}
+            style={{borderRadius:15}}>
+            <TaskCard task={t} {...taskProps} reorderMode ordNum={i+1}/>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ─── SECTOR VIEW ───
+function SectorView({sector,info,pool,search,setSearch,groupBy,setGroupBy,reorder,setReorder,selecting,setSelecting,onSaveOrder,quick,setQuick,onQuickAdd,onNewTask,taskProps}){
+  if(!info)return <div className="empty"><p>Setor não encontrado</p></div>;
+  const sorted=useMemo(()=>[...pool].sort((a,b)=>a.priority-b.priority),[pool]);
+  return (
+    <>
+      <div className="page-head">
+        <div><h2 className="page-title font-display">{info.icon} {info.label}</h2>
+          <div className="page-sub">{pool.length} tarefas ativas</div></div>
+      </div>
+      <QuickAdd value={quick} setValue={setQuick} onAdd={onQuickAdd}/>
+      <ControlRow search={search} setSearch={setSearch} sectors={taskProps.sectors} groupBy={groupBy} setGroupBy={setGroupBy}
+        reorder={reorder} setReorder={setReorder} selecting={selecting} setSelecting={setSelecting}
+        onNewTask={onNewTask} showReorder={groupBy==='none'} hideSectorFilter/>
+      {reorder&&groupBy==='none'?(
+        <ReorderList tasks={sorted} onSaveOrder={onSaveOrder} taskProps={taskProps}/>
+      ):(
+        <GroupedList list={sorted} groupBy={groupBy} taskProps={taskProps}/>
+      )}
+    </>
+  );
+}
+
+// ─── ARCHIVE ───
+function ArchiveView({title,tasks,sectors,search,setSearch,onRestore,onPermDelete,trash}){
+  const filtered=search.trim()?tasks.filter(t=>t.title.toLowerCase().includes(search.toLowerCase())):tasks;
+  return (
+    <>
+      <div className="page-head"><div><h2 className="page-title font-display">{title}</h2>
+        <div className="page-sub">{tasks.length} {trash?'itens':'tarefas'}</div></div></div>
+      <div className="ctl-row"><div className="search-wrap"><span className="si">🔍</span>
+        <input className="search-input" placeholder="Buscar…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div>
+      <div className="task-list">
+        {filtered.length?filtered.map(t=>{
+          const si=sectors[t.sector]||{icon:'📌',label:t.sector};
+          return (
+            <div key={t.id} className="task-card" style={{cursor:'default',opacity:trash?0.7:0.85}}>
+              <div className="tc-inner">
+                <div className="pbar" style={{background:trash?'var(--muted)':priorityColor(t.priority),opacity:trash?.3:.4}}/>
+                <div className="tc-body">
+                  <div className="tc-title done">{t.title}</div>
+                  <div className="tc-meta"><span className="sector-tag">{si.icon} {si.label}</span>
+                    {!trash&&<span className="badge badge-soft">Prioridade {t.priority}</span>}</div>
+                </div>
+                <div className="tc-actions">
+                  <button className="act" title="Restaurar" onClick={()=>onRestore(t.id)}>↩️</button>
+                  <button className="act del" title="Excluir permanente" onClick={()=>{if(confirm('Excluir permanentemente?'))onPermDelete(t.id);}}>🗑</button>
+                </div>
+              </div>
+            </div>
+          );
+        }):<div className="empty"><div className="ei">{trash?'🗑':'📭'}</div><p>{trash?'Lixeira vazia':'Nenhuma tarefa concluída'}</p></div>}
+      </div>
+    </>
+  );
+}
+
+// ─── TASK CARD ───
+function TaskCard({task,sectors,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onSubtasks,onEdit,isCompleted,selected,onToggleSel,selMode,reorderMode,ordNum}){
+  const [expand,setExpand]=useState(false);
   const [commentText,setCommentText]=useState("");
-  const [showPicker,setShowPicker]=useState(false);
-  const [showStatusPicker,setShowStatusPicker]=useState(false);
-  const [showDatePicker,setShowDatePicker]=useState(false);
+  const [subText,setSubText]=useState("");
+  const [showPri,setShowPri]=useState(false);
+  const [showStatus,setShowStatus]=useState(false);
+  const [showDate,setShowDate]=useState(false);
   const [dateVal,setDateVal]=useState(task.due_date?task.due_date.substring(0,16):"");
-  const pickerRef=useRef(null);
-  const statusPickerRef=useRef(null);
-  const sectorInfo=sectors[task.sector]||{icon:"📌",label:task.sector,color:"#888"};
-  const commentCount=(task.comments||[]).length;
+  const priRef=useRef(null),statRef=useRef(null);
+  const si=sectors[task.sector]||{icon:"📌",label:task.sector,color:"#888"};
+  const prog=subProgress(task);
+  const isSel=selected&&selected.has(task.id);
 
-  function handleAddComment(){if(!commentText.trim())return;onAddComment(task.id,commentText.trim());setCommentText("");}
-  function handleDateSave(){onDueDateChange(task.id,dateVal||null);setShowDatePicker(false);}
+  useEffect(()=>{function h(e){if(priRef.current&&!priRef.current.contains(e.target))setShowPri(false);}if(showPri)document.addEventListener('mousedown',h);return()=>document.removeEventListener('mousedown',h);},[showPri]);
+  useEffect(()=>{function h(e){if(statRef.current&&!statRef.current.contains(e.target))setShowStatus(false);}if(showStatus)document.addEventListener('mousedown',h);return()=>document.removeEventListener('mousedown',h);},[showStatus]);
 
-  useEffect(()=>{
-    function h(e){if(pickerRef.current&&!pickerRef.current.contains(e.target))setShowPicker(false);}
-    if(showPicker)document.addEventListener('mousedown',h);
-    return()=>document.removeEventListener('mousedown',h);
-  },[showPicker]);
-
-  useEffect(()=>{
-    function h(e){if(statusPickerRef.current&&!statusPickerRef.current.contains(e.target))setShowStatusPicker(false);}
-    if(showStatusPicker)document.addEventListener('mousedown',h);
-    return()=>document.removeEventListener('mousedown',h);
-  },[showStatusPicker]);
-
-  const statusBg=task.status==='pendente'?'var(--yellow-bg)':task.status==='aguardando'?'var(--blue-bg)':'var(--green-bg)';
-  const statusColor=task.status==='pendente'?'var(--yellow)':task.status==='aguardando'?'var(--blue)':'var(--green)';
+  const stop=e=>e.stopPropagation();
+  function cardClick(){if(selMode&&onToggleSel){onToggleSel(task.id);}else if(onEdit){onEdit(task);}}
+  function toggleSub(id){const st=(task.subtasks||[]).map(s=>s.id===id?{...s,done:!s.done}:s);onSubtasks(task.id,st);}
+  function addSub(){if(!subText.trim())return;const st=[...(task.subtasks||[]),{id:Date.now()+'_'+Math.round(Math.random()*1e4),text:subText.trim(),done:false}];onSubtasks(task.id,st);setSubText("");}
+  function delSub(id){onSubtasks(task.id,(task.subtasks||[]).filter(s=>s.id!==id));}
+  function addCmt(){if(!commentText.trim())return;onAddComment(task.id,commentText.trim());setCommentText("");}
 
   return (
-    <div className={`task-card${wrapperClassName?' '+wrapperClassName:''}`} {...(dragEvents||{})}>
-      <div className="task-card-inner">
-        {dragSlot}
-        <div className="task-priority-bar" style={{background:priorityColor(task.priority)}}/>
-        <div className="task-body">
-          <div className="task-header">
-            <span className="task-title"
-              onClick={()=>onEdit&&onEdit(task)}
-              style={isCompleted?{textDecoration:'line-through',opacity:.7}:{}}>
-              {task.title}
-            </span>
-          </div>
-          <div className="task-meta">
-            {/* 1. Status badge clicável — bidirecional incluindo concluido→aguardando/pendente */}
-            <span style={{position:'relative'}} ref={statusPickerRef}>
-              <span className="badge"
-                style={{background:statusBg,color:statusColor,padding:'5px 12px',fontSize:'12.5px',cursor:'pointer'}}
-                onClick={()=>setShowStatusPicker(!showStatusPicker)}
-                title="Clique para alterar status">
-                {statusIcon(task.status)} {statusLabel(task.status)}
-              </span>
-              {showStatusPicker&&(
-                <div className="status-picker">
-                  <button onClick={()=>{onStatusChange(task.id,'pendente');setShowStatusPicker(false);}}>⏳ Pendente</button>
-                  <button onClick={()=>{onStatusChange(task.id,'aguardando');setShowStatusPicker(false);}}>⏸ Aguardando</button>
-                  <button onClick={()=>{onStatusChange(task.id,'concluido');setShowStatusPicker(false);}}>✅ Concluído</button>
-                </div>
-              )}
-            </span>
-
-            {/* 2. Prioridade clicável */}
-            <span style={{position:'relative'}} ref={pickerRef}>
-              <span className={`badge ${task.priority<=2?'badge-red':task.priority<=4?'badge-yellow':task.priority<=7?'badge-blue':'badge-green'}`}
-                onClick={()=>setShowPicker(!showPicker)} title="Clique para alterar prioridade">
-                {priorityLabel(task.priority)} · {task.priority}
-              </span>
-              {showPicker&&(
-                <div className="priority-picker">
-                  {[1,2,3,4,5,6,7,8,9,10].map(p=>(
-                    <button key={p} className={task.priority===p?'selected':''}
-                      style={{background:priorityBg(p),color:priorityColor(p)}}
-                      onClick={()=>{onPriorityChange(task.id,p);setShowPicker(false);}}>
-                      {p}
-                    </button>
+    <div className={`task-card ${isSel?'sel':''}`} onClick={cardClick}>
+      <div className="tc-inner">
+        {reorderMode&&<span className="drag-handle" onClick={stop}>⠿</span>}
+        {reorderMode&&<span className="ord-num">{ordNum}</span>}
+        {!reorderMode&&(selMode||isSel)&&(
+          <div className={`chk ${isSel?'on':''}`} onClick={e=>{stop(e);onToggleSel(task.id);}}>{isSel?'✓':''}</div>
+        )}
+        <div className="pbar" style={{background:priorityColor(task.priority)}}/>
+        <div className="tc-body">
+          <div className={`tc-title ${isCompleted?'done':''}`}>{task.title}</div>
+          <div className="tc-meta">
+            <span style={{position:'relative'}} ref={statRef}>
+              <span className={`badge ${task.status==='pendente'?'badge-yellow':task.status==='aguardando'?'badge-blue':'badge-green'}`}
+                onClick={e=>{stop(e);setShowStatus(v=>!v);}}>{statusIcon(task.status)} {statusLabel(task.status)}</span>
+              {showStatus&&(
+                <div className="status-pop" onClick={stop}>
+                  {['pendente','aguardando','concluido'].map(s=>(
+                    <button key={s} onClick={()=>{onStatusChange(task.id,s);setShowStatus(false);}}>{statusIcon(s)} {statusLabel(s)}</button>
                   ))}
                 </div>
               )}
             </span>
-
-            {/* 3. Data — clicável se existe; botão definir se não existe */}
-            {task.due_date?(
-              <span className={`task-date-tag ${isOverdue(task.due_date)&&task.status!=='concluido'?'overdue':''}`}
-                onClick={()=>setShowDatePicker(!showDatePicker)}>
-                📅 {fmtShort(task.due_date)}
-              </span>
-            ):(
-              <button style={{fontSize:11,color:"var(--muted)",background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"2px 8px",cursor:"pointer"}}
-                onClick={()=>setShowDatePicker(!showDatePicker)}>
-                📅 Definir data
-              </button>
-            )}
-
-            {/* 4. Comentários com badge de notificação */}
-            <span style={{position:'relative',display:'inline-flex'}}>
-              <button
-                style={{fontSize:12,color:"var(--accent)",background:"var(--accent-soft)",border:"none",borderRadius:8,padding:"4px 10px",cursor:"pointer",display:'flex',alignItems:'center',gap:4}}
-                onClick={()=>setOpenComment(!openComment)}
-                title="Comentários">
-                💬
-              </button>
-              {commentCount>0&&<span className="comment-badge-count">{commentCount}</span>}
+            <span style={{position:'relative'}} ref={priRef}>
+              <span className={`badge ${priorityBadge(task.priority)}`} onClick={e=>{stop(e);setShowPri(v=>!v);}}>{priorityLabel(task.priority)} · {task.priority}</span>
+              {showPri&&(
+                <div className="pri-pop" onClick={stop}>
+                  {[1,2,3,4,5,6,7,8,9,10].map(pp=>(
+                    <button key={pp} className={task.priority===pp?'on':''} style={{background:priorityBg(pp),color:priorityColor(pp)}}
+                      onClick={()=>{onPriorityChange(task.id,pp);setShowPri(false);}}>{pp}</button>
+                  ))}
+                </div>
+              )}
             </span>
-
-            {/* 5. Setor — menor, por último */}
-            <span className="sector-tag">{sectorInfo.icon} {sectorInfo.label}</span>
+            {task.due_date?(
+              <span className={`date-tag ${isOverdue(task.due_date)&&task.status!=='concluido'?'over':''}`} onClick={e=>{stop(e);setShowDate(v=>!v);}}>📅 {fmtShort(task.due_date)}</span>
+            ):(
+              <button className="mini-btn" onClick={e=>{stop(e);setShowDate(v=>!v);}}>📅 Data</button>
+            )}
+            <button className="mini-btn" onClick={e=>{stop(e);setExpand(v=>!v);}}>💬 {(task.comments||[]).length||''}{prog?` · ✔${prog.done}/${prog.total}`:''}</button>
+            <span className="sector-tag">{si.icon} {si.label}</span>
           </div>
 
-          {showDatePicker&&(
-            <div className="date-picker-inline">
+          {prog&&!expand&&(
+            <div className="prog"><div className="prog-bar"><div className="prog-fill" style={{width:prog.pct+'%'}}/></div><span className="prog-txt">{prog.pct}%</span></div>
+          )}
+
+          {showDate&&(
+            <div className="date-inline" onClick={stop}>
               <input type="datetime-local" value={dateVal} onChange={e=>setDateVal(e.target.value)}/>
-              <button style={{background:"var(--accent)",color:"#fff"}} onClick={handleDateSave}>Salvar</button>
-              <button style={{background:"var(--red-bg)",color:"var(--red)"}} onClick={()=>{setDateVal("");onDueDateChange(task.id,null);setShowDatePicker(false);}}>Remover</button>
-              <button style={{background:"var(--input-bg)",color:"var(--muted)"}} onClick={()=>setShowDatePicker(false)}>Cancelar</button>
+              <button style={{background:'var(--accent)',color:'#fff'}} onClick={()=>{onDueDateChange(task.id,dateVal||null);setShowDate(false);}}>Salvar</button>
+              <button style={{background:'var(--red-bg)',color:'var(--red)'}} onClick={()=>{setDateVal("");onDueDateChange(task.id,null);setShowDate(false);}}>Remover</button>
+              <button style={{background:'var(--input-bg)',color:'var(--muted)'}} onClick={()=>setShowDate(false)}>Cancelar</button>
             </div>
           )}
 
-          {openComment&&(
-            <div className="comments-area">
-              {(task.comments||[]).map((c,i)=>(
-                <div key={i} className="comment-item">
-                  <small>{fmt(c.date)}</small>{c.text}
+          {expand&&(
+            <div className="expand" onClick={stop}>
+              <div style={{fontSize:11,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:6}}>Subtarefas</div>
+              {(task.subtasks||[]).map(s=>(
+                <div key={s.id} className="sub-row">
+                  <div className={`sub-check ${s.done?'on':''}`} onClick={()=>toggleSub(s.id)}>{s.done?'✓':''}</div>
+                  <span className={`sub-text ${s.done?'done':''}`}>{s.text}</span>
+                  <button className="sub-del" onClick={()=>delSub(s.id)}>✕</button>
                 </div>
               ))}
-              <div className="comment-input-row">
-                <input className="comment-input" value={commentText}
-                  onChange={e=>setCommentText(e.target.value)}
-                  placeholder="Adicionar comentário..."
-                  onKeyDown={e=>e.key==='Enter'&&handleAddComment()}/>
-                <button className="comment-send" onClick={handleAddComment}>→</button>
+              <div className="row-input">
+                <input value={subText} onChange={e=>setSubText(e.target.value)} placeholder="+ subtarefa…" onKeyDown={e=>{if(e.key==='Enter')addSub();}}/>
+                <button onClick={addSub}>+</button>
+              </div>
+              <div style={{fontSize:11,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',margin:'14px 0 6px'}}>Comentários</div>
+              {(task.comments||[]).map((c,i)=>(<div key={i} className="comment"><small>{fmt(c.date)}</small>{c.text}</div>))}
+              <div className="row-input">
+                <input value={commentText} onChange={e=>setCommentText(e.target.value)} placeholder="Adicionar comentário…" onKeyDown={e=>{if(e.key==='Enter')addCmt();}}/>
+                <button onClick={addCmt}>→</button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Ações: restore (Concluídos) ou editar/excluir (normal) */}
-        {showRestoreActions?(
-          <div className="task-actions">
-            <button title="Restaurar para Pendente" onClick={()=>onRestore&&onRestore(task.id)}
-              style={{color:"var(--accent)",borderColor:"var(--accent)"}}>↩️</button>
-            <button title="Excluir permanente" onClick={()=>onPermDelete&&onPermDelete(task.id)} style={{color:"var(--red)"}}>🗑</button>
-          </div>
-        ):(
-          <div className="task-actions">
-            <button title="Editar" onClick={()=>onEdit&&onEdit(task)}>✏️</button>
-            <button title="Excluir" onClick={()=>onDelete(task.id)} style={{color:"var(--red)"}}>🗑</button>
+        {!reorderMode&&(
+          <div className="tc-actions" onClick={stop}>
+            <button className="act" title="Editar" onClick={()=>onEdit(task)}>✏️</button>
+            <button className="act del" title="Excluir" onClick={()=>onDelete(task.id)}>🗑</button>
           </div>
         )}
       </div>
@@ -1020,263 +891,117 @@ function TaskCard({task,sectors,onStatusChange,onPriorityChange,onDelete,onAddCo
   );
 }
 
-// ─── DRAGGABLE TASK CARD ───────────────────────
-function DraggableTaskCard({task,draggingId,position,handlers,...taskProps}){
-  const dragSlot=(
-    <div className="drag-handle" title={`#${position} — arrastar`}
-      onTouchStart={e=>handlers.onTouchStart(e,task.id)}
-      onTouchEnd={handlers.onTouchEnd}>
-      <span className="drag-dots">⠿</span>
-      <span className="minha-ordem-pos">#{position}</span>
-    </div>
-  );
-  const dragEvents={
-    'data-task-id':task.id,draggable:true,
-    onDragStart:e=>handlers.onDragStart(e,task.id),
-    onDragEnter:e=>handlers.onDragEnter(e,task.id),
-    onDragOver:handlers.onDragOver,
-    onDrop:handlers.onDrop,
-    onDragEnd:handlers.onDragEnd,
-  };
+// ─── BULK BAR ───
+function BulkBar({count,sectors,onClear,onStatus,onPriority,onSector,onDelete}){
   return (
-    <TaskCard task={task} {...taskProps}
-      dragSlot={dragSlot}
-      wrapperClassName={`minha-ordem-card${draggingId===task.id?' is-dragging':''}`}
-      dragEvents={dragEvents}/>
+    <div className="bulk-bar">
+      <span className="bulk-count">{count} selecionada{count>1?'s':''}</span>
+      <select className="bulk-sel" defaultValue="" onChange={e=>{if(e.target.value){onStatus(e.target.value);e.target.value="";}}}>
+        <option value="" disabled>Status…</option>
+        <option value="pendente">⏳ Pendente</option><option value="aguardando">⏸ Aguardando</option><option value="concluido">✅ Concluído</option>
+      </select>
+      <select className="bulk-sel" defaultValue="" onChange={e=>{if(e.target.value){onPriority(parseInt(e.target.value));e.target.value="";}}}>
+        <option value="" disabled>Prioridade…</option>
+        {[1,2,3,4,5,6,7,8,9,10].map(pp=><option key={pp} value={pp}>{pp} · {priorityLabel(pp)}</option>)}
+      </select>
+      <select className="bulk-sel" defaultValue="" onChange={e=>{if(e.target.value){onSector(e.target.value);e.target.value="";}}}>
+        <option value="" disabled>Setor…</option>
+        {Object.entries(sectors).map(([k,v])=><option key={k} value={k}>{v.icon} {v.label}</option>)}
+      </select>
+      <button className="bb del" onClick={()=>{if(confirm(`Excluir ${count} tarefa(s)?`))onDelete();}}>🗑 Excluir</button>
+      <button className="bb x" onClick={onClear}>✕</button>
+    </div>
   );
 }
 
-// ─── PROGR TAB ─────────────────────────────────
-function ProgrTab({tasks,sectors,onSaveOrder,onStatusChange,onPriorityChange,onDelete,onAddComment,onDueDateChange,onEditTask,onNewTask}){
-  const [fullList,setFullList]=useState([]);
-  const [filter,setFilter]=useState('todas');
-  const [search,setSearch]=useState('');
-  const [draggingId,setDraggingId]=useState(null);
-  const [prioDlg,setPrioDlg]=useState(null);
-
-  const fullListRef=useRef([]);
-  const prevListRef=useRef([]);
-  const draggingIdRef=useRef(null);
-  const dropSucceededRef=useRef(false);
-  const lastEnterRef=useRef(null);
-  const saveTimerRef=useRef(null);
-  const listRef=useRef(null);
-  const filterRef=useRef('todas');
-  const searchRef=useRef('');
-
-  useEffect(()=>{filterRef.current=filter;},[filter]);
-  useEffect(()=>{searchRef.current=search;},[search]);
-  useEffect(()=>{fullListRef.current=fullList;},[fullList]);
-
-  useEffect(()=>{
-    if(draggingIdRef.current)return;
-    const sorted=[...tasks].sort((a,b)=>{
-      if(a.manual_order==null&&b.manual_order==null)return a.priority-b.priority;
-      if(a.manual_order==null)return 1;if(b.manual_order==null)return -1;
-      return a.manual_order-b.manual_order;
-    });
-    setFullList(sorted);fullListRef.current=sorted;
-  },[tasks]);
-
-  function applyFilters(list,f,s){
-    let pool=list;
-    if(f==='urgentes')pool=pool.filter(t=>t.priority<=2);
-    else if(f==='pendentes')pool=pool.filter(t=>t.status==='pendente');
-    else if(f==='aguardando')pool=pool.filter(t=>t.status==='aguardando');
-    if(s&&s.trim()){const q=s.toLowerCase();pool=pool.filter(t=>t.title.toLowerCase().includes(q));}
-    return pool;
-  }
-
-  const displayList=useMemo(()=>applyFilters(fullList,filter,search),[fullList,filter,search]);
-  const tabStats=useMemo(()=>({
-    urgentes:fullList.filter(t=>t.priority<=2).length,
-    pendentes:fullList.filter(t=>t.status==='pendente').length,
-    aguardando:fullList.filter(t=>t.status==='aguardando').length,
-  }),[fullList]);
-
-  function reorderById(fromId,toId){
-    setFullList(prev=>{
-      const currentDisplay=applyFilters(prev,filterRef.current,searchRef.current);
-      const fromIdx=currentDisplay.findIndex(t=>t.id===fromId);
-      const toIdx=currentDisplay.findIndex(t=>t.id===toId);
-      if(fromIdx===-1||toIdx===-1||fromIdx===toIdx)return prev;
-      const newDisplay=[...currentDisplay];
-      const [moved]=newDisplay.splice(fromIdx,1);newDisplay.splice(toIdx,0,moved);
-      const filteredIds=new Set(currentDisplay.map(t=>t.id));
-      const slots=[];prev.forEach((t,idx)=>{if(filteredIds.has(t.id))slots.push(idx);});
-      const result=[...prev];slots.forEach((slotIdx,i)=>{result[slotIdx]=newDisplay[i];});
-      return result;
-    });
-  }
-
-  function scheduleSave(){
-    if(saveTimerRef.current)clearTimeout(saveTimerRef.current);
-    saveTimerRef.current=setTimeout(()=>{onSaveOrder(fullListRef.current);},500);
-  }
-
-  function getSuggestedPriority(taskId,orderedList){
-    const displayed=applyFilters(orderedList,filterRef.current,searchRef.current);
-    const idx=displayed.findIndex(t=>t.id===taskId);
-    if(idx===-1)return null;
-    const task=displayed[idx];const prev=displayed[idx-1];const next=displayed[idx+1];
-    let suggested;
-    if(prev&&next)suggested=Math.round((prev.priority+next.priority)/2);
-    else if(prev)suggested=Math.min(10,prev.priority+1);
-    else if(next)suggested=Math.max(1,next.priority-1);
-    else return null;
-    suggested=Math.max(1,Math.min(10,suggested));
-    function band(p){return p<=2?0:p<=4?1:p<=7?2:3;}
-    if(band(suggested)!==band(task.priority))return{task,suggested};
-    return null;
-  }
-
-  function handleDragStart(e,id){prevListRef.current=[...fullListRef.current];dropSucceededRef.current=false;lastEnterRef.current=null;draggingIdRef.current=id;setDraggingId(id);e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(id));}
-  function handleDragEnter(e,id){if(lastEnterRef.current===id)return;lastEnterRef.current=id;const fromId=draggingIdRef.current;if(fromId&&id!==fromId)reorderById(fromId,id);}
-  function handleDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
-  function handleDrop(e){
-    e.preventDefault();dropSucceededRef.current=true;
-    const fromId=draggingIdRef.current;const currentList=[...fullListRef.current];
-    const dlg=getSuggestedPriority(fromId,currentList);
-    if(dlg)setPrioDlg({...dlg,pendingList:currentList});else scheduleSave();
-  }
-  function handleDragEnd(){
-    if(!dropSucceededRef.current){if(saveTimerRef.current)clearTimeout(saveTimerRef.current);setFullList(prevListRef.current);fullListRef.current=prevListRef.current;}
-    setDraggingId(null);draggingIdRef.current=null;dropSucceededRef.current=false;lastEnterRef.current=null;
-  }
-  function handleTouchStart(e,id){prevListRef.current=[...fullListRef.current];draggingIdRef.current=id;setDraggingId(id);}
-  function handleTouchEnd(){
-    if(draggingIdRef.current){const fromId=draggingIdRef.current;const currentList=[...fullListRef.current];const dlg=getSuggestedPriority(fromId,currentList);if(dlg)setPrioDlg({...dlg,pendingList:currentList});else scheduleSave();}
-    setDraggingId(null);draggingIdRef.current=null;lastEnterRef.current=null;
-  }
-
-  const dragHandlers={onDragStart:handleDragStart,onDragEnter:handleDragEnter,onDragOver:handleDragOver,onDrop:handleDrop,onDragEnd:handleDragEnd,onTouchStart:handleTouchStart,onTouchEnd:handleTouchEnd};
-
-  useEffect(()=>{
-    const el=listRef.current;if(!el)return;
-    function onTouchMove(e){
-      if(!draggingIdRef.current)return;e.preventDefault();
-      const touch=e.touches[0];
-      const target=document.elementFromPoint(touch.clientX,touch.clientY);
-      const card=target&&target.closest('[data-task-id]');
-      if(card){
-        const targetId=Number(card.dataset.taskId);const fromId=draggingIdRef.current;
-        if(fromId&&targetId&&targetId!==fromId&&lastEnterRef.current!==targetId){
-          lastEnterRef.current=targetId;
-          const list=[...fullListRef.current];
-          const fi=list.findIndex(t=>t.id===fromId);const ti=list.findIndex(t=>t.id===targetId);
-          if(fi!==-1&&ti!==-1){const [item]=list.splice(fi,1);list.splice(ti,0,item);fullListRef.current=list;setFullList(list);}
-        }
-      }
-    }
-    el.addEventListener('touchmove',onTouchMove,{passive:false});
-    return()=>el.removeEventListener('touchmove',onTouchMove);
-  },[]);
-
-  function confirmPrioUpdate(){const{task,suggested,pendingList}=prioDlg;setPrioDlg(null);onPriorityChange(task.id,suggested);onSaveOrder(pendingList);}
-  function declinePrioUpdate(){const{pendingList}=prioDlg;setPrioDlg(null);onSaveOrder(pendingList);}
-
+// ─── CALENDAR ───
+function CalendarWidget({tasks,month,year,setMonth,setYear,hoverDay,setHoverDay,taskProps}){
+  const firstDay=new Date(year,month,1).getDay();
+  const daysIn=new Date(year,month+1,0).getDate();
+  const prevDays=new Date(year,month,0).getDate();
+  const today=new Date();
+  const byDay={};
+  tasks.forEach(t=>{if(!t.due_date)return;const d=new Date(t.due_date);if(d.getMonth()===month&&d.getFullYear()===year){const day=d.getDate();(byDay[day]=byDay[day]||[]).push(t);}});
+  const cells=[];
+  for(let i=firstDay-1;i>=0;i--)cells.push({day:prevDays-i,other:true});
+  for(let d=1;d<=daysIn;d++)cells.push({day:d,today:d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear()});
+  for(let d=1;cells.length<42;d++)cells.push({day:d,other:true});
   return (
-    <>
-      <div className="view-tabs" style={{marginBottom:14}}>
-        <button className={`view-tab ${filter==='todas'?'active':''}`} onClick={()=>setFilter('todas')}>📋 Todas ({fullList.length})</button>
-        <button className={`view-tab ${filter==='urgentes'?'active':''}`} onClick={()=>setFilter('urgentes')}>🔴 Urgentes ({tabStats.urgentes})</button>
-        <button className={`view-tab ${filter==='pendentes'?'active':''}`} onClick={()=>setFilter('pendentes')}>⏳ Pendentes ({tabStats.pendentes})</button>
-        <button className={`view-tab ${filter==='aguardando'?'active':''}`} onClick={()=>setFilter('aguardando')}>⏸ Aguardando ({tabStats.aguardando})</button>
+    <div className="cal">
+      <div className="cal-head">
+        <button className="cal-nav" onClick={()=>{if(month===0){setMonth(11);setYear(year-1);}else setMonth(month-1);}}>◀</button>
+        <h3 className="font-display">{MONTHS[month]} {year}</h3>
+        <button className="cal-nav" onClick={()=>{if(month===11){setMonth(0);setYear(year+1);}else setMonth(month+1);}}>▶</button>
       </div>
-      <div className="search-row" style={{marginBottom:14}}>
-        <input className="search-input" placeholder="🔍 Buscar para filtrar..." value={search} onChange={e=>setSearch(e.target.value)}/>
-        {(filter!=='todas'||search.trim())&&(
-          <button className="btn-secondary" onClick={()=>{setFilter('todas');setSearch('');}} style={{whiteSpace:'nowrap'}}>✕ Limpar</button>
-        )}
-        <button className="btn-primary" onClick={onNewTask}>+ Nova Tarefa</button>
-      </div>
-
-      {displayList.length===0?(
-        <div className="empty-state"><div className="empty-icon">↕️</div><p>{fullList.length===0?'Nenhuma tarefa ativa':'Nenhuma tarefa para este filtro'}</p></div>
-      ):(
-        <div ref={listRef} className="minha-ordem-list" style={draggingId?{touchAction:'none',userSelect:'none'}:{}}>
-          {displayList.map(task=>(
-            <DraggableTaskCard key={task.id} task={task} sectors={sectors}
-              draggingId={draggingId}
-              position={fullList.findIndex(t=>t.id===task.id)+1}
-              handlers={dragHandlers}
-              onStatusChange={onStatusChange} onPriorityChange={onPriorityChange}
-              onDelete={onDelete} onAddComment={onAddComment}
-              onDueDateChange={onDueDateChange} onEdit={onEditTask}/>
-          ))}
-        </div>
-      )}
-
-      {prioDlg&&(
-        <div className="modal-overlay" onClick={declinePrioUpdate}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:380}}>
-            <h2>Atualizar Prioridade?</h2>
-            <p style={{margin:'12px 0',fontSize:13,color:'var(--muted)'}}>
-              Você moveu <strong style={{color:'var(--text)'}}>{prioDlg.task.title}</strong> para uma nova posição.
-            </p>
-            <p style={{fontSize:13}}>
-              Deseja atualizar a prioridade de{' '}
-              <span style={{color:priorityColor(prioDlg.task.priority),fontWeight:600}}>{priorityLabel(prioDlg.task.priority)} ({prioDlg.task.priority})</span>
-              {' '}para{' '}
-              <span style={{color:priorityColor(prioDlg.suggested),fontWeight:600}}>{priorityLabel(prioDlg.suggested)} ({prioDlg.suggested})</span>?
-            </p>
-            <div className="modal-actions">
-              <button className="btn-secondary" onClick={declinePrioUpdate}>Manter prioridade</button>
-              <button className="btn-primary" onClick={confirmPrioUpdate}>Atualizar para {prioDlg.suggested}</button>
+      <div className="cal-grid">
+        {DAYS.map(d=><div key={d} className="cal-dl">{d}</div>)}
+        {cells.map((c,i)=>{
+          const dt=!c.other?(byDay[c.day]||[]):[];const has=dt.length>0;
+          return (
+            <div key={i} className={`cal-cell ${c.other?'other':''} ${c.today?'today':''} ${has?'has':''}`}
+              onMouseEnter={()=>has&&setHoverDay(`${year}-${month}-${c.day}`)} onMouseLeave={()=>setHoverDay(null)}>
+              <span>{c.day}</span>
+              {has&&<div className="cal-dots">{dt.slice(0,4).map((t,j)=><div key={j} className="cal-dot" style={{background:priorityColor(t.priority)}}/>)}</div>}
+              {hoverDay===`${year}-${month}-${c.day}`&&has&&(
+                <div className="cal-tip">{dt.map((t,j)=><div key={j}><span style={{color:priorityColor(t.priority),fontWeight:700}}>●</span> {t.title.substring(0,44)}{t.title.length>44?'…':''}</div>)}</div>
+              )}
             </div>
-          </div>
-        </div>
-      )}
-    </>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
-// ─── TASK MODAL ────────────────────────────────
+// ─── MODAL ───
 function TaskModal({task,sectors,onSave,onClose}){
   const isEdit=task&&task.id;
-  const [title,setTitle]=useState(task?.title||"");
-  const [sector,setSector]=useState(task?.sector||Object.keys(sectors)[0]);
-  const [priority,setPriority]=useState(task?.priority||5);
-  const [status,setStatus]=useState(task?.status||"pendente");
-  const [description,setDescription]=useState(task?.description||"");
-  const [dueDate,setDueDate]=useState(task?.due_date?task.due_date.substring(0,16):"");
-
-  function handleSave(){
-    if(!title.trim())return;
-    onSave({id:task?.id||null,title:title.trim(),sector,priority,status,description,due_date:dueDate||null});
-  }
-
+  const [title,setTitle]=useState((task&&task.title)||"");
+  const [sector,setSector]=useState((task&&task.sector)||Object.keys(sectors)[0]);
+  const [priority,setPriority]=useState((task&&task.priority)||5);
+  const [status,setStatus]=useState((task&&task.status)||"pendente");
+  const [description,setDescription]=useState((task&&task.description)||"");
+  const [dueDate,setDueDate]=useState(task&&task.due_date?task.due_date.substring(0,16):"");
+  const [subtasks,setSubtasks]=useState((task&&task.subtasks)||[]);
+  const [subText,setSubText]=useState("");
+  function addSub(){if(!subText.trim())return;setSubtasks([...subtasks,{id:Date.now()+'_'+Math.round(Math.random()*1e4),text:subText.trim(),done:false}]);setSubText("");}
+  function save(){if(!title.trim())return;onSave({id:(task&&task.id)||null,title:title.trim(),sector,priority,status,description,due_date:dueDate||null,subtasks});}
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
-        <h2>{isEdit?'✏️ Editar Tarefa':'➕ Nova Tarefa'}</h2>
-        <label>Título *</label>
-        <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="O que precisa ser feito?" autoFocus onKeyDown={e=>e.key==='Enter'&&handleSave()}/>
+        <h2 className="font-display">{isEdit?'✏️ Editar Tarefa':'➕ Nova Tarefa'}</h2>
+        <label>Título</label>
+        <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="O que precisa ser feito?" autoFocus/>
         <label>Setor</label>
         <select value={sector} onChange={e=>setSector(e.target.value)}>
           {Object.entries(sectors).map(([k,v])=><option key={k} value={k}>{v.icon} {v.label}</option>)}
         </select>
         <label>Prioridade (1 = mais urgente)</label>
-        <div style={{display:'flex',gap:4,marginTop:4}}>
-          {[1,2,3,4,5,6,7,8,9,10].map(p=>(
-            <button key={p}
-              style={{width:36,height:36,borderRadius:8,border:priority===p?'2px solid var(--text)':'2px solid transparent',background:priorityBg(p),color:priorityColor(p),fontWeight:700,fontSize:13,cursor:'pointer',transition:'.15s',transform:priority===p?'scale(1.15)':'scale(1)'}}
-              onClick={()=>setPriority(p)}>{p}</button>
+        <div className="pri-grid">
+          {[1,2,3,4,5,6,7,8,9,10].map(pp=>(
+            <button key={pp} style={{border:priority===pp?'2px solid var(--text)':'2px solid transparent',background:priorityBg(pp),color:priorityColor(pp),transform:priority===pp?'scale(1.1)':'none'}} onClick={()=>setPriority(pp)}>{pp}</button>
           ))}
         </div>
-        <label>Status</label>
-        <select value={status} onChange={e=>setStatus(e.target.value)}>
-          <option value="pendente">⏳ Pendente</option>
-          <option value="aguardando">⏸ Aguardando</option>
-          <option value="concluido">✅ Concluído</option>
-        </select>
+        {isEdit&&(<><label>Status</label>
+          <select value={status} onChange={e=>setStatus(e.target.value)}>
+            <option value="pendente">⏳ Pendente</option><option value="aguardando">⏸ Aguardando</option><option value="concluido">✅ Concluído</option>
+          </select></>)}
         <label>Data / Prazo (opcional)</label>
         <input type="datetime-local" value={dueDate} onChange={e=>setDueDate(e.target.value)}/>
+        <label>Subtarefas</label>
+        {subtasks.map(s=>(
+          <div key={s.id} className="sub-row">
+            <div className={`sub-check ${s.done?'on':''}`} onClick={()=>setSubtasks(subtasks.map(x=>x.id===s.id?{...x,done:!x.done}:x))}>{s.done?'✓':''}</div>
+            <span className={`sub-text ${s.done?'done':''}`}>{s.text}</span>
+            <button className="sub-del" onClick={()=>setSubtasks(subtasks.filter(x=>x.id!==s.id))}>✕</button>
+          </div>
+        ))}
+        <div className="row-input"><input value={subText} onChange={e=>setSubText(e.target.value)} placeholder="+ subtarefa…" onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addSub();}}}/><button onClick={addSub}>+</button></div>
         <label>Descrição (opcional)</label>
-        <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Detalhes adicionais..."/>
+        <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Detalhes adicionais…"/>
         <div className="modal-actions">
-          <button className="btn-secondary" onClick={onClose}>Cancelar</button>
-          <button className="btn-primary" onClick={handleSave}>{isEdit?'Salvar':'Criar Tarefa'}</button>
+          <button className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+          <button className="btn btn-primary" onClick={save}>{isEdit?'Salvar':'Criar Tarefa'}</button>
         </div>
       </div>
     </div>
