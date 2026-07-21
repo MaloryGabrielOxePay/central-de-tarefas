@@ -1,0 +1,76 @@
+{
+    "gerado":  "2026-07-21 16:31",
+    "escopo":  "Somente docs do QG (QG-DOCS). Vault Obsidian NAO incluido.",
+    "docs":  [
+                 {
+                     "arquivo":  "QG-COPILOTO-IN-APP.md",
+                     "titulo":  "QG — copiloto embutido no app (registro de decisão)",
+                     "grupo":  "QG-DOCS",
+                     "bytes":  5588,
+                     "alterado":  "2026-07-19"
+                 },
+                 {
+                     "arquivo":  "QG-I18N-PT-BR.md",
+                     "titulo":  "QG — tradução pt-BR e eliminação do nome legado",
+                     "grupo":  "QG-DOCS",
+                     "bytes":  5816,
+                     "alterado":  "2026-07-19"
+                 },
+                 {
+                     "arquivo":  "QG-MARCA-E-WHITELABEL.md",
+                     "titulo":  "QG — Marca e modelo white-label",
+                     "grupo":  "QG-DOCS",
+                     "bytes":  4134,
+                     "alterado":  "2026-07-18"
+                 },
+                 {
+                     "arquivo":  "QG-O-QUE-E.md",
+                     "titulo":  "O que é o QG (Quartel General)",
+                     "grupo":  "QG-DOCS",
+                     "bytes":  3085,
+                     "alterado":  "2026-07-18"
+                 },
+                 {
+                     "arquivo":  "QG-PRODUTO.md",
+                     "titulo":  "QG — Registro do Produto (material comercial + técnico)",
+                     "grupo":  "QG-DOCS",
+                     "bytes":  9640,
+                     "alterado":  "2026-07-18"
+                 },
+                 {
+                     "arquivo":  "QG-WHATSAPP-EVOLUTION-DIAGNOSTICO.md",
+                     "titulo":  "QG x WhatsApp (Evolution API) — por que travou e como pedir certo",
+                     "grupo":  "QG-DOCS",
+                     "bytes":  9498,
+                     "alterado":  "2026-07-19"
+                 },
+                 {
+                     "arquivo":  "README.md",
+                     "titulo":  "QG (Quartel General) — documentação central",
+                     "grupo":  "QG-DOCS",
+                     "bytes":  5126,
+                     "alterado":  "2026-07-19"
+                 },
+                 {
+                     "arquivo":  "vps-QG-Fase1-Arquitetura.md",
+                     "titulo":  "FASE 1 — Recon + Arquitetura · QG (Paperclip → Hermes → OpenJarvis)",
+                     "grupo":  "QG-DOCS/vps",
+                     "bytes":  26357,
+                     "alterado":  "2026-07-19"
+                 },
+                 {
+                     "arquivo":  "vps-QG-FRONTEND-COEXISTENCIA.md",
+                     "titulo":  "NOTA — Frontend do QG roda DO FORK (sessão de frontend/white-label)",
+                     "grupo":  "QG-DOCS/vps",
+                     "bytes":  1735,
+                     "alterado":  "2026-07-19"
+                 },
+                 {
+                     "arquivo":  "vps-QG-paperclip-runbook.md",
+                     "titulo":  "QG (Paperclip) × Hermes — Runbook de Instalação",
+                     "grupo":  "QG-DOCS/vps",
+                     "bytes":  10553,
+                     "alterado":  "2026-07-19"
+                 }
+             ]
+}

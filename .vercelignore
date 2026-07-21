@@ -5,3 +5,10 @@ backups/
 .playwright-mcp/
 .gitignore
 _redirects
+tools/
+
+# EXCECAO: docs-qg/ e conteudo publicado de proposito (view "Docs QG" do app).
+# Gerado por tools/publish-docs.ps1 a partir de projects\QG\QG-DOCS (allowlist).
+# Fica atras do gate do middleware.js. Nao mover nada do vault Obsidian pra ca.
+!docs-qg/
+!docs-qg/*.md
