@@ -341,6 +341,26 @@ body.dark{
   .docs-list{position:static}
   .docs-body{padding:18px 16px}
 }
+
+/* ─── AUTH (fase 2a: opcional, nao bloqueia o app) ─── */
+.auth-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:var(--muted)}
+.auth-btn{flex:1;border:1px solid var(--border);background:var(--surface);color:var(--text);
+  border-radius:9px;padding:8px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.auth-btn:hover{border-color:var(--accent);color:var(--accent)}
+.auth-who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
+.auth-who b{color:var(--text);font-weight:600}
+.auth-out{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:11.5px;
+  text-decoration:underline;padding:2px 4px}
+.auth-out:hover{color:var(--red,#ef4444)}
+.login-form{display:flex;flex-direction:column;gap:11px;margin-top:4px}
+.login-form label{font-size:12px;color:var(--muted);font-weight:600}
+.login-form input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;
+  background:var(--surface);color:var(--text);font-size:14px;font-family:inherit}
+.login-form input:focus{outline:none;border-color:var(--accent)}
+.login-err{color:#ef4444;font-size:12.5px;line-height:1.45;margin:0}
+.login-ok{color:#22c55e;font-size:12.5px;line-height:1.45;margin:0}
+.login-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0;padding-top:2px;border-top:1px solid var(--border)}
 </style>
 </head>
 <body class="light">
@@ -398,6 +418,8 @@ function App(){
   const [sectors,setSectors]=useState(DEFAULT_SECTORS);
   const [loading,setLoading]=useState(true);
   const [sync,setSync]=useState("loading");
+  const [session,setSession]=useState(null);
+  const [showLogin,setShowLogin]=useState(false);
   const [sbOpen,setSbOpen]=useState(false);
   const [view,setView]=useState("geral");
   const [curSector,setCurSector]=useState(null);
@@ -421,6 +443,15 @@ function App(){
     const ch=sb.channel('tasks-changes').on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks()).subscribe();
     return()=>sb.removeChannel(ch);
   },[]);
+  // sessao Supabase Auth (fase 2a). Nao bloqueia nada: so reflete o estado na sidebar.
+  useEffect(()=>{
+    let vivo=true;
+    sb.auth.getSession().then(({data})=>{if(vivo)setSession((data&&data.session)||null);}).catch(()=>{});
+    const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{if(vivo)setSession(s||null);});
+    return()=>{vivo=false;if(sub&&sub.subscription)sub.subscription.unsubscribe();};
+  },[]);
+  const sair=useCallback(async()=>{try{await sb.auth.signOut();}catch(e){console.error(e);}},[]);
+
   useEffect(()=>{document.body.className=theme;localStorage.setItem('hub_theme',theme);},[theme]);
   useEffect(()=>{if(tasks.length)localStorage.setItem('tasks_cache',JSON.stringify(tasks));},[tasks]);
 
@@ -545,6 +576,7 @@ function App(){
           </button>
         </nav>
         <div className="sidebar-foot">
+          <AuthBox session={session} onOpen={()=>setShowLogin(true)} onOut={sair}/>
           <button className="theme-toggle" onClick={()=>setTheme(t=>t==='light'?'dark':'light')}>
             {theme==='light'?'🌙 Modo Escuro':'☀️ Modo Claro'}
           </button>
@@ -596,6 +628,8 @@ function App(){
         <TaskModal task={editTask} sectors={sectors}
           onSave={d=>{saveTask(d);setShowModal(false);}} onClose={()=>setShowModal(false)}/>
       )}
+
+      {showLogin&&<LoginModal onClose={()=>setShowLogin(false)}/>}
     </div>
   );
 }
@@ -724,6 +758,85 @@ function DocsView(){
         </div>
       </div>
     </>
+  );
+}
+
+// ─── AUTH (fase 2a) ───
+// Login OPCIONAL de proposito. O app continua funcionando sem sessao, porque as
+// policies RLS de hoje ainda liberam anon. So depois que o login estiver validado
+// e o dono tiver conta criada e que a RLS deve ser fechada (fase 2b) — apertar antes
+// derruba o app na hora.
+function AuthBox({session,onOpen,onOut}){
+  if(session&&session.user){
+    return (
+      <div className="auth-row">
+        <span className="auth-who">🔓 <b>{session.user.email}</b></span>
+        <button className="auth-out" onClick={onOut}>sair</button>
+      </div>
+    );
+  }
+  return (
+    <div className="auth-row">
+      <button className="auth-btn" onClick={onOpen}>🔑 Entrar</button>
+    </div>
+  );
+}
+
+function LoginModal({onClose}){
+  const [email,setEmail]=useState('');
+  const [senha,setSenha]=useState('');
+  const [erro,setErro]=useState(null);
+  const [ok,setOk]=useState(false);
+  const [busy,setBusy]=useState(false);
+
+  async function entrar(e){
+    e.preventDefault();
+    setErro(null);setBusy(true);
+    try{
+      const{error}=await sb.auth.signInWithPassword({email:email.trim(),password:senha});
+      if(error)throw error;
+      setOk(true);setTimeout(onClose,700);
+    }catch(ex){
+      const m=String((ex&&ex.message)||ex);
+      setErro(/invalid login/i.test(m)
+        ?'Email ou senha incorretos. Se a conta ainda não foi criada, crie no painel do Supabase.'
+        :m);
+    }finally{setBusy(false);}
+  }
+
+  return (
+    <div className="overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div className="modal" style={{maxWidth:400}}>
+        <h3 className="font-display" style={{margin:'0 0 4px'}}>Entrar no HUB</h3>
+        <p style={{fontSize:12.5,color:'var(--muted)',margin:'0 0 14px'}}>
+          Login opcional por enquanto. O HUB continua funcionando sem ele.
+        </p>
+        <form className="login-form" onSubmit={entrar}>
+          <div>
+            <label htmlFor="lg-mail">Email</label>
+            <input id="lg-mail" type="email" value={email} autoComplete="username"
+              onChange={e=>setEmail(e.target.value)} required autoFocus/>
+          </div>
+          <div>
+            <label htmlFor="lg-pass">Senha</label>
+            <input id="lg-pass" type="password" value={senha} autoComplete="current-password"
+              onChange={e=>setSenha(e.target.value)} required/>
+          </div>
+          {erro&&<p className="login-err">{erro}</p>}
+          {ok&&<p className="login-ok">Conectado.</p>}
+          <div className="modal-actions">
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={busy}>
+              {busy?'Entrando…':'Entrar'}
+            </button>
+          </div>
+          <p className="login-note">
+            Conta criada pelo painel do Supabase (projeto <code>Claude</code>, login por GitHub).
+            Cadastro público fica fechado de propósito.
+          </p>
+        </form>
+      </div>
+    </div>
   );
 }
 
